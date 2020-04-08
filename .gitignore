@@ -1,0 +1,14 @@
+# do not track node_modules
+node_modules/
+
+# do not track build output
+build/
+
+# do not track generated tailwind css
+src/styles/tailwind.css
+
+# do not track miscellaneous log files
+npm-debug.log
+
+# do not track any key files
+*.pem

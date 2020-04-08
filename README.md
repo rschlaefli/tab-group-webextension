@@ -1,2 +1,1 @@
-# tab-group-webextension
-Cross-browser webextension for tab grouping
+# automated-tab-organization
