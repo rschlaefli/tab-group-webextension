@@ -110,7 +110,10 @@ function onTabActivated(activeInfo: Tabs.OnActivatedActiveInfoType): void {
   store.dispatch(activateTab({ tabId: activeInfo.tabId, previousTabId: activeInfo.previousTabId }))
 
   try {
-    nativePort.postMessage({ action: TAB_ACTION.ACTIVATE, payload: activeInfo })
+    nativePort.postMessage({
+      action: TAB_ACTION.ACTIVATE,
+      payload: { id: activeInfo.tabId, ...activeInfo }
+    })
   } catch (e) {
     console.error(e)
   }
