@@ -1,3 +1,4 @@
+import md5 from 'blueimp-md5'
 import { Browser } from 'webextension-polyfill-ts'
 
 export function hasExtensionContext(): boolean {
@@ -11,4 +12,9 @@ export async function getBrowserSafe(): Promise<Browser> {
   }
 
   return Promise.reject('MISSING_EXTENSION_CONTEXT')
+}
+
+export function computeUrlHash(url: string): string {
+  const { origin, pathname } = new URL(url)
+  return md5(origin + pathname)
 }

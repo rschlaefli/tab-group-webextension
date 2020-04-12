@@ -13,6 +13,7 @@ import configureStore from './state/configureStore'
 
 import './optionsStorage'
 import { createTab, updateTab, activateTab, removeTab } from './state/currentTabs'
+import { computeUrlHash } from './lib/utils'
 
 // setup a redux store
 const { store } = configureStore({})
@@ -72,7 +73,10 @@ async function performTabUpdate(tab: Partial<Tabs.Tab>): Promise<void> {
 
   try {
     if (tab.status !== 'loading') {
-      nativePort.postMessage({ action: TAB_ACTION.UPDATE, payload: tab })
+      nativePort.postMessage({
+        action: TAB_ACTION.UPDATE,
+        payload: { ...tab, hash: computeUrlHash(tabData.url) }
+      })
     }
   } catch (e) {
     console.error(e)
@@ -86,7 +90,10 @@ function onTabCreate(tabData: Tabs.CreateCreatePropertiesType): void {
   store.dispatch(createTab({ tabData }))
 
   try {
-    nativePort.postMessage({ action: TAB_ACTION.CREATE, payload: tabData })
+    nativePort.postMessage({
+      action: TAB_ACTION.CREATE,
+      payload: { ...tabData, hash: computeUrlHash(tabData.url) }
+    })
   } catch (e) {
     console.error(e)
   }
