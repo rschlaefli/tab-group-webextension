@@ -71,7 +71,9 @@ async function performTabUpdate(tab: Partial<Tabs.Tab>): Promise<void> {
   store.dispatch(updateTab({ tabId: tab.id, tabData: tab }))
 
   try {
-    nativePort.postMessage({ action: TAB_ACTION.UPDATE, payload: tab })
+    if (tab.status !== 'loading') {
+      nativePort.postMessage({ action: TAB_ACTION.UPDATE, payload: tab })
+    }
   } catch (e) {
     console.error(e)
     return Promise.reject(e)
