@@ -89,7 +89,7 @@
     "url-loader": "3.0.0",
     "uuid": "7.0.3",
     "webext-base-css": "1.1.0",
-    "webext-options-sync": "1.2.2",
+    "webext-options-sync": "1.2.3",
     "webext-redux": "2.1.6",
     "webext-storage-cache": "2.3.1",
     "webextension-polyfill-ts": "0.13.0",
