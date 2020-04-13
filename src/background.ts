@@ -6,7 +6,8 @@ import { browser, Tabs, Runtime } from 'webextension-polyfill-ts'
 import {
   TAB_ACTION,
   IHeuristicsAction,
-  HEURISTICS_ACTION
+  HEURISTICS_ACTION,
+  ITab
   // TAB_GROUP_ACTION
 } from './types/Extension'
 import configureStore from './state/configureStore'
@@ -68,15 +69,18 @@ browser.runtime.onMessage.addListener(async (message: any) => {
   }
 })
 
-async function performTabUpdate(tab: Partial<Tabs.Tab>): Promise<void> {
-  store.dispatch(updateTab({ tabId: tab.id, tabData: tab }))
+async function performTabUpdate(tab: Partial<ITab>): Promise<void> {
+  const tabData = { ...tab, hash: tab.url ? computeUrlHash(tab.url) : tab.hash }
+
+  store.dispatch(updateTab({ tabId: tab.id, tabData }))
 
   try {
     if (tab.status !== 'loading') {
       nativePort.postMessage({
         action: TAB_ACTION.UPDATE,
-        payload: { ...tab, hash: computeUrlHash(tab.url) }
+        payload: tabData
       })
+      return Promise.resolve()
     }
   } catch (e) {
     console.error(e)
@@ -85,14 +89,16 @@ async function performTabUpdate(tab: Partial<Tabs.Tab>): Promise<void> {
 }
 
 function onTabCreate(tabData: Tabs.CreateCreatePropertiesType): void {
-  console.log('CREATE', tabData)
+  const augmentedTabData = { ...tabData, hash: computeUrlHash(tabData.url) }
 
-  store.dispatch(createTab({ tabData }))
+  console.log('CREATE', augmentedTabData)
+
+  store.dispatch(createTab({ tabData: augmentedTabData }))
 
   try {
     nativePort.postMessage({
       action: TAB_ACTION.CREATE,
-      payload: { ...tabData, hash: computeUrlHash(tabData.url) }
+      payload: augmentedTabData
     })
   } catch (e) {
     console.error(e)
@@ -108,8 +114,6 @@ function onTabUpdate(tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType, ta
 function onTabMoved(tabId: number, moveInfo: Tabs.OnMovedMoveInfoType): void {
   console.log('MOVED', tabId, moveInfo)
 
-  // store.dispatch(createTab({ tabData }))
-
   performTabUpdate({ id: tabId, ...moveInfo })
 }
 
@@ -119,6 +123,8 @@ function onTabActivated(activeInfo: Tabs.OnActivatedActiveInfoType): void {
   store.dispatch(activateTab({ tabId: activeInfo.tabId, previousTabId: activeInfo.previousTabId }))
 
   try {
+    // TODO: lookup hashes of new and previous active tab and send to the heuristics engine?
+
     nativePort.postMessage({
       action: TAB_ACTION.ACTIVATE,
       payload: { id: activeInfo.tabId, ...activeInfo }
@@ -130,8 +136,6 @@ function onTabActivated(activeInfo: Tabs.OnActivatedActiveInfoType): void {
 
 function onTabAttached(tabId: number, attachInfo: Tabs.OnAttachedAttachInfoType): void {
   console.log('ATTACHED', tabId, attachInfo)
-
-  // store.dispatch(createTab({ tabData }))
 
   performTabUpdate({ id: tabId, ...attachInfo })
 }

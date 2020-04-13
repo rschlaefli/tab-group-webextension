@@ -28,5 +28,6 @@ export interface IHeuristicsAction {
 }
 
 export interface ITab extends Tabs.Tab {
-  uuid: string
+  hash: string
+  uuid?: string
 }
