@@ -14,7 +14,8 @@ export async function getBrowserSafe(): Promise<Browser> {
   return Promise.reject('MISSING_EXTENSION_CONTEXT')
 }
 
-export function computeUrlHash(url: string): string {
+export function computeUrlHash(url?: string): string {
+  if (typeof url === 'undefined') return ''
   const { origin, pathname } = new URL(url)
   return md5(origin + pathname)
 }

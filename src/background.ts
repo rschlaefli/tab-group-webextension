@@ -75,7 +75,7 @@ async function performTabUpdate(tab: Partial<Tabs.Tab>): Promise<void> {
     if (tab.status !== 'loading') {
       nativePort.postMessage({
         action: TAB_ACTION.UPDATE,
-        payload: { ...tab, hash: computeUrlHash(tabData.url) }
+        payload: { ...tab, hash: computeUrlHash(tab.url) }
       })
     }
   } catch (e) {
