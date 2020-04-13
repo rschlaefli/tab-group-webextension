@@ -21,7 +21,7 @@
     "@types/chrome": "0.0.100",
     "@types/jest": "25.2.1",
     "@types/node": "10.17.17",
-    "@types/ramda": "0.26.43",
+    "@types/ramda": "0.27.3",
     "@types/react": "16.9.34",
     "@types/react-beautiful-dnd": "12.1.2",
     "@types/react-dom": "16.9.6",
