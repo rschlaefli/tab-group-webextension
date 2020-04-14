@@ -70,7 +70,12 @@ browser.runtime.onMessage.addListener(async (message: any) => {
 })
 
 async function performTabUpdate(tab: Partial<ITab>): Promise<void> {
-  const tabData = { ...tab, hash: tab.url ? computeUrlHash(tab.url) : tab.hash }
+  const tabData = { ...tab }
+  if (tab.url) {
+    const { baseUrl, hash } = computeUrlHash(tab.url)
+    tabData.baseUrl = baseUrl
+    tabData.hash = hash
+  }
 
   store.dispatch(updateTab({ tabId: tab.id, tabData }))
 
@@ -89,7 +94,12 @@ async function performTabUpdate(tab: Partial<ITab>): Promise<void> {
 }
 
 function onTabCreate(tabData: Tabs.CreateCreatePropertiesType): void {
-  const augmentedTabData = { ...tabData, hash: computeUrlHash(tabData.url) }
+  const augmentedTabData: Partial<ITab> = { ...tabData }
+  if (tabData.url) {
+    const { baseUrl, hash } = computeUrlHash(tabData.url)
+    augmentedTabData.baseUrl = baseUrl
+    augmentedTabData.hash = hash
+  }
 
   console.log('CREATE', augmentedTabData)
 
