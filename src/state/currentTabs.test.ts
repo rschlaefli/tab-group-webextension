@@ -1,9 +1,11 @@
 import { Tabs } from 'webextension-polyfill-ts'
 
 import currentTabsReducer, { createTab, activateTab, updateTab, removeTab } from './currentTabs'
+import { ITab } from '@src/types/Extension'
 
-const TABS: Tabs.Tab[] = [
+const TABS: ITab[] = [
   {
+    uuid: 'abcd',
     id: 0,
     index: 0,
     windowId: 1,
@@ -25,10 +27,13 @@ const TABS: Tabs.Tab[] = [
     sharingState: { camera: false, microphone: false },
     successorTabId: 1,
     url: 'https://xyz.ch',
+    baseUrl: 'https://xyz.ch',
+    hash: '123',
     title: 'test tab 1',
     favIconUrl: 'xyz'
   },
   {
+    uuid: 'bcde',
     id: 1,
     index: 1,
     windowId: 1,
@@ -50,10 +55,13 @@ const TABS: Tabs.Tab[] = [
     sharingState: { camera: false, microphone: false },
     successorTabId: 2,
     url: 'https://abc.ch',
+    baseUrl: 'https://abc.ch',
+    hash: '234',
     title: 'test tab 2',
     favIconUrl: 'abc'
   },
   {
+    uuid: 'cdef',
     id: 2,
     index: 2,
     windowId: 1,
@@ -75,6 +83,8 @@ const TABS: Tabs.Tab[] = [
     sharingState: { camera: false, microphone: false },
     successorTabId: -1,
     url: 'https://qwertz.ch',
+    baseUrl: 'https://qwertz.ch',
+    hash: '345',
     title: 'test tab 3',
     favIconUrl: 'qwertz'
   }
@@ -85,7 +95,7 @@ describe('currentTabsReducer', () => {
     previousTabId: number
     activeTab: number
     activeWindow: number
-    tabs: Tabs.Tab[]
+    tabs: ITab[]
   }
 
   beforeAll(() => {
