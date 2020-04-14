@@ -17,24 +17,29 @@ export async function getBrowserSafe(): Promise<Browser> {
 }
 
 interface IHashResult {
+  origin: string
+  originHash: string
   baseUrl: string
-  hash: string
+  baseHash: string
 }
 export function computeUrlHash(url: string): IHashResult {
   const { origin, pathname } = new URL(url)
-  const baseUrl = origin + pathname
   return {
-    baseUrl,
-    hash: md5(origin + pathname)
+    origin,
+    originHash: md5(origin),
+    baseUrl: origin + pathname,
+    baseHash: md5(origin + pathname)
   }
 }
 
 export function augmentTabExtras(tabData: Partial<ITab>): ITab {
   const augmentedTabData: Partial<ITab> = { ...tabData }
-  if (typeof tabData.hash === 'undefined' && tabData.url) {
-    const { baseUrl, hash } = computeUrlHash(tabData.url)
+  if (typeof tabData.baseHash === 'undefined' && tabData.url) {
+    const { origin, originHash, baseUrl, baseHash } = computeUrlHash(tabData.url)
+    augmentedTabData.origin = origin
+    augmentedTabData.originHash = originHash
     augmentedTabData.baseUrl = baseUrl
-    augmentedTabData.hash = hash
+    augmentedTabData.baseHash = baseHash
   }
   if (typeof tabData.uuid === 'undefined') {
     augmentedTabData.uuid = uuidv4()
