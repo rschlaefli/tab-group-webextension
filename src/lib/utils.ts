@@ -34,6 +34,15 @@ export function computeUrlHash(url: string): IHashResult {
 
 export function augmentTabExtras(tabData: Partial<ITab>): ITab {
   const augmentedTabData: Partial<ITab> = { ...tabData }
+
+  // ensure that no query params can ever be in the title
+  if (typeof tabData.title !== 'undefined') {
+    try {
+      const { origin, pathname } = new URL(tabData.title)
+      augmentedTabData.title = origin + pathname
+    } catch {}
+  }
+
   if (typeof tabData.baseHash === 'undefined' && tabData.url) {
     const { origin, originHash, baseUrl, baseHash } = computeUrlHash(tabData.url)
     augmentedTabData.origin = origin
@@ -41,9 +50,11 @@ export function augmentTabExtras(tabData: Partial<ITab>): ITab {
     augmentedTabData.baseUrl = baseUrl
     augmentedTabData.baseHash = baseHash
   }
+
   if (typeof tabData.uuid === 'undefined') {
     augmentedTabData.uuid = uuidv4()
   }
+
   return augmentedTabData as ITab
 }
 

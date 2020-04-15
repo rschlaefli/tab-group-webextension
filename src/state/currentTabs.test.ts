@@ -26,9 +26,10 @@ const TABS: ITab[] = [
     isInReaderMode: false,
     sharingState: { camera: false, microphone: false },
     successorTabId: 1,
-    url: 'https://xyz.ch',
-    baseUrl: 'https://xyz.ch',
-    hash: '123',
+    origin: '',
+    originHash: '',
+    baseUrl: 'https://qwertz.ch',
+    baseHash: '345',
     title: 'test tab 1',
     favIconUrl: 'xyz'
   },
@@ -55,8 +56,10 @@ const TABS: ITab[] = [
     sharingState: { camera: false, microphone: false },
     successorTabId: 2,
     url: 'https://abc.ch',
-    baseUrl: 'https://abc.ch',
-    hash: '234',
+    origin: '',
+    originHash: '',
+    baseUrl: 'https://qwertz.ch',
+    baseHash: '345',
     title: 'test tab 2',
     favIconUrl: 'abc'
   },
@@ -83,8 +86,10 @@ const TABS: ITab[] = [
     sharingState: { camera: false, microphone: false },
     successorTabId: -1,
     url: 'https://qwertz.ch',
+    origin: '',
+    originHash: '',
     baseUrl: 'https://qwertz.ch',
-    hash: '345',
+    baseHash: '345',
     title: 'test tab 3',
     favIconUrl: 'qwertz'
   }
