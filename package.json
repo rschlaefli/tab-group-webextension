@@ -82,7 +82,7 @@
     "redux-persist": "6.0.0",
     "style-loader": "1.1.4",
     "tailwindcss": "1.3.5",
-    "terser-webpack-plugin": "2.3.5",
+    "terser-webpack-plugin": "2.3.6",
     "ts-jest": "25.4.0",
     "ts-loader": "6.2.2",
     "typescript": "3.8.3",
