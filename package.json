@@ -93,7 +93,7 @@
     "webext-redux": "2.1.6",
     "webext-storage-cache": "2.3.1",
     "webextension-polyfill-ts": "0.13.0",
-    "webpack": "4.42.1",
+    "webpack": "4.43.0",
     "webpack-cli": "3.3.11",
     "webpack-dev-server": "3.10.3",
     "webpack-webextension-plugin": "0.2.0",
