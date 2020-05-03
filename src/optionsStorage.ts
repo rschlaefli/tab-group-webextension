@@ -3,7 +3,8 @@ import OptionsSync from 'webext-options-sync'
 export default new OptionsSync({
   // specify default settings
   defaults: {
-    number: 3,
+    enableHeuristics: false,
+    openSidebarByDefault: false,
   },
 
   // List of functions that are called when the extension is updated
