@@ -29,16 +29,11 @@ function UI(): React.ReactElement {
   const currentTabs = useSelector((state: any) => state.currentTabs)
   const tabGroups = useSelector((state: any) => state.tabGroups)
 
-  const [number, setNumber] = useState(-1)
-
   useEffect(() => {
     const init = async (): Promise<void> => {
-      // initialize current tabs
-      // await dispatch(initializeCurrentTabs())
-
       // initialize options data
       const result = await optionsStorage.getAll()
-      if (result.number) setNumber(result.number)
+      console.log(result)
     }
     init()
   }, [dispatch])
@@ -121,8 +116,6 @@ function UI(): React.ReactElement {
             />
           ))}
         </div>
-
-        <div>hello from synced settings: {number}</div>
 
         <div className="flex flex-row">
           <Button onClick={handleAddTabGroup}>New Group</Button>
