@@ -16,6 +16,14 @@ export async function getBrowserSafe(): Promise<Browser> {
   return Promise.reject('MISSING_EXTENSION_CONTEXT')
 }
 
+export function performBrowserActionSafe(func: (browser: Browser) => void): Function {
+  return async (): Promise<void> => {
+    try {
+      func(await getBrowserSafe())
+    } catch (e) {}
+  }
+}
+
 interface IHashResult {
   origin: string
   originHash: string
@@ -62,6 +70,7 @@ export async function postNativeMessage(
   nativePort: Runtime.Port,
   message: { action: TAB_ACTION; payload: any }
 ): Promise<void> {
+  if (!nativePort) return Promise.resolve()
   try {
     nativePort.postMessage(message)
     return Promise.resolve()

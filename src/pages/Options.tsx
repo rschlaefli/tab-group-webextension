@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { FormGroup, Checkbox, FormControlLabel, FormControl, FormLabel } from '@material-ui/core'
 
+import { performBrowserActionSafe } from '../lib/utils'
 import optionsStorage from '../optionsStorage'
 
 function Options(): React.ReactElement {
@@ -16,10 +17,11 @@ function Options(): React.ReactElement {
     getAll()
   }, [])
 
-  const handleToggleCheckbox = (name: string, setter: Function) => (
+  const handleToggleCheckbox = (name: string, setter: Function, extra?: Function) => async (
     e: React.ChangeEvent<HTMLInputElement>
-  ): void => {
-    optionsStorage.set({ [name]: e.target.checked })
+  ): Promise<void> => {
+    await optionsStorage.set({ [name]: e.target.checked })
+    if (extra) extra()
     setter(e.target.checked)
   }
 
@@ -46,7 +48,11 @@ function Options(): React.ReactElement {
             control={
               <Checkbox
                 checked={enableHeuristics}
-                onChange={handleToggleCheckbox('enableHeuristics', setEnableHeuristics)}
+                onChange={handleToggleCheckbox(
+                  'enableHeuristics',
+                  setEnableHeuristics,
+                  performBrowserActionSafe((browser) => browser.runtime.reload())
+                )}
               />
             }
             label="Enable grouping heuristics"

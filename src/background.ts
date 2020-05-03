@@ -11,8 +11,7 @@ import {
   // TAB_GROUP_ACTION
 } from './types/Extension'
 import configureStore from './state/configureStore'
-
-import './optionsStorage'
+import optionsStorage from './optionsStorage'
 import {
   createTab,
   updateTab,
@@ -32,8 +31,47 @@ wrapStore(store, { portName: 'tabGrouping' })
 store.dispatch(initializeCurrentTabs() as any)
 
 // connect to the native port
-const nativePort: Runtime.Port = browser.runtime.connectNative('tabs')
-console.log('> Opened native port: ', nativePort)
+let nativePort: Runtime.Port
+optionsStorage.getAll().then((options) => {
+  if (options.enableHeuristics) {
+    nativePort = browser.runtime.connectNative('tabs')
+    console.log('> Opened native port: ', nativePort)
+
+    // setup a listener for native communcation
+    if (nativePort) {
+      nativePort.onMessage.addListener(async (messageFromHeuristics: IHeuristicsAction) => {
+        console.log(`> Received message over native port:`, messageFromHeuristics)
+
+        try {
+          switch (messageFromHeuristics.action) {
+            case HEURISTICS_ACTION.NEW_TAB:
+              await browser.tabs.create({ url: messageFromHeuristics.payload.url })
+
+            case HEURISTICS_ACTION.NOTIFY:
+              await browser.notifications.create('heuristics-notify', {
+                title: 'New Event',
+                type: 'basic',
+                message: messageFromHeuristics.payload.message,
+                iconUrl:
+                  'data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7',
+              })
+
+            case HEURISTICS_ACTION.QUERY_TABS:
+              const currentTabs = store.getState().currentTabs?.tabs as ITab[]
+              console.log(`> Initializing current tabs in heuristics: ${currentTabs}`)
+              postNativeMessage(nativePort, {
+                action: TAB_ACTION.INIT_TABS,
+                payload: { currentTabs },
+              })
+          }
+        } catch (e) {
+          console.error(e)
+        }
+      })
+      console.log('> Prepared a listener for native communication events')
+    }
+  }
+})
 
 async function performTabUpdate(tab: Partial<ITab>): Promise<void> {
   const augmentedTabData = augmentTabExtras(tab)
@@ -97,34 +135,6 @@ function onTabRemoved(tabId: number, removeInfo: Tabs.OnRemovedRemoveInfoType): 
     payload: { id: tabId, ...removeInfo },
   })
 }
-
-// setup a listener for native communcation
-nativePort.onMessage.addListener(async (messageFromHeuristics: IHeuristicsAction) => {
-  console.log(`> Received message over native port:`, messageFromHeuristics)
-
-  try {
-    switch (messageFromHeuristics.action) {
-      case HEURISTICS_ACTION.NEW_TAB:
-        await browser.tabs.create({ url: messageFromHeuristics.payload.url })
-
-      case HEURISTICS_ACTION.NOTIFY:
-        await browser.notifications.create('heuristics-notify', {
-          title: 'New Event',
-          type: 'basic',
-          message: messageFromHeuristics.payload.message,
-          iconUrl:
-            'data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7',
-        })
-
-      case HEURISTICS_ACTION.QUERY_TABS:
-        const currentTabs = store.getState().currentTabs?.tabs as ITab[]
-        console.log(`> Initializing current tabs in heuristics: ${currentTabs}`)
-        postNativeMessage(nativePort, { action: TAB_ACTION.INIT_TABS, payload: { currentTabs } })
-    }
-  } catch (e) {
-    console.error(e)
-  }
-})
 
 // setup a listener for communication from the popup
 browser.runtime.onMessage.addListener(async (message: any) => {
