@@ -35,7 +35,7 @@ function UI(): React.ReactElement {
   useEffect(() => {
     const init = async (): Promise<void> => {
       // initialize current tabs
-      await dispatch(initializeCurrentTabs())
+      // await dispatch(initializeCurrentTabs())
 
       // initialize options data
       const result = await optionsStorage.getAll()

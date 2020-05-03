@@ -7,12 +7,13 @@ export enum TAB_ACTION {
   'ACTIVATE' = 'ACTIVATE',
   'ATTACH' = 'ATTACH',
   'REMOVE' = 'REMOVE',
-  'QUERY_TABS' = 'QUERY_TABS'
+  'INIT_TABS' = 'INIT_TABS'
 }
 
 export enum HEURISTICS_ACTION {
   'NEW_TAB' = 'NEW_TAB',
-  'NOTIFY' = 'NOTIFY'
+  'NOTIFY' = 'NOTIFY',
+  'QUERY_TABS' = 'QUERY_TABS'
 }
 
 export interface ITabGroup {
@@ -28,5 +29,9 @@ export interface IHeuristicsAction {
 }
 
 export interface ITab extends Tabs.Tab {
+  origin: string
+  originHash: string
+  baseUrl: string
+  baseHash: string
   uuid: string
 }
