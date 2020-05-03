@@ -61,7 +61,6 @@ function Tab({
             ) : (
               title
             )}
-            {windowId && ` (${windowId})`}
           </div>
 
           {onRemoveTab && !isReadOnly && (
