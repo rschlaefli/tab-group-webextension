@@ -6,7 +6,7 @@ import tabGroupsReducer, {
   removeGroup,
   moveTab,
   reorderTab,
-  removeTab
+  removeTab,
 } from './tabGroups'
 
 function expectIdsInGroups(expectedState: number[][], result: ITabGroup[]): void {
@@ -47,7 +47,7 @@ const TABS: ITab[] = [
     baseUrl: 'https://qwertz.ch',
     baseHash: '345',
     title: 'test tab 1',
-    favIconUrl: 'xyz'
+    favIconUrl: 'xyz',
   },
   {
     uuid: 'bcde',
@@ -77,7 +77,7 @@ const TABS: ITab[] = [
     baseUrl: 'https://qwertz.ch',
     baseHash: '345',
     title: 'test tab 2',
-    favIconUrl: 'abc'
+    favIconUrl: 'abc',
   },
   {
     uuid: 'cdef',
@@ -107,8 +107,8 @@ const TABS: ITab[] = [
     baseUrl: 'https://qwertz.ch',
     baseHash: '345',
     title: 'test tab 3',
-    favIconUrl: 'qwertz'
-  }
+    favIconUrl: 'qwertz',
+  },
 ]
 
 describe('tabGroupsReducer', () => {
@@ -120,8 +120,8 @@ describe('tabGroupsReducer', () => {
       {
         id: 'current',
         name: 'Current Tabs',
-        tabs: TABS
-      }
+        tabs: TABS,
+      },
     ]
   })
 
@@ -162,7 +162,7 @@ describe('tabGroupsReducer', () => {
       sourceGroupId: 'current',
       targetGroupId: newGroupId,
       sourceTabIndex: 0,
-      targetTabIndex: 0
+      targetTabIndex: 0,
     })
 
     currentState = tabGroupsReducer(currentState, action)
@@ -176,7 +176,7 @@ describe('tabGroupsReducer', () => {
       sourceGroupId: 'current',
       targetGroupId: newGroupId,
       sourceTabIndex: 1,
-      targetTabIndex: 0
+      targetTabIndex: 0,
     })
 
     currentState = tabGroupsReducer(currentState, action)
@@ -185,7 +185,7 @@ describe('tabGroupsReducer', () => {
     expectIdsInGroups(
       [
         [0, 1, 2],
-        [1, 0]
+        [1, 0],
       ],
       currentState
     )
@@ -195,7 +195,7 @@ describe('tabGroupsReducer', () => {
     const action = reorderTab({
       sourceGroupId: newGroupId,
       sourceTabIndex: 1,
-      targetTabIndex: 0
+      targetTabIndex: 0,
     })
 
     currentState = tabGroupsReducer(currentState, action)
@@ -204,7 +204,7 @@ describe('tabGroupsReducer', () => {
     expectIdsInGroups(
       [
         [0, 1, 2],
-        [0, 1]
+        [0, 1],
       ],
       currentState
     )
@@ -213,7 +213,7 @@ describe('tabGroupsReducer', () => {
   it('removes a tab from the new group', () => {
     const action = removeTab({
       sourceGroupId: newGroupId,
-      sourceTabIndex: 0
+      sourceTabIndex: 0,
     })
 
     currentState = tabGroupsReducer(currentState, action)
@@ -224,7 +224,7 @@ describe('tabGroupsReducer', () => {
 
   it('removes the new tab group', () => {
     const action = removeGroup({
-      sourceGroupId: newGroupId
+      sourceGroupId: newGroupId,
     })
 
     currentState = tabGroupsReducer(currentState, action)
@@ -237,7 +237,7 @@ describe('tabGroupsReducer', () => {
     const action = updateGroup({
       sourceGroupId: 'current',
       name: 'Replaced Current Tabs',
-      tabs: TABS.slice(0, 2)
+      tabs: TABS.slice(0, 2),
     })
 
     currentState = tabGroupsReducer(currentState, action)

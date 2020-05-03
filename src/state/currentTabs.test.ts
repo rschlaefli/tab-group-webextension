@@ -1,5 +1,3 @@
-import { Tabs } from 'webextension-polyfill-ts'
-
 import currentTabsReducer, { createTab, activateTab, updateTab, removeTab } from './currentTabs'
 import { ITab } from '@src/types/Extension'
 
@@ -31,7 +29,7 @@ const TABS: ITab[] = [
     baseUrl: 'https://qwertz.ch',
     baseHash: '345',
     title: 'test tab 1',
-    favIconUrl: 'xyz'
+    favIconUrl: 'xyz',
   },
   {
     uuid: 'bcde',
@@ -61,7 +59,7 @@ const TABS: ITab[] = [
     baseUrl: 'https://qwertz.ch',
     baseHash: '345',
     title: 'test tab 2',
-    favIconUrl: 'abc'
+    favIconUrl: 'abc',
   },
   {
     uuid: 'cdef',
@@ -91,8 +89,8 @@ const TABS: ITab[] = [
     baseUrl: 'https://qwertz.ch',
     baseHash: '345',
     title: 'test tab 3',
-    favIconUrl: 'qwertz'
-  }
+    favIconUrl: 'qwertz',
+  },
 ]
 
 describe('currentTabsReducer', () => {
@@ -108,7 +106,7 @@ describe('currentTabsReducer', () => {
       previousTabId: -1,
       activeTab: -1,
       activeWindow: 0,
-      tabs: [TABS[0]]
+      tabs: [TABS[0]],
     }
   })
 

@@ -10,7 +10,7 @@ const currentTabsSlice = createSlice({
     previousTabId: -1,
     activeTab: -1,
     activeWindow: 0,
-    tabs: [] as ITab[]
+    tabs: [] as ITab[],
   },
   reducers: {
     updateTabs(state, action): void {
@@ -24,7 +24,7 @@ const currentTabsSlice = createSlice({
       state.previousTabId = action.payload.previousTabId
     },
     updateTab(state, action): void {
-      const tabIndex = findIndex(tab => tab.id === action.payload.tabId, state.tabs)
+      const tabIndex = findIndex((tab) => tab.id === action.payload.tabId, state.tabs)
 
       if (tabIndex > -1) {
         state.tabs[tabIndex] = mergeRight(state.tabs[tabIndex], action.payload.tabData)
@@ -33,19 +33,19 @@ const currentTabsSlice = createSlice({
       }
     },
     removeTab(state, action): void {
-      const tabIndex = findIndex(tab => tab.id === action.payload.tabId, state.tabs)
+      const tabIndex = findIndex((tab) => tab.id === action.payload.tabId, state.tabs)
 
       if (tabIndex > -1) {
         state.tabs = remove(tabIndex, 1, state.tabs)
       }
-    }
+    },
     // moveTab(state, action) {
     //   return state
     // },
     // attachTab(state, action) {
     //   return state
     // },
-  }
+  },
 })
 
 const { actions, reducer } = currentTabsSlice

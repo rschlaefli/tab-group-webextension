@@ -7,7 +7,7 @@ import {
   TAB_ACTION,
   IHeuristicsAction,
   HEURISTICS_ACTION,
-  ITab
+  ITab,
   // TAB_GROUP_ACTION
 } from './types/Extension'
 import configureStore from './state/configureStore'
@@ -18,7 +18,7 @@ import {
   updateTab,
   activateTab,
   removeTab,
-  initializeCurrentTabs
+  initializeCurrentTabs,
 } from './state/currentTabs'
 import { postNativeMessage, augmentTabExtras } from './lib/utils'
 
@@ -43,7 +43,7 @@ async function performTabUpdate(tab: Partial<ITab>): Promise<void> {
   if (tab.status !== 'loading') {
     postNativeMessage(nativePort, {
       action: TAB_ACTION.UPDATE,
-      payload: augmentedTabData
+      payload: augmentedTabData,
     })
   }
 }
@@ -77,7 +77,7 @@ function onTabActivated(activeInfo: Tabs.OnActivatedActiveInfoType): void {
 
   postNativeMessage(nativePort, {
     action: TAB_ACTION.ACTIVATE,
-    payload: { id: activeInfo.tabId, ...activeInfo }
+    payload: { id: activeInfo.tabId, ...activeInfo },
   })
 }
 
@@ -94,7 +94,7 @@ function onTabRemoved(tabId: number, removeInfo: Tabs.OnRemovedRemoveInfoType): 
 
   postNativeMessage(nativePort, {
     action: TAB_ACTION.REMOVE,
-    payload: { id: tabId, ...removeInfo }
+    payload: { id: tabId, ...removeInfo },
   })
 }
 
@@ -113,7 +113,7 @@ nativePort.onMessage.addListener(async (messageFromHeuristics: IHeuristicsAction
           type: 'basic',
           message: messageFromHeuristics.payload.message,
           iconUrl:
-            'data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7'
+            'data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7',
         })
 
       case HEURISTICS_ACTION.QUERY_TABS:
@@ -134,14 +134,14 @@ browser.runtime.onMessage.addListener(async (message: any) => {
     const currentTab = (
       await browser.tabs.query({
         active: true,
-        currentWindow: true
+        currentWindow: true,
       })
     )[0]
 
     await browser.tabs.executeScript(currentTab.id, {
       file: '/sidebar.bundle.js',
       runAt: 'document_start',
-      matchAboutBlank: true
+      matchAboutBlank: true,
     })
   }
 })

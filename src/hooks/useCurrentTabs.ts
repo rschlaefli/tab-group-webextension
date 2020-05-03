@@ -23,7 +23,7 @@ function useCurrentTabs(): void {
           sourceGroupId: 'current',
           name: 'Current Tabs',
           tabs: visibleTabs,
-          readOnly: true
+          readOnly: true,
         })
       )
     }

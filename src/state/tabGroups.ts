@@ -11,7 +11,7 @@ import {
   path,
   update,
   find,
-  nth
+  nth,
 } from 'ramda'
 import { v4 as uuidv4 } from 'uuid'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
@@ -25,18 +25,21 @@ function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): 
 
 function removeTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): Function {
   return (state: ITabGroup[]): ITabGroup[] =>
-    pipe(pathOr([], [sourceGroupIndex, 'tabs']), remove(sourceTabIndex, 1), sourceTabsWithoutTab =>
-      adjust(
-        sourceGroupIndex,
-        (tabGroup: ITabGroup) => assoc('tabs', sourceTabsWithoutTab, tabGroup),
-        state
-      )
+    pipe(
+      pathOr([], [sourceGroupIndex, 'tabs']),
+      remove(sourceTabIndex, 1),
+      (sourceTabsWithoutTab) =>
+        adjust(
+          sourceGroupIndex,
+          (tabGroup: ITabGroup) => assoc('tabs', sourceTabsWithoutTab, tabGroup),
+          state
+        )
     )(state)
 }
 
 function injectTab(state: ITabGroup[], action: any, tabData: ITab) {
   // compute the index of the target group
-  const targetGroupIndex = findIndex(el => el.id === action.payload.targetGroupId, state)
+  const targetGroupIndex = findIndex((el) => el.id === action.payload.targetGroupId, state)
   if (targetGroupIndex === -1) {
     return state
   }
@@ -44,7 +47,7 @@ function injectTab(state: ITabGroup[], action: any, tabData: ITab) {
   return pipe(
     pathOr([], [targetGroupIndex, 'tabs']),
     insert(action.payload.targetTabIndex as number, tabData),
-    targetTabsWithTab =>
+    (targetTabsWithTab) =>
       adjust(
         targetGroupIndex,
         (tabGroup: ITabGroup) => assoc('tabs', targetTabsWithTab, tabGroup),
@@ -58,7 +61,7 @@ const tabGroupsSlice = createSlice({
   initialState: [] as ITabGroup[],
   reducers: {
     updateGroup(state, action): ITabGroup[] {
-      const sourceGroupIndex = findIndex(el => el.id === action.payload.sourceGroupId, state)
+      const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
       const existingTabGroup = sourceGroupIndex > -1 ? nth(sourceGroupIndex, state) : null
 
       // if trying to update a group that does not exist, append it
@@ -69,7 +72,7 @@ const tabGroupsSlice = createSlice({
           action?.payload?.tabs?.map((tab: ITab) => ({ ...tab, uuid: uuidv4() })) ??
           existingTabGroup?.tabs ??
           [],
-        readOnly: action?.payload?.readOnly ?? existingTabGroup?.readOnly ?? false
+        readOnly: action?.payload?.readOnly ?? existingTabGroup?.readOnly ?? false,
       }
 
       if (sourceGroupIndex === -1) {
@@ -80,7 +83,7 @@ const tabGroupsSlice = createSlice({
       return update(sourceGroupIndex, tabGroup, state)
     },
     removeGroup(state, action): ITabGroup[] {
-      const sourceGroupIndex = findIndex(el => el.id === action.payload.sourceGroupId, state)
+      const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
       if (sourceGroupIndex === -1) {
         console.error('EARLY_RETURN')
         return state
@@ -95,14 +98,14 @@ const tabGroupsSlice = createSlice({
       return remove(sourceGroupIndex, 1, state)
     },
     moveTab(state, action): ITabGroup[] {
-      const sourceGroupIndex = findIndex(el => el.id === action.payload.sourceGroupId, state)
+      const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
       if (sourceGroupIndex === -1) {
         console.error('EARLY_RETURN')
         return state
       }
 
       // compute the index of the target group
-      const targetGroupIndex = findIndex(el => el.id === action.payload.targetGroupId, state)
+      const targetGroupIndex = findIndex((el) => el.id === action.payload.targetGroupId, state)
       if (sourceGroupIndex === -1 || targetGroupIndex === -1) {
         return state
       }
@@ -130,7 +133,7 @@ const tabGroupsSlice = createSlice({
       return injectTab(state, action, { ...action.payload.currentTab, uuid: uuidv4() })
     },
     reorderTab(state, action): ITabGroup[] {
-      const sourceGroupIndex = findIndex(el => el.id === action.payload.sourceGroupId, state)
+      const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
       if (sourceGroupIndex === -1) {
         console.error('EARLY_RETURN')
         return state
@@ -143,7 +146,7 @@ const tabGroupsSlice = createSlice({
           move(action.payload.sourceTabIndex as number, action.payload.targetTabIndex as number)
         ),
         // inject the reordered tabs into the source group
-        reorderedTabs =>
+        (reorderedTabs) =>
           adjust(
             sourceGroupIndex,
             (tabGroup: ITabGroup) => assoc('tabs', reorderedTabs, tabGroup),
@@ -152,14 +155,14 @@ const tabGroupsSlice = createSlice({
       )(state)
     },
     removeTab(state, action): ITabGroup[] {
-      const sourceGroupIndex = findIndex(el => el.id === action.payload.sourceGroupId, state)
+      const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
       if (sourceGroupIndex === -1) {
         console.error('EARLY_RETURN')
         return state
       }
       return removeTabFromGroup(sourceGroupIndex, action.payload.sourceTabIndex as number)(state)
-    }
-  }
+    },
+  },
 })
 
 const { actions, reducer } = tabGroupsSlice
@@ -175,7 +178,7 @@ export const openTabGroup = createAsyncThunk(
 
     const tabGroup = find((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
     if (tabGroup) {
-      await Promise.all(tabGroup.tabs.map(tab => browser.tabs.create({ url: tab.url })))
+      await Promise.all(tabGroup.tabs.map((tab) => browser.tabs.create({ url: tab.url })))
     }
   }
 )

@@ -34,10 +34,10 @@ const PATHS = {
   sidebar: path.join(__dirname, 'src/sidebar.ts'),
   src: path.join(__dirname, 'src'),
   ui: path.join(__dirname, 'src/ui.tsx'),
-  uiTemplate: path.join(__dirname, 'public/ui.html')
+  uiTemplate: path.join(__dirname, 'public/ui.html'),
 }
 
-module.exports = function(webpackEnv) {
+module.exports = function (webpackEnv) {
   const isEnvDevelopment = webpackEnv === 'development'
   const isEnvProduction = webpackEnv === 'production'
 
@@ -48,7 +48,7 @@ module.exports = function(webpackEnv) {
     devServer: {
       contentBase: PATHS.output,
       compress: true,
-      port: 9000
+      port: 9000,
     },
     entry: {
       // create a build for the background page
@@ -58,11 +58,11 @@ module.exports = function(webpackEnv) {
       // content script for sidebar injection
       sidebar: PATHS.sidebar,
       // create a build for the extension ui (popup/newtab)
-      ui: PATHS.ui
+      ui: PATHS.ui,
     },
     output: {
       path: PATHS.output,
-      filename: '[name].bundle.js'
+      filename: '[name].bundle.js',
     },
     module: {
       rules: [
@@ -73,8 +73,8 @@ module.exports = function(webpackEnv) {
               loader: require.resolve('url-loader'),
               options: {
                 limit: '10000',
-                name: 'media/[name].[hash:8].[ext]'
-              }
+                name: 'media/[name].[hash:8].[ext]',
+              },
             },
             {
               exclude: /node_modules/,
@@ -85,25 +85,25 @@ module.exports = function(webpackEnv) {
                   options: {
                     cacheDirectory: true,
                     cacheCompression: false,
-                    compact: isEnvProduction
-                  }
+                    compact: isEnvProduction,
+                  },
                 },
                 {
-                  loader: require.resolve('ts-loader')
-                }
-              ]
+                  loader: require.resolve('ts-loader'),
+                },
+              ],
             },
             {
               // exclude: /node_modules/,
               test: /\.css$/,
               use: [
                 {
-                  loader: require.resolve('style-loader')
+                  loader: require.resolve('style-loader'),
                 },
                 {
                   loader: require.resolve('css-loader'),
-                  options: { importLoaders: 1, sourceMap: isEnvProduction }
-                }
+                  options: { importLoaders: 1, sourceMap: isEnvProduction },
+                },
                 // MiniCssExtractPlugin.loader
                 // {
                 //   loader: 'postcss-loader',
@@ -112,25 +112,25 @@ module.exports = function(webpackEnv) {
                 //     sourceMap: isEnvProduction
                 //   }
                 // }
-              ]
+              ],
             },
             {
               // process all files that are not covered by previous loaders
               loader: require.resolve('file-loader'),
               exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
               options: {
-                name: 'media/[name].[hash:8].[ext]'
-              }
-            }
-          ]
-        }
-      ]
+                name: 'media/[name].[hash:8].[ext]',
+              },
+            },
+          ],
+        },
+      ],
     },
     resolve: {
       extensions: ['.mjs', '.js', '.ts', '.tsx', '.json'],
       alias: {
-        '@src': PATHS.src
-      }
+        '@src': PATHS.src,
+      },
     },
     optimization: {
       minimize: isEnvProduction,
@@ -141,11 +141,11 @@ module.exports = function(webpackEnv) {
             compress: isEnvProduction,
             output: {
               beautify: !isEnvProduction,
-              indent_level: 2
-            }
-          }
-        })
-      ]
+              indent_level: 2,
+            },
+          },
+        }),
+      ],
     },
     plugins: [
       // automatically reload if a missing module is newly installed
@@ -156,26 +156,26 @@ module.exports = function(webpackEnv) {
       // new webpack.DefinePlugin(env.stringified),
       new CleanWebpackPlugin({
         // prevent clean plugin from deleting manifest and html pages
-        cleanStaleWebpackAssets: false
+        cleanStaleWebpackAssets: false,
       }),
       new CopyWebpackPlugin([
         // copy the extension manifest
         {
           from: PATHS.manifest,
           // inject dynamic content into the manifest
-          transform: function(content, path) {
+          transform: function (content, path) {
             return Buffer.from(
               JSON.stringify({
                 description: process.env.npm_package_description,
                 version: process.env.npm_package_version,
-                ...JSON.parse(content.toString())
+                ...JSON.parse(content.toString()),
               })
             )
-          }
-        }
+          },
+        },
       ]),
       new WebextensionPlugin({
-        vendor: 'chrome'
+        vendor: 'chrome',
       }),
       // new MiniCssExtractPlugin({
       //   filename: 'style.css'
@@ -184,16 +184,16 @@ module.exports = function(webpackEnv) {
       new HtmlWebpackPlugin({
         template: PATHS.uiTemplate,
         filename: 'ui.html',
-        chunks: ['ui']
+        chunks: ['ui'],
       }),
       // dynamically generate the extension options page
       new HtmlWebpackPlugin({
         template: PATHS.optionsTemplate,
         filename: 'options.html',
-        chunks: ['options']
+        chunks: ['options'],
       }),
       // ensure that webpack always writes files (for dev-server)
-      new WriteFilePlugin()
-    ].filter(Boolean)
+      new WriteFilePlugin(),
+    ].filter(Boolean),
   }
 }

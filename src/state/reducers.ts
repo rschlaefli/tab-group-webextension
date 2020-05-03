@@ -9,6 +9,6 @@ export default persistReducer(
   { key: 'root', storage, blacklist: ['currentTabs'] },
   combineReducers({
     currentTabs,
-    tabGroups
+    tabGroups,
   })
 )

@@ -28,7 +28,7 @@ export function computeUrlHash(url: string): IHashResult {
     origin,
     originHash: md5(origin),
     baseUrl: origin + pathname,
-    baseHash: md5(origin + pathname)
+    baseHash: md5(origin + pathname),
   }
 }
 

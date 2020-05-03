@@ -3,7 +3,7 @@ const purgecss = require('@fullhuman/postcss-purgecss')({
   content: ['./src/**/*.tsx'],
 
   // Include any special characters you're using in this regular expression
-  defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || []
+  defaultExtractor: (content) => content.match(/[\w-/:]+(?<!:)/g) || [],
 })
 
 module.exports = {
@@ -13,10 +13,10 @@ module.exports = {
     require('tailwindcss'),
     require('postcss-preset-env')({
       autoprefixer: {
-        flexbox: 'no-2009'
+        flexbox: 'no-2009',
       },
-      stage: 3
+      stage: 3,
     }),
-    ...(process.env.NODE_ENV === 'production' ? [purgecss] : [])
-  ]
+    ...(process.env.NODE_ENV === 'production' ? [purgecss] : []),
+  ],
 }

@@ -4,10 +4,10 @@ import {
   DraggableProvided,
   DraggableStateSnapshot,
   DraggingStyle,
-  NotDraggingStyle
+  NotDraggingStyle,
 } from 'react-beautiful-dnd'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash, faGripLines } from '@fortawesome/free-solid-svg-icons'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
 const getItemStyle = (
   isDragging: boolean,
@@ -15,7 +15,7 @@ const getItemStyle = (
 ): {} => ({
   userSelect: 'none',
   border: isDragging && '1px solid lightgrey',
-  ...draggableStyle
+  ...draggableStyle,
 })
 
 interface IProps {
@@ -37,7 +37,7 @@ function Tab({
   isReadOnly,
   windowId,
   faviconUrl,
-  onRemoveTab
+  onRemoveTab,
 }: IProps): React.ReactElement {
   return (
     <Draggable key={uuid} draggableId={`draggable-${uuid}`} index={index}>
@@ -52,12 +52,6 @@ function Tab({
           <div className="w-4 ml-1 mr-2">
             <img src={faviconUrl} />
           </div>
-
-          {/* {!isReadOnly && (
-            <div className="pr-2">
-              <FontAwesomeIcon icon={faGripLines} />
-            </div>
-          )} */}
 
           <div className="flex-1">
             {!isReadOnly && url ? (

@@ -14,15 +14,14 @@ import {
   removeGroup,
   updateGroup,
   openTabGroup,
-  moveCurrentTab
+  moveCurrentTab,
 } from '@src/state/tabGroups'
-import { initializeCurrentTabs } from '@src/state/currentTabs'
 
 const extractDragEventProperties = (dragEvent: DropResult): any => ({
   sourceGroupId: dragEvent.source.droppableId,
   targetGroupId: dragEvent?.destination?.droppableId,
   sourceTabIndex: dragEvent.source.index,
-  targetTabIndex: dragEvent?.destination?.index
+  targetTabIndex: dragEvent?.destination?.index,
 })
 
 function UI(): React.ReactElement {

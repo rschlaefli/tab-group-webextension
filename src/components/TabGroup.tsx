@@ -18,7 +18,7 @@ interface IProps {
 }
 
 const getListStyle = (isDraggingOver: boolean): {} => ({
-  backgroundColor: isDraggingOver && '#CFDAFC'
+  backgroundColor: isDraggingOver && '#CFDAFC',
 })
 
 function TabGroup({
@@ -29,7 +29,7 @@ function TabGroup({
   onOpenTabGroup,
   onRemoveTab,
   onRemoveTabGroup,
-  isReadOnly
+  isReadOnly,
 }: IProps): React.ReactElement {
   return (
     <Droppable ignoreContainerClipping isDropDisabled={isReadOnly} droppableId={id}>
@@ -70,7 +70,7 @@ function TabGroup({
 
           <div>
             {tabs
-              .filter(tab => typeof tab.id !== 'undefined')
+              .filter((tab) => typeof tab.id !== 'undefined')
               .map((tab: ITab, index: number) => [
                 <Tab
                   key={tab.uuid}
@@ -82,7 +82,7 @@ function TabGroup({
                   windowId={tab.windowId}
                   isReadOnly={isReadOnly}
                   onRemoveTab={onRemoveTab && onRemoveTab(index)}
-                />
+                />,
               ])}
           </div>
 

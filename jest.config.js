@@ -18,7 +18,7 @@ module.exports = {
   moduleFileExtensions: ['js', 'json', 'jsx', 'ts', 'tsx', 'node'],
   // A map from regular expressions to module names that allow to stub out resources with a single module
   moduleNameMapper: {
-    '@src/(.*)': '<rootDir>/src/$1'
+    '@src/(.*)': '<rootDir>/src/$1',
   },
   // Activates notifications for test results
   // notify: false,
@@ -44,6 +44,6 @@ module.exports = {
   // testEnvironment: "jest-environment-jsdom",
   testPathIgnorePatterns: ['/node_modules/'],
   transform: {
-    '\\.tsx?$': 'ts-jest'
-  }
+    '\\.tsx?$': 'ts-jest',
+  },
 }
