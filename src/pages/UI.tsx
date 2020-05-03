@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
+import { Button } from '@material-ui/core'
 
 import optionsStorage from '@src/optionsStorage'
 import TabGroup from '@src/components/TabGroup'
-import Button from '@src/components/Button'
+
 import { ITabGroup } from '@src/types/Extension'
 import { getBrowserSafe } from '@src/lib/utils'
 import {
@@ -73,14 +74,14 @@ function UI(): React.ReactElement {
     dispatch(updateGroup({}))
   }
 
-  const handleReloadExtension = async (): Promise<void> => {
-    const browser = await getBrowserSafe()
-    browser.runtime.reload()
-  }
-
   const handleSendMessage = async (): Promise<void> => {
     const browser = await getBrowserSafe()
     browser.runtime.sendMessage({ type: 'SIDEBAR' })
+  }
+
+  const handleOpenOptions = async (): Promise<void> => {
+    const browser = await getBrowserSafe()
+    browser.runtime.openOptionsPage()
   }
 
   const handleOpenTabGroup = (sourceGroupId: string) => async (): Promise<void> => {
@@ -119,8 +120,8 @@ function UI(): React.ReactElement {
 
         <div className="flex flex-row">
           <Button onClick={handleAddTabGroup}>New Group</Button>
-          <Button onClick={handleReloadExtension}>Reload Ext.</Button>
           <Button onClick={handleSendMessage}>Sidebar</Button>
+          <Button onClick={handleOpenOptions}>Options</Button>
         </div>
       </div>
     </DragDropContext>

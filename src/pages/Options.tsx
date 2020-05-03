@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { FormGroup, Checkbox, FormControlLabel, FormControl, FormLabel } from '@material-ui/core'
+import {
+  Container,
+  FormGroup,
+  Checkbox,
+  FormControlLabel,
+  FormControl,
+  FormLabel,
+} from '@material-ui/core'
 
 import { performBrowserActionSafe } from '../lib/utils'
 import optionsStorage from '../optionsStorage'
@@ -7,11 +14,13 @@ import optionsStorage from '../optionsStorage'
 function Options(): React.ReactElement {
   const [enableHeuristics, setEnableHeuristics] = useState(false)
   const [openSidebarByDefault, setOpenSidebarByDefault] = useState(false)
+  const [enableLogging, setEnableLogging] = useState(false)
 
   useEffect(() => {
     const getAll = async (): Promise<void> => {
       const options = await optionsStorage.getAll()
       setEnableHeuristics(options.enableHeuristics)
+      setEnableLogging(options.debugLogging)
       setOpenSidebarByDefault(options.openSidebarByDefault)
     }
     getAll()
@@ -26,9 +35,9 @@ function Options(): React.ReactElement {
   }
 
   return (
-    <div className="p-4">
+    <Container>
       <FormControl component="fieldset">
-        <FormLabel component="legend">WebExtension</FormLabel>
+        <FormLabel component="legend">Browser Extension</FormLabel>
         <FormGroup>
           <FormControlLabel
             control={
@@ -38,6 +47,15 @@ function Options(): React.ReactElement {
               />
             }
             label="Open the sidebar by default"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={enableLogging}
+                onChange={handleToggleCheckbox('debugLogging', setEnableLogging)}
+              />
+            }
+            label="Enable debug logging"
           />
         </FormGroup>
       </FormControl>
@@ -59,7 +77,7 @@ function Options(): React.ReactElement {
           />
         </FormGroup>
       </FormControl>
-    </div>
+    </Container>
   )
 }
 

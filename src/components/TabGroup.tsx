@@ -1,7 +1,6 @@
 import React from 'react'
 import { Droppable, DroppableProvided, DroppableStateSnapshot } from 'react-beautiful-dnd'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
+import { Delete, Launch } from '@material-ui/icons'
 
 import Tab from './Tab'
 import { ITab } from '@src/types/Extension'
@@ -58,11 +57,11 @@ function TabGroup({
             {!isReadOnly && (
               <div className="flex flex-row">
                 <button className="mr-3" onClick={onOpenTabGroup}>
-                  <FontAwesomeIcon icon={faExternalLinkAlt} />
+                  <Launch fontSize="inherit" />
                 </button>
 
                 <button className="mr-1" onClick={onRemoveTabGroup}>
-                  <FontAwesomeIcon icon={faTrash} />
+                  <Delete fontSize="inherit" />
                 </button>
               </div>
             )}

@@ -20,6 +20,7 @@ import {
   initializeCurrentTabs,
 } from './state/currentTabs'
 import { postNativeMessage, augmentTabExtras } from './lib/utils'
+import OptionsSync from 'webext-options-sync'
 
 // setup a redux store
 const { store } = configureStore({})
@@ -31,9 +32,11 @@ wrapStore(store, { portName: 'tabGrouping' })
 store.dispatch(initializeCurrentTabs() as any)
 
 // connect to the native port
+let options: any
 let nativePort: Runtime.Port
-optionsStorage.getAll().then((options) => {
-  if (options.enableHeuristics) {
+optionsStorage.getAll().then((opt) => {
+  options = opt
+  if (opt.enableHeuristics) {
     nativePort = browser.runtime.connectNative('tabs')
     console.log('> Opened native port: ', nativePort)
 
@@ -73,6 +76,10 @@ optionsStorage.getAll().then((options) => {
   }
 })
 
+export function debug(...content: any[]): void {
+  if (!options || options.debugLogging) console.log(...content)
+}
+
 async function performTabUpdate(tab: Partial<ITab>): Promise<void> {
   const augmentedTabData = augmentTabExtras(tab)
 
@@ -89,25 +96,37 @@ async function performTabUpdate(tab: Partial<ITab>): Promise<void> {
 function onTabCreate(tabData: Tabs.CreateCreatePropertiesType): void {
   const augmentedTabData = augmentTabExtras(tabData)
 
-  console.log('CREATE', augmentedTabData)
+  debug('CREATE', augmentedTabData)
 
   store.dispatch(createTab({ tabData: augmentedTabData }))
 }
 
 function onTabUpdate(tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType, tab: Tabs.Tab): void {
-  console.log('UPDATE', tabId, changeInfo, tab)
+  debug('UPDATE', tabId, changeInfo, tab)
+
+  if (
+    !tab.url?.startsWith('moz-extension:') &&
+    !tab.url?.startsWith('chrome:') &&
+    tab.status === 'complete'
+  ) {
+    browser.tabs.executeScript(tab.id, {
+      file: '/sidebar.bundle.js',
+      runAt: 'document_start',
+      matchAboutBlank: true,
+    })
+  }
 
   performTabUpdate(tab)
 }
 
 function onTabMoved(tabId: number, moveInfo: Tabs.OnMovedMoveInfoType): void {
-  console.log('MOVED', tabId, moveInfo)
+  debug('MOVED', tabId, moveInfo)
 
   performTabUpdate({ id: tabId, ...moveInfo })
 }
 
 function onTabActivated(activeInfo: Tabs.OnActivatedActiveInfoType): void {
-  console.log('ACTIVATED', activeInfo)
+  debug('ACTIVATED', activeInfo)
 
   store.dispatch(activateTab({ tabId: activeInfo.tabId, previousTabId: activeInfo.previousTabId }))
 
@@ -120,13 +139,13 @@ function onTabActivated(activeInfo: Tabs.OnActivatedActiveInfoType): void {
 }
 
 function onTabAttached(tabId: number, attachInfo: Tabs.OnAttachedAttachInfoType): void {
-  console.log('ATTACHED', tabId, attachInfo)
+  debug('ATTACHED', tabId, attachInfo)
 
   performTabUpdate({ id: tabId, ...attachInfo })
 }
 
 function onTabRemoved(tabId: number, removeInfo: Tabs.OnRemovedRemoveInfoType): void {
-  console.log('REMOVED', tabId, removeInfo)
+  debug('REMOVED', tabId, removeInfo)
 
   store.dispatch(removeTab({ tabId }))
 
@@ -138,7 +157,7 @@ function onTabRemoved(tabId: number, removeInfo: Tabs.OnRemovedRemoveInfoType): 
 
 // setup a listener for communication from the popup
 browser.runtime.onMessage.addListener(async (message: any) => {
-  console.log('received message in background', message)
+  debug('received message in background', message)
 
   if (message.type === 'SIDEBAR') {
     const currentTab = (

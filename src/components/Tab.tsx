@@ -6,8 +6,7 @@ import {
   DraggingStyle,
   NotDraggingStyle,
 } from 'react-beautiful-dnd'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import { Delete, CheckBoxOutlineBlankSharp } from '@material-ui/icons'
 
 const getItemStyle = (
   isDragging: boolean,
@@ -65,7 +64,7 @@ function Tab({
 
           {onRemoveTab && !isReadOnly && (
             <button className="p-1" onClick={onRemoveTab}>
-              <FontAwesomeIcon icon={faTrash} />
+              <Delete fontSize="inherit" />
             </button>
           )}
         </div>
