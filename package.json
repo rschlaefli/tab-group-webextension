@@ -1,12 +1,25 @@
 {
+  "name": "automated-tab-organization",
+  "version": "0.0.1",
   "author": "Roland Schlaefli <rolandschlaefli@gmail.com>",
-  "browserslist": {
-    "development": [
-      "last 1 chrome version"
-    ],
-    "production": [
-      "last 5 chrome versions"
-    ]
+  "description": "A WebExtension for automated tab organization",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rschlaefli/automated-tab-organization.git"
+  },
+  "scripts": {
+    "build": "npm-run-all build:style build:app",
+    "build:app": "cross-env NODE_ENV=production webpack",
+    "build:style": "postcss src/styles/index.css -o src/styles/tailwind.css",
+    "dev": "npm-run-all --parallel dev:style dev:app",
+    "dev:app": "cross-env NODE_ENV=development nodemon --delay 2500ms -e json,html -w public -w package.json -w package-lock.json -w webpack.config.js --exec 'webpack -w'",
+    "dev:style": "postcss src/styles/index.css -o src/styles/tailwind.css --watch",
+    "dev:serve": "cross-env NODE_ENV=development nodemon --delay 2500ms -e json,html -w public -w package.json -w package-lock.json -w webpack.config.js --exec 'webpack-dev-server'",
+    "format": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\" && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
+    "format:ci": "prettier --check \"**/*.+(js|jsx|ts|tsx|json|css|md)\"",
+    "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}'",
+    "test": "jest --config=jest.config.js",
+    "test:watch": "jest --config=jest.config.js --watch"
   },
   "dependencies": {
     "@babel/core": "7.9.0",
@@ -100,7 +113,6 @@
     "webpack-webextension-plugin": "0.2.0",
     "write-file-webpack-plugin": "4.5.1"
   },
-  "description": "A WebExtension for automated tab organization",
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
@@ -114,24 +126,12 @@
       "eslint --fix"
     ]
   },
-  "name": "automated-tab-organization",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/rschlaefli/automated-tab-organization.git"
-  },
-  "scripts": {
-    "build": "npm-run-all build:style build:app",
-    "build:app": "cross-env NODE_ENV=production webpack",
-    "build:style": "postcss src/styles/index.css -o src/styles/tailwind.css",
-    "dev": "npm-run-all --parallel dev:style dev:app",
-    "dev:app": "cross-env NODE_ENV=development nodemon --delay 2500ms -e json,html -w public -w package.json -w package-lock.json -w webpack.config.js --exec 'webpack -w'",
-    "dev:style": "postcss src/styles/index.css -o src/styles/tailwind.css --watch",
-    "dev:serve": "cross-env NODE_ENV=development nodemon --delay 2500ms -e json,html -w public -w package.json -w package-lock.json -w webpack.config.js --exec 'webpack-dev-server'",
-    "format": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\" && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
-    "format:ci": "prettier --check \"**/*.+(js|jsx|ts|tsx|json|css|md)\"",
-    "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}'",
-    "test": "jest --config=jest.config.js",
-    "test:watch": "jest --config=jest.config.js --watch"
-  },
-  "version": "0.0.1"
+  "browserslist": {
+    "development": [
+      "last 1 chrome version"
+    ],
+    "production": [
+      "last 5 chrome versions"
+    ]
+  }
 }
