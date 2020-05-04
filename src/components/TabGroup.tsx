@@ -31,7 +31,7 @@ function TabGroup({
   isReadOnly,
 }: IProps): React.ReactElement {
   return (
-    <Droppable ignoreContainerClipping isDropDisabled={isReadOnly} droppableId={id}>
+    <Droppable ignoreContainerClipping droppableId={id}>
       {(provided: DroppableProvided, snapshot: DroppableStateSnapshot): React.ReactElement => (
         <div
           className="flex-1 mb-1 border border-solid min-h-32 md:mr-2 md:last:mr-0 md:max-w-xs"

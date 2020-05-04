@@ -71,3 +71,12 @@ export const initializeCurrentTabs = createAsyncThunk(
     await thunkAPI.dispatch(updateTabs(visibleTabs))
   }
 )
+
+export const reorderCurrentTabs = createAsyncThunk(
+  'currentTabs/reorder',
+  async ({ fromWindow, toWindow, fromIndex, toIndex }: any, thunkAPI): Promise<void> => {
+    const browser = await getBrowserSafe()
+
+    console.log(`> Reordering current tab from ${fromIndex} to ${toIndex}`)
+  }
+)

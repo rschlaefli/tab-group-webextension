@@ -47,6 +47,11 @@ function UI(): React.ReactElement {
 
     // if we are reordering within a droppable
     if (properties.sourceGroupId === properties.targetGroupId) {
+      if (properties.sourceGroupId === 'current') {
+        console.log('reordering current tabs')
+        return
+      }
+
       // if we are reordering to the same position,, return
       if (properties.sourceTabIndex === properties.targetGroupIndex) return
 
