@@ -9,8 +9,7 @@ function setupSidebar(): any {
   newSidebar.setAttribute(
     'style',
     `
-      flex: 0 0 250px;
-      // border-right: 2px solid grey;
+      flex: 0 0 300px;
     `
   )
   return newSidebar
@@ -28,6 +27,7 @@ if (oldSidebar) {
     newRoot.setAttribute(
       'style',
       `
+        z-index: 0;
         height: 100%;
         display: flex;
         flex-flow: row nowrap;
