@@ -200,3 +200,7 @@ browser.tabs.onAttached.addListener(onTabAttached)
 
 // setup the listener for the onRemoved event
 browser.tabs.onRemoved.addListener(onTabRemoved)
+
+// setup context menu entries
+browser.contextMenus.create({ title: 'group this', contexts: ['tab'] }, () => null)
+// browser.contextMenus.removeAll()
