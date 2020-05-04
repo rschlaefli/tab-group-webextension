@@ -105,6 +105,7 @@ function onTabUpdate(tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType, ta
   debug('UPDATE', tabId, changeInfo, tab)
 
   if (
+    options.openSidebarByDefault &&
     !tab.url?.startsWith('moz-extension:') &&
     !tab.url?.startsWith('chrome:') &&
     tab.status === 'complete'

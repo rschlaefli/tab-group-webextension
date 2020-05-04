@@ -29,10 +29,13 @@ function Options(): React.ReactElement {
   const handleToggleCheckbox = (name: string, setter: Function, extra?: Function) => async (
     e: React.ChangeEvent<HTMLInputElement>
   ): Promise<void> => {
-    await optionsStorage.set({ [name]: e.target.checked })
+    const checkValue = e.target.checked
+    await optionsStorage.set({ [name]: checkValue })
     if (extra) extra()
-    setter(e.target.checked)
+    setter(checkValue)
   }
+
+  const reloadExtension = performBrowserActionSafe((browser) => browser.runtime.reload())
 
   return (
     <Container>
@@ -43,7 +46,11 @@ function Options(): React.ReactElement {
             control={
               <Checkbox
                 checked={openSidebarByDefault}
-                onChange={handleToggleCheckbox('openSidebarByDefault', setOpenSidebarByDefault)}
+                onChange={handleToggleCheckbox(
+                  'openSidebarByDefault',
+                  setOpenSidebarByDefault,
+                  reloadExtension
+                )}
               />
             }
             label="Open the sidebar by default"
@@ -52,7 +59,7 @@ function Options(): React.ReactElement {
             control={
               <Checkbox
                 checked={enableLogging}
-                onChange={handleToggleCheckbox('debugLogging', setEnableLogging)}
+                onChange={handleToggleCheckbox('debugLogging', setEnableLogging, reloadExtension)}
               />
             }
             label="Enable debug logging"
@@ -69,7 +76,7 @@ function Options(): React.ReactElement {
                 onChange={handleToggleCheckbox(
                   'enableHeuristics',
                   setEnableHeuristics,
-                  performBrowserActionSafe((browser) => browser.runtime.reload())
+                  reloadExtension
                 )}
               />
             }
