@@ -20,7 +20,6 @@ import {
   initializeCurrentTabs,
 } from './state/currentTabs'
 import { postNativeMessage, augmentTabExtras } from './lib/utils'
-import OptionsSync from 'webext-options-sync'
 
 // setup a redux store
 const { store } = configureStore({})
@@ -73,6 +72,9 @@ optionsStorage.getAll().then((opt) => {
       })
       console.log('> Prepared a listener for native communication events')
     }
+  }
+  if (opt.tutorialProgress < 3) {
+    browser.tabs.create({ url: 'tutorial.html' })
   }
 })
 

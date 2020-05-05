@@ -21,6 +21,16 @@ function Tutorial(): React.ReactElement {
     setActiveStep(1)
   }
 
+  const finalizeHeuristicsSetup = async (): Promise<void> => {
+    await optionsStorage.set({ tutorialProgress: 2 })
+    setActiveStep(2)
+  }
+
+  const finalizeDataCollection = async (): Promise<void> => {
+    await optionsStorage.set({ tutorialProgress: 3 })
+    setActiveStep(3)
+  }
+
   return (
     <Container>
       <div className="p-4 border border-gray-100 border-solid min-h-64">
@@ -47,7 +57,7 @@ function Tutorial(): React.ReactElement {
               <li>if everything works, the extension will show it HERE and THERE...</li>
             </ul>
             <Button onClick={(): void => setActiveStep(0)}>Previous Step</Button>
-            <Button onClick={(): void => setActiveStep(2)}>Next Step</Button>
+            <Button onClick={finalizeHeuristicsSetup}>Next Step</Button>
           </div>
         )}
 
@@ -60,7 +70,14 @@ function Tutorial(): React.ReactElement {
               <li>you can modify your groups at will...</li>
             </ul>
             <Button onClick={(): void => setActiveStep(1)}>Previous Step</Button>
-            <Button onClick={(): void => console.log('finish')}>Finish Tutorial</Button>
+            <Button onClick={finalizeDataCollection}>Finish Tutorial</Button>
+          </div>
+        )}
+
+        {activeStep === 3 && (
+          <div>
+            <p>You have finished the tutorial...</p>
+            <p>Please send feedback to bla or fill the following form xyz...</p>
           </div>
         )}
       </div>
