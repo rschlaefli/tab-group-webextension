@@ -33,5 +33,5 @@
       "strict_min_version": "50.0"
     }
   },
-  "web_accessible_resources": ["ui.html"]
+  "web_accessible_resources": ["ui.html", "tutorial.html"]
 }

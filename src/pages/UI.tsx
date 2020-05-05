@@ -146,6 +146,9 @@ function UI(): React.ReactElement {
           <Button onClick={handleAddTabGroup}>New Group</Button>
           {/* <Button onClick={handleSendMessage}>Sidebar</Button> */}
           <Button onClick={handleOpenOptions}>Options</Button>
+          <a href="tutorial.html">
+            <Button>Tutorial</Button>
+          </a>
         </div>
       </div>
     </DragDropContext>
