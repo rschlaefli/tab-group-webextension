@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
 import { Button } from '@material-ui/core'
 
 import optionsStorage from '@src/optionsStorage'
-import TabGroup from '@src/components/TabGroup'
+import TabGroup from '@src/components/tabs/TabGroup'
 
 import { ITabGroup } from '@src/types/Extension'
 import { getBrowserSafe } from '@src/lib/utils'
@@ -16,7 +16,9 @@ import {
   updateGroup,
   openTabGroup,
   moveCurrentTab,
+  collapseGroup,
 } from '@src/state/tabGroups'
+import { collapseCurrentTabs } from '@src/state/currentTabs'
 
 const extractDragEventProperties = (dragEvent: DropResult): any => ({
   sourceGroupId: dragEvent.source.droppableId,
@@ -97,6 +99,14 @@ function UI(): React.ReactElement {
     dispatch(updateGroup({ sourceGroupId, name }))
   }
 
+  const handleCollapseTabGroup = (sourceGroupId: string) => (): void => {
+    dispatch(collapseGroup({ sourceGroupId }))
+  }
+
+  const handleCollapseCurrentTabs = (): void => {
+    dispatch(collapseCurrentTabs())
+  }
+
   if (!tabGroups) {
     return <div>Loading</div>
   }
@@ -105,7 +115,14 @@ function UI(): React.ReactElement {
     <DragDropContext onDragEnd={handleDragEnd}>
       <div className="w-full h-auto p-1 min-h-64 min-w-64">
         <div className="flex flex-col md:flex-wrap md:flex-row">
-          <TabGroup isReadOnly id="current" name="Current Tabs" tabs={currentTabs.tabs} />
+          <TabGroup
+            isReadOnly
+            id="current"
+            name="Current Tabs"
+            tabs={currentTabs.tabs}
+            isCollapsed={currentTabs.collapsed}
+            onCollapseGroup={handleCollapseCurrentTabs}
+          />
           {tabGroups.map((tabGroup: ITabGroup) => (
             <TabGroup
               // TODO: pass down current tabs and mark tabs that are open
@@ -114,7 +131,9 @@ function UI(): React.ReactElement {
               id={tabGroup.id}
               name={tabGroup.name}
               tabs={tabGroup.tabs}
+              isCollapsed={tabGroup.collapsed}
               isReadOnly={tabGroup.readOnly}
+              onCollapseGroup={handleCollapseTabGroup(tabGroup.id)}
               onRemoveTab={handleRemoveTab(tabGroup.id)}
               onRemoveTabGroup={handleRemoveTabGroup(tabGroup.id)}
               onOpenTabGroup={handleOpenTabGroup(tabGroup.id)}
@@ -125,7 +144,7 @@ function UI(): React.ReactElement {
 
         <div className="flex flex-row">
           <Button onClick={handleAddTabGroup}>New Group</Button>
-          <Button onClick={handleSendMessage}>Sidebar</Button>
+          {/* <Button onClick={handleSendMessage}>Sidebar</Button> */}
           <Button onClick={handleOpenOptions}>Options</Button>
         </div>
       </div>
