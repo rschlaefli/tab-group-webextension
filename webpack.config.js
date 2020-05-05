@@ -32,6 +32,8 @@ const PATHS = {
   optionsTemplate: path.join(__dirname, 'public/options.html'),
   output: path.join(__dirname, 'build'),
   sidebar: path.join(__dirname, 'src/sidebar.ts'),
+  tutorial: path.join(__dirname, 'src/tutorial.tsx'),
+  tutorialTemplate: path.join(__dirname, 'public/tutorial.html'),
   src: path.join(__dirname, 'src'),
   ui: path.join(__dirname, 'src/ui.tsx'),
   uiTemplate: path.join(__dirname, 'public/ui.html'),
@@ -57,6 +59,8 @@ module.exports = function (webpackEnv) {
       options: PATHS.options,
       // content script for sidebar injection
       sidebar: PATHS.sidebar,
+      // tutorial page
+      tutorial: PATHS.tutorial,
       // create a build for the extension ui (popup/newtab)
       ui: PATHS.ui,
     },
@@ -191,6 +195,12 @@ module.exports = function (webpackEnv) {
         template: PATHS.optionsTemplate,
         filename: 'options.html',
         chunks: ['options'],
+      }),
+      // dynamically generate the extension tutorial page
+      new HtmlWebpackPlugin({
+        template: PATHS.tutorialTemplate,
+        filename: 'tutorial.html',
+        chunks: ['tutorial'],
       }),
       // ensure that webpack always writes files (for dev-server)
       new WriteFilePlugin(),

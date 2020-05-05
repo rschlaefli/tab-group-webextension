@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
+import { Button, IconButton } from '@material-ui/core'
+import { Settings } from '@material-ui/icons'
 
 import optionsStorage from '@src/optionsStorage'
-import TabGroup from '@src/components/TabGroup'
-import Button from '@src/components/Button'
+import TabGroup from '@src/components/tabs/TabGroup'
+
 import { ITabGroup } from '@src/types/Extension'
 import { getBrowserSafe } from '@src/lib/utils'
 import {
@@ -15,7 +17,9 @@ import {
   updateGroup,
   openTabGroup,
   moveCurrentTab,
+  collapseGroup,
 } from '@src/state/tabGroups'
+import { collapseCurrentTabs } from '@src/state/currentTabs'
 
 const extractDragEventProperties = (dragEvent: DropResult): any => ({
   sourceGroupId: dragEvent.source.droppableId,
@@ -29,16 +33,11 @@ function UI(): React.ReactElement {
   const currentTabs = useSelector((state: any) => state.currentTabs)
   const tabGroups = useSelector((state: any) => state.tabGroups)
 
-  const [number, setNumber] = useState(-1)
-
   useEffect(() => {
     const init = async (): Promise<void> => {
-      // initialize current tabs
-      // await dispatch(initializeCurrentTabs())
-
       // initialize options data
       const result = await optionsStorage.getAll()
-      if (result.number) setNumber(result.number)
+      console.log(result)
     }
     init()
   }, [dispatch])
@@ -51,6 +50,11 @@ function UI(): React.ReactElement {
 
     // if we are reordering within a droppable
     if (properties.sourceGroupId === properties.targetGroupId) {
+      if (properties.sourceGroupId === 'current') {
+        console.log('reordering current tabs')
+        return
+      }
+
       // if we are reordering to the same position,, return
       if (properties.sourceTabIndex === properties.targetGroupIndex) return
 
@@ -78,14 +82,9 @@ function UI(): React.ReactElement {
     dispatch(updateGroup({}))
   }
 
-  const handleReloadExtension = async (): Promise<void> => {
+  const handleOpenOptions = async (): Promise<void> => {
     const browser = await getBrowserSafe()
-    browser.runtime.reload()
-  }
-
-  const handleSendMessage = async (): Promise<void> => {
-    const browser = await getBrowserSafe()
-    browser.runtime.sendMessage({ type: 'SIDEBAR' })
+    browser.runtime.openOptionsPage()
   }
 
   const handleOpenTabGroup = (sourceGroupId: string) => async (): Promise<void> => {
@@ -96,6 +95,14 @@ function UI(): React.ReactElement {
     dispatch(updateGroup({ sourceGroupId, name }))
   }
 
+  const handleCollapseTabGroup = (sourceGroupId: string) => (): void => {
+    dispatch(collapseGroup({ sourceGroupId }))
+  }
+
+  const handleCollapseCurrentTabs = (): void => {
+    dispatch(collapseCurrentTabs())
+  }
+
   if (!tabGroups) {
     return <div>Loading</div>
   }
@@ -103,8 +110,21 @@ function UI(): React.ReactElement {
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <div className="w-full h-auto p-1 min-h-64 min-w-64">
+        <div className="flex flex-row justify-end">
+          <button className="text-sm text-gray-600" onClick={handleOpenOptions}>
+            <Settings fontSize="inherit" />
+          </button>
+        </div>
         <div className="flex flex-col md:flex-wrap md:flex-row">
-          <TabGroup isReadOnly id="current" name="Current Tabs" tabs={currentTabs.tabs} />
+          <TabGroup
+            isReadOnly
+            id="current"
+            name="Current Tabs"
+            tabs={currentTabs.tabs}
+            isCollapsed={currentTabs.collapsed}
+            onCollapseGroup={handleCollapseCurrentTabs}
+          />
+
           {tabGroups.map((tabGroup: ITabGroup) => (
             <TabGroup
               // TODO: pass down current tabs and mark tabs that are open
@@ -113,7 +133,9 @@ function UI(): React.ReactElement {
               id={tabGroup.id}
               name={tabGroup.name}
               tabs={tabGroup.tabs}
+              isCollapsed={tabGroup.collapsed}
               isReadOnly={tabGroup.readOnly}
+              onCollapseGroup={handleCollapseTabGroup(tabGroup.id)}
               onRemoveTab={handleRemoveTab(tabGroup.id)}
               onRemoveTabGroup={handleRemoveTabGroup(tabGroup.id)}
               onOpenTabGroup={handleOpenTabGroup(tabGroup.id)}
@@ -122,13 +144,9 @@ function UI(): React.ReactElement {
           ))}
         </div>
 
-        <div>hello from synced settings: {number}</div>
-
-        <div className="flex flex-row">
-          <Button onClick={handleAddTabGroup}>New Group</Button>
-          <Button onClick={handleReloadExtension}>Reload Ext.</Button>
-          <Button onClick={handleSendMessage}>Sidebar</Button>
-        </div>
+        <Button fullWidth onClick={handleAddTabGroup}>
+          New Group
+        </Button>
       </div>
     </DragDropContext>
   )

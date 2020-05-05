@@ -1,4 +1,10 @@
-import currentTabsReducer, { createTab, activateTab, updateTab, removeTab } from './currentTabs'
+import currentTabsReducer, {
+  createTab,
+  activateTab,
+  updateTab,
+  removeTab,
+  collapseCurrentTabs,
+} from './currentTabs'
 import { ITab } from '@src/types/Extension'
 
 const TABS: ITab[] = [
@@ -99,6 +105,7 @@ describe('currentTabsReducer', () => {
     activeTab: number
     activeWindow: number
     tabs: ITab[]
+    collapsed: boolean
   }
 
   beforeAll(() => {
@@ -107,6 +114,7 @@ describe('currentTabsReducer', () => {
       activeTab: -1,
       activeWindow: 0,
       tabs: [TABS[0]],
+      collapsed: false,
     }
   })
 
@@ -140,5 +148,17 @@ describe('currentTabsReducer', () => {
     currentState = currentTabsReducer(currentState, removeTab({ tabId: 2 }))
 
     expect(currentState.tabs).toHaveLength(1)
+  })
+
+  it('can be collapsed', () => {
+    currentState = currentTabsReducer(currentState, collapseCurrentTabs())
+
+    expect(currentState.collapsed).toEqual(true)
+  })
+
+  it('can be uncollapsed', () => {
+    currentState = currentTabsReducer(currentState, collapseCurrentTabs())
+
+    expect(currentState.collapsed).toEqual(false)
   })
 })

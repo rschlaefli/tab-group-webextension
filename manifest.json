@@ -5,7 +5,14 @@
   "description": "A WebExtension for automated tab organization",
   "version": "0.0.1",
   "incognito": "not_allowed",
-  "permissions": ["<all_urls>", "tabs", "storage", "nativeMessaging", "notifications"],
+  "permissions": [
+    "<all_urls>",
+    "tabs",
+    "storage",
+    "nativeMessaging",
+    "notifications",
+    "contextMenus"
+  ],
   "browser_action": {
     "default_popup": "ui.html"
   },
@@ -17,7 +24,8 @@
   },
   "options_ui": {
     "chrome_style": true,
-    "page": "options.html"
+    "page": "options.html",
+    "open_in_tab": false
   },
   "applications": {
     "gecko": {
@@ -25,5 +33,5 @@
       "strict_min_version": "50.0"
     }
   },
-  "web_accessible_resources": ["ui.html"]
+  "web_accessible_resources": ["ui.html", "tutorial.html"]
 }

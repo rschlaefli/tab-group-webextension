@@ -21,6 +21,7 @@ export interface ITabGroup {
   name: string
   tabs: ITab[]
   readOnly?: boolean
+  collapsed: boolean
 }
 
 export interface IHeuristicsAction {

@@ -9,8 +9,7 @@ function setupSidebar(): any {
   newSidebar.setAttribute(
     'style',
     `
-      flex: 0 0 22rem;
-      border-right: 2px solid grey;
+      flex: 0 0 300px;
     `
   )
   return newSidebar
@@ -23,17 +22,13 @@ if (oldSidebar) {
 } else {
   let newRoot = document.querySelector('#document-wrapper')
   if (!newRoot) {
-    // TODO: insert a media query <style> that hides the sidebar on small screens
     newRoot = document.createElement('div')
     newRoot.id = 'document-wrapper'
     newRoot.setAttribute(
       'style',
       `
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
+        z-index: 0;
+        height: 100%;
         display: flex;
         flex-flow: row nowrap;
 

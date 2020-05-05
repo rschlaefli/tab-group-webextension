@@ -11,8 +11,7 @@ import {
   // TAB_GROUP_ACTION
 } from './types/Extension'
 import configureStore from './state/configureStore'
-
-import './optionsStorage'
+import optionsStorage from './optionsStorage'
 import {
   createTab,
   updateTab,
@@ -32,8 +31,56 @@ wrapStore(store, { portName: 'tabGrouping' })
 store.dispatch(initializeCurrentTabs() as any)
 
 // connect to the native port
-const nativePort: Runtime.Port = browser.runtime.connectNative('tabs')
-console.log('> Opened native port: ', nativePort)
+let options: any
+let nativePort: Runtime.Port
+optionsStorage.getAll().then((opt) => {
+  options = opt
+  if (opt.enableHeuristics) {
+    nativePort = browser.runtime.connectNative('tabs')
+    console.log('> Opened native port: ', nativePort)
+
+    // setup a listener for native communcation
+    if (nativePort) {
+      nativePort.onMessage.addListener(async (messageFromHeuristics: IHeuristicsAction) => {
+        console.log(`> Received message over native port:`, messageFromHeuristics)
+
+        try {
+          switch (messageFromHeuristics.action) {
+            case HEURISTICS_ACTION.NEW_TAB:
+              await browser.tabs.create({ url: messageFromHeuristics.payload.url })
+
+            case HEURISTICS_ACTION.NOTIFY:
+              await browser.notifications.create('heuristics-notify', {
+                title: 'New Event',
+                type: 'basic',
+                message: messageFromHeuristics.payload.message,
+                iconUrl:
+                  'data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7',
+              })
+
+            case HEURISTICS_ACTION.QUERY_TABS:
+              const currentTabs = store.getState().currentTabs?.tabs as ITab[]
+              console.log(`> Initializing current tabs in heuristics: ${currentTabs}`)
+              postNativeMessage(nativePort, {
+                action: TAB_ACTION.INIT_TABS,
+                payload: { currentTabs },
+              })
+          }
+        } catch (e) {
+          console.error(e)
+        }
+      })
+      console.log('> Prepared a listener for native communication events')
+    }
+  }
+  if (opt.tutorialProgress < 3) {
+    browser.tabs.create({ url: 'tutorial.html' })
+  }
+})
+
+export function debug(...content: any[]): void {
+  if (!options || options.debugLogging) console.log(...content)
+}
 
 async function performTabUpdate(tab: Partial<ITab>): Promise<void> {
   const augmentedTabData = augmentTabExtras(tab)
@@ -51,25 +98,38 @@ async function performTabUpdate(tab: Partial<ITab>): Promise<void> {
 function onTabCreate(tabData: Tabs.CreateCreatePropertiesType): void {
   const augmentedTabData = augmentTabExtras(tabData)
 
-  console.log('CREATE', augmentedTabData)
+  debug('CREATE', augmentedTabData)
 
   store.dispatch(createTab({ tabData: augmentedTabData }))
 }
 
 function onTabUpdate(tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType, tab: Tabs.Tab): void {
-  console.log('UPDATE', tabId, changeInfo, tab)
+  debug('UPDATE', tabId, changeInfo, tab)
+
+  if (
+    options.openSidebarByDefault &&
+    !tab.url?.startsWith('moz-extension:') &&
+    !tab.url?.startsWith('chrome:') &&
+    tab.status === 'complete'
+  ) {
+    browser.tabs.executeScript(tab.id, {
+      file: '/sidebar.bundle.js',
+      runAt: 'document_start',
+      matchAboutBlank: true,
+    })
+  }
 
   performTabUpdate(tab)
 }
 
 function onTabMoved(tabId: number, moveInfo: Tabs.OnMovedMoveInfoType): void {
-  console.log('MOVED', tabId, moveInfo)
+  debug('MOVED', tabId, moveInfo)
 
   performTabUpdate({ id: tabId, ...moveInfo })
 }
 
 function onTabActivated(activeInfo: Tabs.OnActivatedActiveInfoType): void {
-  console.log('ACTIVATED', activeInfo)
+  debug('ACTIVATED', activeInfo)
 
   store.dispatch(activateTab({ tabId: activeInfo.tabId, previousTabId: activeInfo.previousTabId }))
 
@@ -82,13 +142,13 @@ function onTabActivated(activeInfo: Tabs.OnActivatedActiveInfoType): void {
 }
 
 function onTabAttached(tabId: number, attachInfo: Tabs.OnAttachedAttachInfoType): void {
-  console.log('ATTACHED', tabId, attachInfo)
+  debug('ATTACHED', tabId, attachInfo)
 
   performTabUpdate({ id: tabId, ...attachInfo })
 }
 
 function onTabRemoved(tabId: number, removeInfo: Tabs.OnRemovedRemoveInfoType): void {
-  console.log('REMOVED', tabId, removeInfo)
+  debug('REMOVED', tabId, removeInfo)
 
   store.dispatch(removeTab({ tabId }))
 
@@ -98,37 +158,9 @@ function onTabRemoved(tabId: number, removeInfo: Tabs.OnRemovedRemoveInfoType): 
   })
 }
 
-// setup a listener for native communcation
-nativePort.onMessage.addListener(async (messageFromHeuristics: IHeuristicsAction) => {
-  console.log(`> Received message over native port:`, messageFromHeuristics)
-
-  try {
-    switch (messageFromHeuristics.action) {
-      case HEURISTICS_ACTION.NEW_TAB:
-        await browser.tabs.create({ url: messageFromHeuristics.payload.url })
-
-      case HEURISTICS_ACTION.NOTIFY:
-        await browser.notifications.create('heuristics-notify', {
-          title: 'New Event',
-          type: 'basic',
-          message: messageFromHeuristics.payload.message,
-          iconUrl:
-            'data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7',
-        })
-
-      case HEURISTICS_ACTION.QUERY_TABS:
-        const currentTabs = store.getState().currentTabs?.tabs as ITab[]
-        console.log(`> Initializing current tabs in heuristics: ${currentTabs}`)
-        postNativeMessage(nativePort, { action: TAB_ACTION.INIT_TABS, payload: { currentTabs } })
-    }
-  } catch (e) {
-    console.error(e)
-  }
-})
-
 // setup a listener for communication from the popup
 browser.runtime.onMessage.addListener(async (message: any) => {
-  console.log('received message in background', message)
+  debug('received message in background', message)
 
   if (message.type === 'SIDEBAR') {
     const currentTab = (
@@ -171,3 +203,7 @@ browser.tabs.onAttached.addListener(onTabAttached)
 
 // setup the listener for the onRemoved event
 browser.tabs.onRemoved.addListener(onTabRemoved)
+
+// setup context menu entries
+// browser.contextMenus.create({ title: 'group this', contexts: ['tab'] }, () => null)
+// browser.contextMenus.removeAll()

@@ -1,8 +1,10 @@
 import React from 'react'
+import clsx from 'clsx'
 import { Droppable, DroppableProvided, DroppableStateSnapshot } from 'react-beautiful-dnd'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
+import { Delete, Launch, ArrowDropDown, ArrowDropUp } from '@material-ui/icons'
+// import { Rating } from '@material-ui/lab'
 
+import Input from '../common/Input'
 import Tab from './Tab'
 import { ITab } from '@src/types/Extension'
 
@@ -11,6 +13,8 @@ interface IProps {
   name: string
   tabs: ITab[]
   isReadOnly?: boolean
+  isCollapsed?: boolean
+  onCollapseGroup?: () => void
   onRemoveTab?: (tabIndex: number) => () => void
   onRemoveTabGroup?: () => void
   onChangeGroupName?: (newName: string) => void
@@ -25,50 +29,57 @@ function TabGroup({
   id,
   name,
   tabs,
+  onCollapseGroup,
   onChangeGroupName,
   onOpenTabGroup,
   onRemoveTab,
   onRemoveTabGroup,
   isReadOnly,
+  isCollapsed,
 }: IProps): React.ReactElement {
   return (
-    <Droppable ignoreContainerClipping isDropDisabled={isReadOnly} droppableId={id}>
+    <Droppable ignoreContainerClipping droppableId={id}>
       {(provided: DroppableProvided, snapshot: DroppableStateSnapshot): React.ReactElement => (
         <div
-          className="flex-1 mb-1 border border-solid min-h-32 md:mr-2 md:last:mr-0 md:max-w-xs"
+          className="flex-1 mb-1 border border-solid md:mr-2 md:last:mr-0 md:max-w-xs"
           ref={provided.innerRef}
           {...provided.droppableProps}
           style={getListStyle(snapshot.isDraggingOver)}
         >
-          <h1 className="flex flex-row justify-between p-1 bg-gray-300 dark:bg-gray-100 dark:text-gray-900">
-            <div className="text-sm font-bold">
-              {isReadOnly ? (
-                name
-              ) : (
-                <input
-                  className="pl-1 text-sm font-bold border-b"
-                  value={name}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
-                    onChangeGroupName && onChangeGroupName(e.target.value)
-                  }
-                />
+          <div className="flex flex-row items-center justify-between px-2 py-1 bg-gray-100 dark:bg-gray-100 dark:text-gray-900 ">
+            <button
+              className={clsx(
+                'mr-2 text-sm md:hidden',
+                tabs.length === 0 && 'text-gray-500 cursor-default'
               )}
-            </div>
+              disabled={tabs.length === 0}
+              onClick={onCollapseGroup}
+            >
+              {isCollapsed ? (
+                <ArrowDropDown fontSize="inherit" />
+              ) : (
+                <ArrowDropUp fontSize="inherit" />
+              )}
+            </button>
+
+            <h1 className="w-full text-xs font-bold">
+              {isReadOnly ? name : <Input fullWidth value={name} onChange={onChangeGroupName} />}
+            </h1>
 
             {!isReadOnly && (
               <div className="flex flex-row">
-                <button className="mr-3" onClick={onOpenTabGroup}>
-                  <FontAwesomeIcon icon={faExternalLinkAlt} />
+                <button className="ml-2 mr-2 text-sm text-gray-600" onClick={onOpenTabGroup}>
+                  <Launch fontSize="inherit" />
                 </button>
 
-                <button className="mr-1" onClick={onRemoveTabGroup}>
-                  <FontAwesomeIcon icon={faTrash} />
+                <button className="text-sm text-gray-600" onClick={onRemoveTabGroup}>
+                  <Delete fontSize="inherit" />
                 </button>
               </div>
             )}
-          </h1>
+          </div>
 
-          <div>
+          <div className={clsx('min-h-2', tabs.length > 0 && isCollapsed && 'hidden', 'md:block')}>
             {tabs
               .filter((tab) => typeof tab.id !== 'undefined')
               .map((tab: ITab, index: number) => [
@@ -87,6 +98,8 @@ function TabGroup({
           </div>
 
           {provided.placeholder}
+
+          <div>{/* <Rating value={4} size="small" /> */}</div>
         </div>
       )}
     </Droppable>
