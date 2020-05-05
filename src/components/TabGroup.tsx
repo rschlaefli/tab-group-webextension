@@ -1,7 +1,9 @@
 import React from 'react'
 import { Droppable, DroppableProvided, DroppableStateSnapshot } from 'react-beautiful-dnd'
 import { Delete, Launch } from '@material-ui/icons'
+import { Rating } from '@material-ui/lab'
 
+import Input from './Input'
 import Tab from './Tab'
 import { ITab } from '@src/types/Extension'
 
@@ -39,33 +41,23 @@ function TabGroup({
           {...provided.droppableProps}
           style={getListStyle(snapshot.isDraggingOver)}
         >
-          <h1 className="flex flex-row justify-between p-1 bg-gray-300 dark:bg-gray-100 dark:text-gray-900">
-            <div className="text-sm font-bold">
-              {isReadOnly ? (
-                name
-              ) : (
-                <input
-                  className="pl-1 text-sm font-bold border-b"
-                  value={name}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
-                    onChangeGroupName && onChangeGroupName(e.target.value)
-                  }
-                />
-              )}
-            </div>
+          <div className="flex flex-row justify-between px-2 py-1 bg-gray-300 dark:bg-gray-100 dark:text-gray-900">
+            <h1 className="w-full text-xs font-bold">
+              {isReadOnly ? name : <Input fullWidth value={name} onChange={onChangeGroupName} />}
+            </h1>
 
             {!isReadOnly && (
               <div className="flex flex-row">
-                <button className="mr-3" onClick={onOpenTabGroup}>
+                <button className="ml-2 mr-2 text-sm" onClick={onOpenTabGroup}>
                   <Launch fontSize="inherit" />
                 </button>
 
-                <button className="mr-1" onClick={onRemoveTabGroup}>
+                <button className="text-sm" onClick={onRemoveTabGroup}>
                   <Delete fontSize="inherit" />
                 </button>
               </div>
             )}
-          </h1>
+          </div>
 
           <div>
             {tabs
@@ -86,6 +78,8 @@ function TabGroup({
           </div>
 
           {provided.placeholder}
+
+          <div>{/* <Rating value={4} size="small" /> */}</div>
         </div>
       )}
     </Droppable>
