@@ -123,6 +123,7 @@ function UI(): React.ReactElement {
             isCollapsed={currentTabs.collapsed}
             onCollapseGroup={handleCollapseCurrentTabs}
           />
+
           {tabGroups.map((tabGroup: ITabGroup) => (
             <TabGroup
               // TODO: pass down current tabs and mark tabs that are open

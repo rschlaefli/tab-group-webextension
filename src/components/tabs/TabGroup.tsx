@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import clsx from 'clsx'
 import { Droppable, DroppableProvided, DroppableStateSnapshot } from 'react-beautiful-dnd'
 import { Delete, Launch, ArrowDropDown, ArrowDropUp } from '@material-ui/icons'
@@ -24,6 +24,11 @@ interface IProps {
 const getListStyle = (isDraggingOver: boolean): {} => ({
   backgroundColor: isDraggingOver && '#CFDAFC',
 })
+
+const initialMousePosition = {
+  mouseX: null,
+  mouseY: null,
+}
 
 function TabGroup({
   id,
