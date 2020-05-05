@@ -1,7 +1,64 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { Button, Container, Stepper, Step, StepLabel, Typography } from '@material-ui/core'
+
+const STEPS = ['Extension Setup', 'Heuristics Setup', 'Data Collection']
 
 function Tutorial(): React.ReactElement {
-  return <div>hello world1</div>
+  const [activeStep, setActiveStep] = useState(0)
+
+  return (
+    <Container>
+      <div className="p-4 border border-gray-100 border-solid min-h-64">
+        <Typography>Tutorial</Typography>
+
+        {activeStep === 0 && (
+          <div>
+            <p>Tune the extension to your liking</p>
+            <ul>
+              <li>asdasd</li>
+            </ul>
+            <Button onClick={(): void => setActiveStep(1)}>Next Step</Button>
+          </div>
+        )}
+
+        {activeStep === 1 && (
+          <div>
+            <p>Setup the heuristics engine on your local machine.</p>
+            <ul>
+              <li>setup steps...</li>
+              <li>download the installer for your OS from xyz...</li>
+              <li>run the installer</li>
+              <li>restart the browser</li>
+              <li>if everything works, the extension will show it HERE and THERE...</li>
+            </ul>
+            <Button onClick={(): void => setActiveStep(0)}>Previous Step</Button>
+            <Button onClick={(): void => setActiveStep(2)}>Next Step</Button>
+          </div>
+        )}
+
+        {activeStep === 2 && (
+          <div>
+            <p>Start browsing and we will collect data in the background!</p>
+            <ul>
+              <li>data can be viewed and censored here: xyz ...</li>
+              <li>experimental procedures...</li>
+              <li>you can modify your groups at will...</li>
+            </ul>
+            <Button onClick={(): void => setActiveStep(1)}>Previous Step</Button>
+            <Button onClick={(): void => console.log('finish')}>Finish Tutorial</Button>
+          </div>
+        )}
+      </div>
+      <Stepper activeStep={activeStep}>
+        {STEPS.map((label) => (
+          <Step key={label}>
+            <StepLabel>{label}</StepLabel>
+          </Step>
+        ))}
+      </Stepper>
+      <Button></Button>
+    </Container>
+  )
 }
 
 export default Tutorial
