@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
-import { Button } from '@material-ui/core'
+import { Button, IconButton } from '@material-ui/core'
+import { Settings } from '@material-ui/icons'
 
 import optionsStorage from '@src/optionsStorage'
 import TabGroup from '@src/components/tabs/TabGroup'
@@ -81,11 +82,6 @@ function UI(): React.ReactElement {
     dispatch(updateGroup({}))
   }
 
-  const handleSendMessage = async (): Promise<void> => {
-    const browser = await getBrowserSafe()
-    browser.runtime.sendMessage({ type: 'SIDEBAR' })
-  }
-
   const handleOpenOptions = async (): Promise<void> => {
     const browser = await getBrowserSafe()
     browser.runtime.openOptionsPage()
@@ -114,6 +110,11 @@ function UI(): React.ReactElement {
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <div className="w-full h-auto p-1 min-h-64 min-w-64">
+        <div className="flex flex-row justify-end">
+          <button className="text-sm text-gray-600" onClick={handleOpenOptions}>
+            <Settings fontSize="inherit" />
+          </button>
+        </div>
         <div className="flex flex-col md:flex-wrap md:flex-row">
           <TabGroup
             isReadOnly
@@ -143,14 +144,9 @@ function UI(): React.ReactElement {
           ))}
         </div>
 
-        <div className="flex flex-row">
-          <Button onClick={handleAddTabGroup}>New Group</Button>
-          {/* <Button onClick={handleSendMessage}>Sidebar</Button> */}
-          <Button onClick={handleOpenOptions}>Options</Button>
-          <a href="tutorial.html">
-            <Button>Tutorial</Button>
-          </a>
-        </div>
+        <Button fullWidth onClick={handleAddTabGroup}>
+          New Group
+        </Button>
       </div>
     </DragDropContext>
   )
