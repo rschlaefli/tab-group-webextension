@@ -6,7 +6,7 @@ export default new OptionsSync({
     debugLogging: true,
     enableHeuristics: false,
     openSidebarByDefault: false,
-    displayTutorial: true,
+    tutorialProgress: 0,
   },
 
   // List of functions that are called when the extension is updated

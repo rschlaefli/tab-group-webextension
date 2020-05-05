@@ -1,10 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button, Container, Stepper, Step, StepLabel, Typography } from '@material-ui/core'
+
+import optionsStorage from '../optionsStorage'
 
 const STEPS = ['Extension Setup', 'Heuristics Setup', 'Data Collection']
 
 function Tutorial(): React.ReactElement {
-  const [activeStep, setActiveStep] = useState(0)
+  const [activeStep, setActiveStep] = useState(-1)
+
+  useEffect(() => {
+    const getAll = async (): Promise<void> => {
+      const options = await optionsStorage.getAll()
+      setActiveStep(options.tutorialProgress)
+    }
+    getAll()
+  }, [])
+
+  const finalizeExtensionSettings = async (): Promise<void> => {
+    await optionsStorage.set({ tutorialProgress: 1 })
+    setActiveStep(1)
+  }
 
   return (
     <Container>
@@ -17,7 +32,7 @@ function Tutorial(): React.ReactElement {
             <ul>
               <li>asdasd</li>
             </ul>
-            <Button onClick={(): void => setActiveStep(1)}>Next Step</Button>
+            <Button onClick={finalizeExtensionSettings}>Next Step</Button>
           </div>
         )}
 

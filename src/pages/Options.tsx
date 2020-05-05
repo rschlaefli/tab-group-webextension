@@ -6,6 +6,7 @@ import {
   FormControlLabel,
   FormControl,
   FormLabel,
+  Button,
 } from '@material-ui/core'
 
 import { performBrowserActionSafe } from '../lib/utils'
@@ -15,6 +16,7 @@ function Options(): React.ReactElement {
   const [enableHeuristics, setEnableHeuristics] = useState(false)
   const [openSidebarByDefault, setOpenSidebarByDefault] = useState(false)
   const [enableLogging, setEnableLogging] = useState(false)
+  const [tutorialProgress, setTutorialProgress] = useState(-1)
 
   useEffect(() => {
     const getAll = async (): Promise<void> => {
@@ -22,9 +24,15 @@ function Options(): React.ReactElement {
       setEnableHeuristics(options.enableHeuristics)
       setEnableLogging(options.debugLogging)
       setOpenSidebarByDefault(options.openSidebarByDefault)
+      setTutorialProgress(options.tutorialProgress)
     }
     getAll()
   }, [])
+
+  const resetTutorialProgress = async (): Promise<void> => {
+    await optionsStorage.set({ tutorialProgress: 0 })
+    setTutorialProgress(0)
+  }
 
   const handleToggleCheckbox = (name: string, setter: Function, extra?: Function) => async (
     e: React.ChangeEvent<HTMLInputElement>
@@ -64,6 +72,12 @@ function Options(): React.ReactElement {
             }
             label="Enable debug logging"
           />
+          <Button
+            disabled={tutorialProgress === 0}
+            onClick={(): Promise<void> => resetTutorialProgress()}
+          >
+            Reset tutorial progress
+          </Button>
         </FormGroup>
       </FormControl>
       <FormControl component="fieldset">
