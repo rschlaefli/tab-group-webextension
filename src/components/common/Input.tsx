@@ -9,6 +9,7 @@ interface IProps {
 
 const useStyles = makeStyles({
   root: {
+    border: 'none',
     fontSize: 'inherit',
     fontWeight: 'inherit',
     lineHeight: 'inherit',

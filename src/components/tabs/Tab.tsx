@@ -34,7 +34,6 @@ function Tab({
   title,
   url,
   isReadOnly,
-  windowId,
   faviconUrl,
   onRemoveTab,
 }: IProps): React.ReactElement {
@@ -48,7 +47,7 @@ function Tab({
           {...provided.dragHandleProps}
           style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
         >
-          <div className="w-4 mr-2">
+          <div className="w-4 h-4 mr-2">
             <img src={faviconUrl} />
           </div>
 
@@ -63,7 +62,7 @@ function Tab({
           </div>
 
           {onRemoveTab && !isReadOnly && (
-            <button className="text-sm" onClick={onRemoveTab}>
+            <button className="text-sm text-gray-600" onClick={onRemoveTab}>
               <Delete fontSize="inherit" />
             </button>
           )}
