@@ -203,5 +203,5 @@ browser.tabs.onAttached.addListener(onTabAttached)
 browser.tabs.onRemoved.addListener(onTabRemoved)
 
 // setup context menu entries
-browser.contextMenus.create({ title: 'group this', contexts: ['tab'] }, () => null)
+// browser.contextMenus.create({ title: 'group this', contexts: ['tab'] }, () => null)
 // browser.contextMenus.removeAll()
