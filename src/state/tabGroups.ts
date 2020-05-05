@@ -37,7 +37,7 @@ function removeTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): F
     )(state)
 }
 
-function injectTab(state: ITabGroup[], action: any, tabData: ITab) {
+function injectTab(state: ITabGroup[], action: any, tabData: ITab): ITabGroup[] {
   // compute the index of the target group
   const targetGroupIndex = findIndex((el) => el.id === action.payload.targetGroupId, state)
   if (targetGroupIndex === -1) {
@@ -56,10 +56,28 @@ function injectTab(state: ITabGroup[], action: any, tabData: ITab) {
   )(state)
 }
 
+// TODO: extend each tab by the hash
+// TODO: deduplicate storage according to the hash of tabs
+// TODO: can we replace the uuid with the hash? uuid + tabgroup id?
 const tabGroupsSlice = createSlice({
   name: 'tabGroups',
   initialState: [] as ITabGroup[],
   reducers: {
+    collapseGroup(state, action): ITabGroup[] {
+      const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
+      if (sourceGroupIndex === -1) {
+        return state
+      }
+
+      const existingTabGroup = sourceGroupIndex > -1 ? nth(sourceGroupIndex, state) : null
+
+      // update a tab group that already exists
+      return update(
+        sourceGroupIndex,
+        assoc('collapsed', !existingTabGroup?.collapsed, existingTabGroup),
+        state
+      )
+    },
     updateGroup(state, action): ITabGroup[] {
       const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
       const existingTabGroup = sourceGroupIndex > -1 ? nth(sourceGroupIndex, state) : null
@@ -73,6 +91,7 @@ const tabGroupsSlice = createSlice({
           existingTabGroup?.tabs ??
           [],
         readOnly: action?.payload?.readOnly ?? existingTabGroup?.readOnly ?? false,
+        collapsed: action?.payload?.collapsed ?? existingTabGroup?.collapsed ?? false,
       }
 
       if (sourceGroupIndex === -1) {
@@ -166,7 +185,15 @@ const tabGroupsSlice = createSlice({
 })
 
 const { actions, reducer } = tabGroupsSlice
-export const { updateGroup, removeGroup, moveTab, reorderTab, removeTab, moveCurrentTab } = actions
+export const {
+  collapseGroup,
+  updateGroup,
+  removeGroup,
+  moveTab,
+  reorderTab,
+  removeTab,
+  moveCurrentTab,
+} = actions
 export default reducer
 
 // THUNKS

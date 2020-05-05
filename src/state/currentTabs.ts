@@ -11,8 +11,12 @@ const currentTabsSlice = createSlice({
     activeTab: -1,
     activeWindow: 0,
     tabs: [] as ITab[],
+    collapsed: false,
   },
   reducers: {
+    collapseCurrentTabs(state): void {
+      state.collapsed = !state.collapsed
+    },
     updateTabs(state, action): void {
       state.tabs = action.payload.map(augmentTabExtras)
     },
@@ -49,7 +53,14 @@ const currentTabsSlice = createSlice({
 })
 
 const { actions, reducer } = currentTabsSlice
-export const { createTab, updateTab, removeTab, activateTab, updateTabs } = actions
+export const {
+  collapseCurrentTabs,
+  createTab,
+  updateTab,
+  removeTab,
+  activateTab,
+  updateTabs,
+} = actions
 export default reducer
 
 // THUNKS

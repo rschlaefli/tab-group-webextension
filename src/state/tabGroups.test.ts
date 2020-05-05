@@ -121,6 +121,7 @@ describe('tabGroupsReducer', () => {
         id: 'current',
         name: 'Current Tabs',
         tabs: TABS,
+        collapsed: false,
       },
     ]
   })
@@ -244,5 +245,23 @@ describe('tabGroupsReducer', () => {
 
     // expect ids like [[0, 1]]
     expectIdsInGroups([[0, 1]], currentState)
+  })
+
+  it('collapses a tab group', () => {
+    const action = updateGroup({
+      sourceGroupId: 'current',
+      collapsed: true,
+    })
+
+    currentState = tabGroupsReducer(currentState, action)
+  })
+
+  it('uncollapsed a tab group', () => {
+    const action = updateGroup({
+      sourceGroupId: 'current',
+      collapsed: false,
+    })
+
+    currentState = tabGroupsReducer(currentState, action)
   })
 })
