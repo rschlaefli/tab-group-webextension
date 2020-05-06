@@ -63,8 +63,12 @@ export function augmentTabExtras(tabData: Partial<ITab>): ITab {
   }
 
   if (typeof tabData.baseHash === 'undefined' && tabData.url) {
-    const { origin, originHash, baseUrl, baseHash } = computeTabHash(tabData.url, tabData.title)
-    augmentedTabData.hash = augmentedTabData.origin = origin
+    const { hash, origin, originHash, baseUrl, baseHash } = computeTabHash(
+      tabData.url,
+      tabData.title
+    )
+    augmentedTabData.hash = hash
+    augmentedTabData.origin = origin
     augmentedTabData.originHash = originHash
     augmentedTabData.baseUrl = baseUrl
     augmentedTabData.baseHash = baseHash
