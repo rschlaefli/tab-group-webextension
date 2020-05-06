@@ -25,19 +25,30 @@ export function performBrowserActionSafe(func: (browser: Browser) => void): Func
 }
 
 interface IHashResult {
+  hash: string
   origin: string
   originHash: string
   baseUrl: string
   baseHash: string
 }
-export function computeUrlHash(url: string): IHashResult {
+export function computeTabHash(url: string, title?: string): IHashResult {
+  let result: Partial<IHashResult> = {}
+
   const { origin, pathname } = new URL(url)
-  return {
+  result = {
     origin,
     originHash: md5(origin),
     baseUrl: origin + pathname,
     baseHash: md5(origin + pathname),
   }
+
+  if (typeof title !== 'undefined') {
+    result['hash'] = md5(result.baseUrl + title)
+  } else {
+    result['hash'] = result.baseHash
+  }
+
+  return result as IHashResult
 }
 
 export function augmentTabExtras(tabData: Partial<ITab>): ITab {
@@ -52,8 +63,8 @@ export function augmentTabExtras(tabData: Partial<ITab>): ITab {
   }
 
   if (typeof tabData.baseHash === 'undefined' && tabData.url) {
-    const { origin, originHash, baseUrl, baseHash } = computeUrlHash(tabData.url)
-    augmentedTabData.origin = origin
+    const { origin, originHash, baseUrl, baseHash } = computeTabHash(tabData.url, tabData.title)
+    augmentedTabData.hash = augmentedTabData.origin = origin
     augmentedTabData.originHash = originHash
     augmentedTabData.baseUrl = baseUrl
     augmentedTabData.baseHash = baseHash

@@ -114,8 +114,8 @@ function onTabUpdate(tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType, ta
   ) {
     browser.tabs.executeScript(tab.id, {
       file: '/sidebar.bundle.js',
-      runAt: 'document_start',
-      matchAboutBlank: true,
+      runAt: 'document_idle',
+      matchAboutBlank: false,
     })
   }
 
