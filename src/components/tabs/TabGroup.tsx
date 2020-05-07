@@ -70,11 +70,19 @@ function TabGroup({
 
             {!isReadOnly && (
               <div className="flex flex-row">
-                <button className="ml-2 mr-2 text-sm text-gray-600" onClick={onOpenTabGroup}>
+                <button
+                  className="ml-2 mr-2 text-sm text-gray-600"
+                  onClick={onOpenTabGroup}
+                  title="open group"
+                >
                   <Launch fontSize="inherit" />
                 </button>
 
-                <button className="text-sm text-gray-600" onClick={onRemoveTabGroup}>
+                <button
+                  className="text-sm text-gray-600"
+                  onClick={onRemoveTabGroup}
+                  title="remove group"
+                >
                   <Delete fontSize="inherit" />
                 </button>
               </div>

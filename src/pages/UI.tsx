@@ -156,6 +156,7 @@ function UI(): React.ReactElement {
                 fullWidth
                 className="min-h-8 md:min-w-xs md:max-w-xs"
                 onClick={handleAddTabGroup}
+                title="add group"
               >
                 <Add />
               </Button>
@@ -164,7 +165,11 @@ function UI(): React.ReactElement {
         </div>
 
         <div className="flex flex-row justify-end">
-          <button className="text-lg text-gray-600" onClick={handleOpenOptions}>
+          <button
+            className="text-lg text-gray-600"
+            onClick={handleOpenOptions}
+            title="open settings"
+          >
             <Settings fontSize="inherit" />
           </button>
         </div>
