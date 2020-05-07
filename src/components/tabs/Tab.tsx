@@ -93,13 +93,21 @@ function Tab({
             </div>
 
             {onRemoveTab && !isReadOnly && (
-              <button className="text-sm text-gray-600" onClick={onRemoveTab} title="remove tab">
+              <button
+                className="text-sm text-gray-600 dark:text-gray-100"
+                onClick={onRemoveTab}
+                title="remove tab"
+              >
                 <Delete fontSize="inherit" />
               </button>
             )}
 
             {onCloseTab && (
-              <button className="text-sm text-gray-600" onClick={onCloseTab} title="close tab">
+              <button
+                className="text-sm text-gray-600 dark:text-gray-100"
+                onClick={onCloseTab}
+                title="close tab"
+              >
                 <Close fontSize="inherit" />
               </button>
             )}

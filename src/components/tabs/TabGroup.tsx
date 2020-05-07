@@ -48,11 +48,11 @@ function TabGroup({
           {...provided.droppableProps}
           style={getListStyle(snapshot.isDraggingOver)}
         >
-          <div className="flex flex-row items-center justify-between px-2 py-1 bg-gray-100 dark:bg-gray-100 dark:text-gray-900 ">
+          <div className="flex flex-row items-center justify-between px-2 py-1 bg-gray-100 dark:text-gray-900 dark:bg-gray-700">
             <button
               className={clsx(
-                'mr-2 text-sm md:hidden',
-                tabs.length === 0 && 'text-gray-500 cursor-default'
+                'mr-2 text-sm md:hidden text-gray-600 dark:text-gray-400',
+                tabs.length === 0 && 'text-gray-400 dark:text-gray-600 cursor-default'
               )}
               disabled={tabs.length === 0}
               onClick={onCollapseGroup}
@@ -64,14 +64,14 @@ function TabGroup({
               )}
             </button>
 
-            <h1 className="w-full text-xs font-bold">
+            <h1 className="w-full text-xs font-bold dark:text-gray-100">
               {isReadOnly ? name : <Input fullWidth value={name} onChange={onChangeGroupName} />}
             </h1>
 
             {!isReadOnly && (
               <div className="flex flex-row">
                 <button
-                  className="ml-2 mr-2 text-sm text-gray-600"
+                  className="ml-2 mr-2 text-sm text-gray-600 dark:text-gray-400"
                   onClick={onOpenTabGroup}
                   title="open group"
                 >
@@ -79,7 +79,7 @@ function TabGroup({
                 </button>
 
                 <button
-                  className="text-sm text-gray-600"
+                  className="text-sm text-gray-600 dark:text-gray-400"
                   onClick={onRemoveTabGroup}
                   title="remove group"
                 >

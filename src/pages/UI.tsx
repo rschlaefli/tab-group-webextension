@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react'
 import { DragDropContext, DropResult, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
-import { Button, IconButton, Input, FormControlLabel } from '@material-ui/core'
+import { Button, Input } from '@material-ui/core'
 import { Add, Settings } from '@material-ui/icons'
 
 import optionsStorage from '@src/optionsStorage'
 import TabGroup from '@src/components/tabs/TabGroup'
 import { ITabGroup } from '@src/types/Extension'
 import { getBrowserSafe } from '@src/lib/utils'
+import Layout from '@src/lib/Layout'
 import {
   removeTab,
   moveTab,
@@ -111,74 +112,76 @@ function UI(): React.ReactElement {
   }
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <div className="w-full h-auto p-1 min-h-64 min-w-64">
-        <div className="pb-1">
-          <Input
-            fullWidth
-            disabled
-            placeholder="Search..."
-            value=""
-            onChange={(): void => undefined}
-          />
-        </div>
-
-        <div className="flex flex-col md:flex-wrap md:flex-row">
-          <TabGroup
-            isReadOnly
-            id="current"
-            name="Current Tabs"
-            tabs={currentTabs.tabs}
-            isCollapsed={currentTabs.collapsed}
-            onCollapseGroup={handleCollapseCurrentTabs}
-            onCloseTab={handleCloseCurrentTab}
-          />
-
-          {tabGroups.map((tabGroup: ITabGroup) => (
-            <TabGroup
-              // TODO: pass down current tabs and mark tabs that are open
-              // TODO: disable window display for tabs that are not open
-              key={tabGroup.id}
-              id={tabGroup.id}
-              name={tabGroup.name}
-              tabs={tabGroup.tabs}
-              isCollapsed={tabGroup.collapsed}
-              isReadOnly={tabGroup.readOnly}
-              onCollapseGroup={handleCollapseTabGroup(tabGroup.id)}
-              onRemoveTab={handleRemoveTab(tabGroup.id)}
-              onRemoveTabGroup={handleRemoveTabGroup(tabGroup.id)}
-              onOpenTabGroup={handleOpenTabGroup(tabGroup.id)}
-              onChangeGroupName={handleRenameTabGroup(tabGroup.id)}
+    <Layout>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div className="w-full h-auto p-1 min-h-64 min-w-64">
+          <div className="pb-1 dark:text-gray-100">
+            <Input
+              fullWidth
+              disabled
+              placeholder="Search..."
+              value=""
+              onChange={(): void => undefined}
             />
-          ))}
+          </div>
 
-          <Droppable ignoreContainerClipping droppableId="newGroup">
-            {(provided: DroppableProvided): React.ReactElement => (
-              <Button
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                fullWidth
-                className="min-h-8 md:min-w-xs md:max-w-xs"
-                onClick={handleAddTabGroup}
-                title="add group"
-              >
-                <Add />
-              </Button>
-            )}
-          </Droppable>
-        </div>
+          <div className="flex flex-col md:flex-wrap md:flex-row">
+            <TabGroup
+              isReadOnly
+              id="current"
+              name="Current Tabs"
+              tabs={currentTabs.tabs}
+              isCollapsed={currentTabs.collapsed}
+              onCollapseGroup={handleCollapseCurrentTabs}
+              onCloseTab={handleCloseCurrentTab}
+            />
 
-        <div className="flex flex-row justify-end">
-          <button
-            className="text-lg text-gray-600"
-            onClick={handleOpenOptions}
-            title="open settings"
-          >
-            <Settings fontSize="inherit" />
-          </button>
+            {tabGroups.map((tabGroup: ITabGroup) => (
+              <TabGroup
+                // TODO: pass down current tabs and mark tabs that are open
+                // TODO: disable window display for tabs that are not open
+                key={tabGroup.id}
+                id={tabGroup.id}
+                name={tabGroup.name}
+                tabs={tabGroup.tabs}
+                isCollapsed={tabGroup.collapsed}
+                isReadOnly={tabGroup.readOnly}
+                onCollapseGroup={handleCollapseTabGroup(tabGroup.id)}
+                onRemoveTab={handleRemoveTab(tabGroup.id)}
+                onRemoveTabGroup={handleRemoveTabGroup(tabGroup.id)}
+                onOpenTabGroup={handleOpenTabGroup(tabGroup.id)}
+                onChangeGroupName={handleRenameTabGroup(tabGroup.id)}
+              />
+            ))}
+
+            <Droppable ignoreContainerClipping droppableId="newGroup">
+              {(provided: DroppableProvided): React.ReactElement => (
+                <Button
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  fullWidth
+                  className="min-h-8 md:min-w-xs md:max-w-xs"
+                  onClick={handleAddTabGroup}
+                  title="add group"
+                >
+                  <Add />
+                </Button>
+              )}
+            </Droppable>
+          </div>
+
+          <div className="flex flex-row justify-end">
+            <button
+              className="text-lg text-gray-600 dark:text-gray-100"
+              onClick={handleOpenOptions}
+              title="open settings"
+            >
+              <Settings fontSize="inherit" />
+            </button>
+          </div>
         </div>
-      </div>
-    </DragDropContext>
+      </DragDropContext>
+    </Layout>
   )
 }
 

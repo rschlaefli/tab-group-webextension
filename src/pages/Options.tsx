@@ -11,6 +11,7 @@ import {
 
 import { performBrowserActionSafe } from '../lib/utils'
 import optionsStorage from '../optionsStorage'
+import Layout from '../lib/Layout'
 
 function Options(): React.ReactElement {
   const [enableHeuristics, setEnableHeuristics] = useState(false)
@@ -46,59 +47,61 @@ function Options(): React.ReactElement {
   const reloadExtension = performBrowserActionSafe((browser) => browser.runtime.reload())
 
   return (
-    <Container>
-      <FormControl component="fieldset">
-        <FormLabel component="legend">Browser Extension</FormLabel>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={openSidebarByDefault}
-                onChange={handleToggleCheckbox(
-                  'openSidebarByDefault',
-                  setOpenSidebarByDefault,
-                  reloadExtension
-                )}
-              />
-            }
-            label="Open the sidebar by default"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={enableLogging}
-                onChange={handleToggleCheckbox('debugLogging', setEnableLogging, reloadExtension)}
-              />
-            }
-            label="Enable debug logging"
-          />
-          <Button
-            disabled={tutorialProgress === 0}
-            onClick={(): Promise<void> => resetTutorialProgress()}
-          >
-            Reset tutorial progress
-          </Button>
-        </FormGroup>
-      </FormControl>
-      <FormControl component="fieldset">
-        <FormLabel component="legend">Heuristics Engine</FormLabel>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={enableHeuristics}
-                onChange={handleToggleCheckbox(
-                  'enableHeuristics',
-                  setEnableHeuristics,
-                  reloadExtension
-                )}
-              />
-            }
-            label="Enable grouping heuristics"
-          />
-        </FormGroup>
-      </FormControl>
-    </Container>
+    <Layout>
+      <Container>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Browser Extension</FormLabel>
+          <FormGroup>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={openSidebarByDefault}
+                  onChange={handleToggleCheckbox(
+                    'openSidebarByDefault',
+                    setOpenSidebarByDefault,
+                    reloadExtension
+                  )}
+                />
+              }
+              label="Open the sidebar by default"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={enableLogging}
+                  onChange={handleToggleCheckbox('debugLogging', setEnableLogging, reloadExtension)}
+                />
+              }
+              label="Enable debug logging"
+            />
+            <Button
+              disabled={tutorialProgress === 0}
+              onClick={(): Promise<void> => resetTutorialProgress()}
+            >
+              Reset tutorial progress
+            </Button>
+          </FormGroup>
+        </FormControl>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Heuristics Engine</FormLabel>
+          <FormGroup>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={enableHeuristics}
+                  onChange={handleToggleCheckbox(
+                    'enableHeuristics',
+                    setEnableHeuristics,
+                    reloadExtension
+                  )}
+                />
+              }
+              label="Enable grouping heuristics"
+            />
+          </FormGroup>
+        </FormControl>
+      </Container>
+    </Layout>
   )
 }
 
