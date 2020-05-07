@@ -6,8 +6,8 @@ import {
   DraggingStyle,
   NotDraggingStyle,
 } from 'react-beautiful-dnd'
-import { Delete, CheckBoxOutlineBlankSharp } from '@material-ui/icons'
-import { Menu, MenuItem } from '@material-ui/core'
+import { Delete, Close } from '@material-ui/icons'
+import { Menu, MenuItem, Button } from '@material-ui/core'
 
 interface IProps {
   index: number
@@ -18,6 +18,7 @@ interface IProps {
   isReadOnly?: boolean
   faviconUrl?: string
   onRemoveTab?: (() => void) | false
+  onCloseTab?: (() => void) | false
   // onOpenContextMenu: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   // onCloseContextMenu: () => void
 }
@@ -49,6 +50,7 @@ function Tab({
   isReadOnly,
   faviconUrl,
   onRemoveTab,
+  onCloseTab,
 }: IProps): React.ReactElement {
   const [mousePosition, setMousePosition] = useState<IMousePosition>(initialMousePosition)
 
@@ -93,6 +95,12 @@ function Tab({
             {onRemoveTab && !isReadOnly && (
               <button className="text-sm text-gray-600" onClick={onRemoveTab}>
                 <Delete fontSize="inherit" />
+              </button>
+            )}
+
+            {onCloseTab && (
+              <button className="text-sm text-gray-600" onClick={onCloseTab}>
+                <Close fontSize="inherit" />
               </button>
             )}
           </div>

@@ -19,6 +19,7 @@ interface IProps {
   onRemoveTabGroup?: () => void
   onChangeGroupName?: (newName: string) => void
   onOpenTabGroup?: () => void
+  onCloseTab?: (tabId: number) => () => void
 }
 
 const getListStyle = (isDraggingOver: boolean): {} => ({
@@ -34,6 +35,7 @@ function TabGroup({
   onOpenTabGroup,
   onRemoveTab,
   onRemoveTabGroup,
+  onCloseTab,
   isReadOnly,
   isCollapsed,
 }: IProps): React.ReactElement {
@@ -93,6 +95,7 @@ function TabGroup({
                   windowId={tab.windowId}
                   isReadOnly={isReadOnly}
                   onRemoveTab={onRemoveTab && onRemoveTab(index)}
+                  onCloseTab={onCloseTab && onCloseTab(tab.id as number)}
                 />,
               ])}
           </div>

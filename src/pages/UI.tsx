@@ -4,7 +4,7 @@ import {
   DropResult,
   Droppable,
   DroppableProvided,
-  DroppableStateSnapshot
+  DroppableStateSnapshot,
 } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
 import { Button, IconButton } from '@material-ui/core'
@@ -22,15 +22,15 @@ import {
   updateGroup,
   openTabGroup,
   moveCurrentTab,
-  collapseGroup
+  collapseGroup,
 } from '@src/state/tabGroups'
-import { collapseCurrentTabs } from '@src/state/currentTabs'
+import { collapseCurrentTabs, closeCurrentTab } from '@src/state/currentTabs'
 
 const extractDragEventProperties = (dragEvent: DropResult): any => ({
   sourceGroupId: dragEvent.source.droppableId,
   targetGroupId: dragEvent?.destination?.droppableId,
   sourceTabIndex: dragEvent.source.index,
-  targetTabIndex: dragEvent?.destination?.index
+  targetTabIndex: dragEvent?.destination?.index,
 })
 
 function UI(): React.ReactElement {
@@ -108,6 +108,10 @@ function UI(): React.ReactElement {
     dispatch(collapseCurrentTabs())
   }
 
+  const handleCloseCurrentTab = (tabId: number) => (): void => {
+    dispatch(closeCurrentTab(tabId))
+  }
+
   if (!tabGroups) {
     return <div>Loading</div>
   }
@@ -123,6 +127,7 @@ function UI(): React.ReactElement {
             tabs={currentTabs.tabs}
             isCollapsed={currentTabs.collapsed}
             onCollapseGroup={handleCollapseCurrentTabs}
+            onCloseTab={handleCloseCurrentTab}
           />
 
           {tabGroups.map((tabGroup: ITabGroup) => (
@@ -142,6 +147,7 @@ function UI(): React.ReactElement {
               onChangeGroupName={handleRenameTabGroup(tabGroup.id)}
             />
           ))}
+
           <Droppable ignoreContainerClipping droppableId="newGroup">
             {(provided: DroppableProvided): React.ReactElement => (
               <Button

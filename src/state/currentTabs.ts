@@ -83,6 +83,14 @@ export const initializeCurrentTabs = createAsyncThunk(
   }
 )
 
+export const closeCurrentTab = createAsyncThunk(
+  'currentTabs/closeTab',
+  async (tabId: number, _): Promise<void> => {
+    const browser = await getBrowserSafe()
+    await browser.tabs.remove(tabId)
+  }
+)
+
 export const reorderCurrentTabs = createAsyncThunk(
   'currentTabs/reorder',
   async ({ fromWindow, toWindow, fromIndex, toIndex }: any, thunkAPI): Promise<void> => {
