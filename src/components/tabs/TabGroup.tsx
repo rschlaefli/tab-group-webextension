@@ -41,7 +41,7 @@ function TabGroup({
     <Droppable ignoreContainerClipping droppableId={id}>
       {(provided: DroppableProvided, snapshot: DroppableStateSnapshot): React.ReactElement => (
         <div
-          className="flex-1 mb-1 border border-solid md:mr-2 md:last:mr-0 md:max-w-xs"
+          className="flex-1 mb-1 border border-solid md:mr-2 md:last:mr-0 md:max-w-xs md:min-w-xs"
           ref={provided.innerRef}
           {...provided.droppableProps}
           style={getListStyle(snapshot.isDraggingOver)}

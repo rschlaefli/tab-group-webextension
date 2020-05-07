@@ -60,7 +60,7 @@ optionsStorage.getAll().then((opt) => {
 
             case HEURISTICS_ACTION.QUERY_TABS:
               const currentTabs = store.getState().currentTabs?.tabs as ITab[]
-              console.log(`> Initializing current tabs in heuristics: ${currentTabs}`)
+              console.log(`> Initializing current tabs in heuristics:`, currentTabs)
               postNativeMessage(nativePort, {
                 action: TAB_ACTION.INIT_TABS,
                 payload: { currentTabs },

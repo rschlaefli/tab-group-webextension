@@ -15,7 +15,7 @@ module.exports = {
   // A set of global variables that need to be available in all test environments
   // globals: {},
   // An array of file extensions your modules use
-  moduleFileExtensions: ['js', 'json', 'jsx', 'ts', 'tsx', 'node'],
+  // moduleFileExtensions: ['js', 'json', 'jsx', 'ts', 'tsx', 'node'],
   // A map from regular expressions to module names that allow to stub out resources with a single module
   moduleNameMapper: {
     '@src/(.*)': '<rootDir>/src/$1',
@@ -25,7 +25,7 @@ module.exports = {
   // An enum that specifies notification mode. Requires { notify: true }
   // notifyMode: "failure-change",
   // A preset that is used as a base for Jest's configuration
-  // preset: null,
+  preset: 'ts-jest/presets/default',
   // Use this configuration option to add custom reporters to Jest
   // reporters: undefined,
   // Automatically reset mock state between every test
@@ -43,7 +43,7 @@ module.exports = {
   // The test environment that will be used for testing
   // testEnvironment: "jest-environment-jsdom",
   testPathIgnorePatterns: ['/node_modules/'],
-  transform: {
-    '\\.tsx?$': 'ts-jest',
-  },
+  // transform: {
+  //   '\\.tsx?$': 'ts-jest',
+  // },
 }

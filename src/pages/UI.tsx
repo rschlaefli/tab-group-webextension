@@ -1,12 +1,17 @@
 import React, { useEffect } from 'react'
-import { DragDropContext, DropResult } from 'react-beautiful-dnd'
+import {
+  DragDropContext,
+  DropResult,
+  Droppable,
+  DroppableProvided,
+  DroppableStateSnapshot
+} from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
 import { Button, IconButton } from '@material-ui/core'
-import { Settings } from '@material-ui/icons'
+import { Add, Settings } from '@material-ui/icons'
 
 import optionsStorage from '@src/optionsStorage'
 import TabGroup from '@src/components/tabs/TabGroup'
-
 import { ITabGroup } from '@src/types/Extension'
 import { getBrowserSafe } from '@src/lib/utils'
 import {
@@ -17,7 +22,7 @@ import {
   updateGroup,
   openTabGroup,
   moveCurrentTab,
-  collapseGroup,
+  collapseGroup
 } from '@src/state/tabGroups'
 import { collapseCurrentTabs } from '@src/state/currentTabs'
 
@@ -25,7 +30,7 @@ const extractDragEventProperties = (dragEvent: DropResult): any => ({
   sourceGroupId: dragEvent.source.droppableId,
   targetGroupId: dragEvent?.destination?.droppableId,
   sourceTabIndex: dragEvent.source.index,
-  targetTabIndex: dragEvent?.destination?.index,
+  targetTabIndex: dragEvent?.destination?.index
 })
 
 function UI(): React.ReactElement {
@@ -42,7 +47,9 @@ function UI(): React.ReactElement {
     init()
   }, [dispatch])
 
-  const handleDragEnd = (dragEvent: DropResult): any => {
+  const handleDragEnd = async (dragEvent: DropResult): Promise<any> => {
+    console.log(dragEvent)
+
     const properties = extractDragEventProperties(dragEvent)
 
     // if the destination is empty, return
@@ -50,10 +57,8 @@ function UI(): React.ReactElement {
 
     // if we are reordering within a droppable
     if (properties.sourceGroupId === properties.targetGroupId) {
-      if (properties.sourceGroupId === 'current') {
-        console.log('reordering current tabs')
-        return
-      }
+      // do not allow reordering in current tabs
+      if (properties.sourceGroupId === 'current') return
 
       // if we are reordering to the same position,, return
       if (properties.sourceTabIndex === properties.targetGroupIndex) return
@@ -110,11 +115,6 @@ function UI(): React.ReactElement {
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <div className="w-full h-auto p-1 min-h-64 min-w-64">
-        <div className="flex flex-row justify-end">
-          <button className="text-sm text-gray-600" onClick={handleOpenOptions}>
-            <Settings fontSize="inherit" />
-          </button>
-        </div>
         <div className="flex flex-col md:flex-wrap md:flex-row">
           <TabGroup
             isReadOnly
@@ -142,11 +142,26 @@ function UI(): React.ReactElement {
               onChangeGroupName={handleRenameTabGroup(tabGroup.id)}
             />
           ))}
+          <Droppable ignoreContainerClipping droppableId="newGroup">
+            {(provided: DroppableProvided): React.ReactElement => (
+              <Button
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                fullWidth
+                className="min-h-8 md:min-w-xs md:max-w-xs"
+                onClick={handleAddTabGroup}
+              >
+                <Add />
+              </Button>
+            )}
+          </Droppable>
         </div>
 
-        <Button fullWidth onClick={handleAddTabGroup}>
-          New Group
-        </Button>
+        <div className="flex flex-row justify-end">
+          <button className="text-lg text-gray-600" onClick={handleOpenOptions}>
+            <Settings fontSize="inherit" />
+          </button>
+        </div>
       </div>
     </DragDropContext>
   )

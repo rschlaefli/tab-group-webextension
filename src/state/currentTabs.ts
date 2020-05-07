@@ -76,7 +76,7 @@ export const initializeCurrentTabs = createAsyncThunk(
     // firefox can hide tabs that have been closed but might be reopened soon
     const visibleTabs = tabs.filter((tab: Tabs.Tab) => !tab.hidden)
 
-    console.log(`> Initializing current tabs to ${visibleTabs.toString()}`)
+    console.log(`> Initializing current tabs to:`, visibleTabs)
 
     // initialize the tabs
     await thunkAPI.dispatch(updateTabs(visibleTabs))
