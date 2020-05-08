@@ -9,9 +9,9 @@ const suggestionsSlice = createSlice({
   initialState: [] as ITabGroup[],
   reducers: {
     updateSuggestedGroups(_, action): ITabGroup[] {
-      return action.payload.map((tabs) => ({
+      return action.payload.map(([keywords, tabs]) => ({
         id: uuidv4(),
-        name: 'xyz',
+        name: keywords ?? 'xyz',
         tabs: tabs.map(augmentTabExtras),
         readOnly: true,
         collapsed: false,
