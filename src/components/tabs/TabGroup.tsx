@@ -1,7 +1,7 @@
 import React from 'react'
 import clsx from 'clsx'
 import { Droppable, DroppableProvided, DroppableStateSnapshot } from 'react-beautiful-dnd'
-import { Save, Delete, Launch, ArrowDropDown, ArrowDropUp } from '@material-ui/icons'
+import { Save, Delete, Launch, ArrowDropDown, ArrowDropUp, InfoOutlined } from '@material-ui/icons'
 // import { Rating } from '@material-ui/lab'
 
 import Input from '../common/Input'
@@ -72,12 +72,33 @@ function TabGroup({
               )}
             </button>
 
-            <h1 className="w-full text-xs font-bold dark:text-gray-100">
-              {isSuggested && 'Suggested: '}
+            <h1 className="w-full mr-2 text-xs font-bold dark:text-gray-100">
               {isReadOnly ? name : <Input fullWidth value={name} onChange={onChangeGroupName} />}
             </h1>
 
             <div className="flex flex-row">
+              {(!isReadOnly || isSuggested) && (
+                <button
+                  key="open"
+                  className="text-sm text-gray-600 dark:text-gray-400"
+                  onClick={onOpenTabGroup}
+                  title="open group"
+                >
+                  <Launch fontSize="inherit" />
+                </button>
+              )}
+
+              {!isReadOnly && (
+                <button
+                  key="remove"
+                  className="ml-2 text-sm text-gray-600 dark:text-gray-400"
+                  onClick={onRemoveTabGroup}
+                  title="remove group"
+                >
+                  <Delete fontSize="inherit" />
+                </button>
+              )}
+
               {isSuggested && [
                 <button
                   disabled
@@ -97,24 +118,6 @@ function TabGroup({
                   <Save fontSize="inherit" />
                 </button>,
               ]}
-              {!isReadOnly && [
-                <button
-                  key="open"
-                  className="ml-2 mr-2 text-sm text-gray-600 dark:text-gray-400"
-                  onClick={onOpenTabGroup}
-                  title="open group"
-                >
-                  <Launch fontSize="inherit" />
-                </button>,
-                <button
-                  key="remove"
-                  className="text-sm text-gray-600 dark:text-gray-400"
-                  onClick={onRemoveTabGroup}
-                  title="remove group"
-                >
-                  <Delete fontSize="inherit" />
-                </button>,
-              ]}
             </div>
           </div>
 
@@ -131,6 +134,7 @@ function TabGroup({
                   faviconUrl={tab.favIconUrl}
                   windowId={tab.windowId}
                   isReadOnly={isReadOnly}
+                  isSuggested={isSuggested}
                   onRemoveTab={onRemoveTab && onRemoveTab(index)}
                   onCloseTab={onCloseTab && onCloseTab(tab.id as number)}
                 />,

@@ -11,6 +11,7 @@ const currentTabsSlice = createSlice({
     activeTab: -1,
     activeWindow: 0,
     tabs: [] as ITab[],
+    // tabHashes: new Set(),
     collapsed: false,
   },
   reducers: {

@@ -7,7 +7,7 @@ import {
   NotDraggingStyle,
 } from 'react-beautiful-dnd'
 import { Delete, Close } from '@material-ui/icons'
-import { Menu, MenuItem, Button } from '@material-ui/core'
+import { Menu, MenuItem, Typography } from '@material-ui/core'
 
 interface IProps {
   index: number
@@ -16,6 +16,7 @@ interface IProps {
   url?: string
   windowId?: number
   isReadOnly?: boolean
+  isSuggested?: boolean
   faviconUrl?: string
   onRemoveTab?: (() => void) | false
   onCloseTab?: (() => void) | false
@@ -48,6 +49,7 @@ function Tab({
   title,
   url,
   isReadOnly,
+  isSuggested,
   faviconUrl,
   onRemoveTab,
   onCloseTab,
@@ -71,30 +73,34 @@ function Tab({
       <Draggable key={uuid} draggableId={`draggable-${uuid}`} index={index}>
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot): React.ReactElement => (
           <div
-            className="flex flex-row items-center justify-between px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0"
+            className="flex flex-row items-center justify-start px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0"
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
             onContextMenu={handleOpenContextMenu}
           >
-            <div className="w-4 h-4 mr-2">
-              <img src={faviconUrl} />
-            </div>
+            {!isSuggested && (
+              <div className="flex-initial w-4 h-4 mr-2">
+                <img src={faviconUrl} />
+              </div>
+            )}
 
-            <div className="flex-1 leading-tight">
-              {!isReadOnly && url ? (
-                <a href={url} target="_blank" rel="noopener noreferrer">
-                  {title}
-                </a>
-              ) : (
-                title
-              )}
+            <div className="flex-1 leading-tight max-w-5/6">
+              <Typography noWrap display="block" variant="inherit" title={title}>
+                {(!isReadOnly || isSuggested) && url ? (
+                  <a href={url} target="_blank" rel="noopener noreferrer">
+                    {title}
+                  </a>
+                ) : (
+                  title
+                )}
+              </Typography>
             </div>
 
             {onRemoveTab && !isReadOnly && (
               <button
-                className="text-sm text-gray-600 dark:text-gray-100"
+                className="flex-auto ml-2 text-sm text-right text-gray-600 dark:text-gray-100"
                 onClick={onRemoveTab}
                 title="remove tab"
               >
@@ -104,7 +110,7 @@ function Tab({
 
             {onCloseTab && (
               <button
-                className="text-sm text-gray-600 dark:text-gray-100"
+                className="flex-auto ml-2 text-sm text-right text-gray-600 dark:text-gray-100"
                 onClick={onCloseTab}
                 title="close tab"
               >
