@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import { v4 as uuidv4 } from 'uuid'
 
 import { ITabGroup } from '@src/types/Extension'
+import { augmentTabExtras } from '@src/lib/utils'
 
 const suggestionsSlice = createSlice({
   name: 'suggestions',
@@ -11,7 +12,7 @@ const suggestionsSlice = createSlice({
       return action.payload.map((tabs) => ({
         id: uuidv4(),
         name: 'xyz',
-        tabs,
+        tabs: tabs.map(augmentTabExtras),
         readOnly: true,
         collapsed: false,
       }))

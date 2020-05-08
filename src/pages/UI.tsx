@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { DragDropContext, DropResult, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
-import { Button, Input } from '@material-ui/core'
+import { Button, Input, Typography } from '@material-ui/core'
 import { Add, Settings } from '@material-ui/icons'
 
 import optionsStorage from '@src/optionsStorage'
@@ -171,22 +171,18 @@ function UI(): React.ReactElement {
             </Droppable>
           </div>
 
+          <Typography>Suggestions</Typography>
           <div className="flex flex-col md:flex-wrap md:flex-row">
             {suggestions.map((tabGroup: ITabGroup) => (
               <TabGroup
                 // TODO: pass down current tabs and mark tabs that are open
                 // TODO: disable window display for tabs that are not open
+                isSuggested
+                isReadOnly
                 key={tabGroup.id}
                 id={tabGroup.id}
                 name={tabGroup.name}
                 tabs={tabGroup.tabs}
-                isCollapsed={tabGroup.collapsed}
-                isReadOnly={tabGroup.readOnly}
-                onCollapseGroup={handleCollapseTabGroup(tabGroup.id)}
-                onRemoveTab={handleRemoveTab(tabGroup.id)}
-                onRemoveTabGroup={handleRemoveTabGroup(tabGroup.id)}
-                onOpenTabGroup={handleOpenTabGroup(tabGroup.id)}
-                onChangeGroupName={handleRenameTabGroup(tabGroup.id)}
               />
             ))}
           </div>
