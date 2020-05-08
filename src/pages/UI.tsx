@@ -32,6 +32,7 @@ function UI(): React.ReactElement {
   const dispatch = useDispatch()
   const currentTabs = useSelector((state: any) => state.currentTabs)
   const tabGroups = useSelector((state: any) => state.tabGroups)
+  const suggestions = useSelector((state: any) => state.suggestions)
 
   useEffect(() => {
     const init = async (): Promise<void> => {
@@ -168,6 +169,26 @@ function UI(): React.ReactElement {
                 </Button>
               )}
             </Droppable>
+          </div>
+
+          <div className="flex flex-col md:flex-wrap md:flex-row">
+            {suggestions.map((tabGroup: ITabGroup) => (
+              <TabGroup
+                // TODO: pass down current tabs and mark tabs that are open
+                // TODO: disable window display for tabs that are not open
+                key={tabGroup.id}
+                id={tabGroup.id}
+                name={tabGroup.name}
+                tabs={tabGroup.tabs}
+                isCollapsed={tabGroup.collapsed}
+                isReadOnly={tabGroup.readOnly}
+                onCollapseGroup={handleCollapseTabGroup(tabGroup.id)}
+                onRemoveTab={handleRemoveTab(tabGroup.id)}
+                onRemoveTabGroup={handleRemoveTabGroup(tabGroup.id)}
+                onOpenTabGroup={handleOpenTabGroup(tabGroup.id)}
+                onChangeGroupName={handleRenameTabGroup(tabGroup.id)}
+              />
+            ))}
           </div>
 
           <div className="flex flex-row justify-end">
