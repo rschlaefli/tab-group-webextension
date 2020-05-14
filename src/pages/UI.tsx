@@ -183,7 +183,9 @@ function UI(): React.ReactElement {
               <Typography variant="body1">Suggestions</Typography>
               <div className="flex flex-col md:flex-wrap md:flex-row">
                 {suggestions.length === 0 && (
-                  <Typography variant="body2">We do not have any suggestions yet.</Typography>
+                  <Typography variant="body2">
+                    We are collecting data to come up with suggestions...
+                  </Typography>
                 )}
                 {suggestions.map((tabGroup: ITabGroup) => (
                   <TabGroup
