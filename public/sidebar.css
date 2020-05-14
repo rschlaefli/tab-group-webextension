@@ -1,7 +1,7 @@
 #tabs-sidebar-wrapper {
   position: relative;
 
-  z-index: 0;
+  z-index: 99999;
   position: fixed;
   top: 0;
   left: 0;
