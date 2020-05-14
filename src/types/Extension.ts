@@ -14,6 +14,7 @@ export enum HEURISTICS_ACTION {
   'NEW_TAB' = 'NEW_TAB',
   'NOTIFY' = 'NOTIFY',
   'QUERY_TABS' = 'QUERY_TABS',
+  'UPDATE_GROUPS' = 'UPDATE_GROUPS',
 }
 
 export interface ITabGroup {

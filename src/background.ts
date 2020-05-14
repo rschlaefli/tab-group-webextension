@@ -19,6 +19,7 @@ import {
   removeTab,
   initializeCurrentTabs,
 } from './state/currentTabs'
+import { updateSuggestedGroups } from './state/suggestions'
 import { postNativeMessage, augmentTabExtras } from './lib/utils'
 
 // setup a redux store
@@ -46,8 +47,13 @@ optionsStorage.getAll().then((opt) => {
 
         try {
           switch (messageFromHeuristics.action) {
+            case HEURISTICS_ACTION.UPDATE_GROUPS:
+              store.dispatch(updateSuggestedGroups(messageFromHeuristics.payload))
+              break
+
             case HEURISTICS_ACTION.NEW_TAB:
               await browser.tabs.create({ url: messageFromHeuristics.payload.url })
+              break
 
             case HEURISTICS_ACTION.NOTIFY:
               await browser.notifications.create('heuristics-notify', {
@@ -57,6 +63,7 @@ optionsStorage.getAll().then((opt) => {
                 iconUrl:
                   'data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7',
               })
+              break
 
             case HEURISTICS_ACTION.QUERY_TABS:
               const currentTabs = store.getState().currentTabs?.tabs as ITab[]
@@ -65,6 +72,7 @@ optionsStorage.getAll().then((opt) => {
                 action: TAB_ACTION.INIT_TABS,
                 payload: { currentTabs },
               })
+              break
           }
         } catch (e) {
           console.error(e)
