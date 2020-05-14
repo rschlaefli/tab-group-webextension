@@ -44,8 +44,6 @@ function UI(): React.ReactElement {
   }, [dispatch])
 
   const handleDragEnd = async (dragEvent: DropResult): Promise<any> => {
-    console.log(dragEvent)
-
     const properties = extractDragEventProperties(dragEvent)
 
     // if the destination is empty, return
@@ -116,7 +114,7 @@ function UI(): React.ReactElement {
     <Layout>
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="w-full h-auto p-1 min-h-64 min-w-64">
-          <div className="pb-1 dark:text-gray-100">
+          <div className="flex flex-row pb-1 dark:text-gray-100">
             <Input
               fullWidth
               disabled
@@ -124,6 +122,13 @@ function UI(): React.ReactElement {
               value=""
               onChange={(): void => undefined}
             />
+            <button
+              className="text-lg text-gray-600 dark:text-gray-100"
+              onClick={handleOpenOptions}
+              title="open settings"
+            >
+              <Settings fontSize="inherit" />
+            </button>
           </div>
 
           <div className="flex flex-col md:flex-wrap md:flex-row">
@@ -171,30 +176,25 @@ function UI(): React.ReactElement {
             </Droppable>
           </div>
 
-          <Typography>Suggestions</Typography>
-          <div className="flex flex-col md:flex-wrap md:flex-row">
-            {suggestions.map((tabGroup: ITabGroup) => (
-              <TabGroup
-                // TODO: pass down current tabs and mark tabs that are open
-                // TODO: disable window display for tabs that are not open
-                isSuggested
-                isReadOnly
-                key={tabGroup.id}
-                id={tabGroup.id}
-                name={tabGroup.name}
-                tabs={tabGroup.tabs}
-              />
-            ))}
-          </div>
-
-          <div className="flex flex-row justify-end">
-            <button
-              className="text-lg text-gray-600 dark:text-gray-100"
-              onClick={handleOpenOptions}
-              title="open settings"
-            >
-              <Settings fontSize="inherit" />
-            </button>
+          <div className="mt-4">
+            <Typography variant="body1">Suggestions</Typography>
+            <div className="flex flex-col md:flex-wrap md:flex-row">
+              {suggestions.length === 0 && (
+                <Typography variant="body2">We do not have any suggestions yet.</Typography>
+              )}
+              {suggestions.map((tabGroup: ITabGroup) => (
+                <TabGroup
+                  // TODO: pass down current tabs and mark tabs that are open
+                  // TODO: disable window display for tabs that are not open
+                  isSuggested
+                  isReadOnly
+                  key={tabGroup.id}
+                  id={tabGroup.id}
+                  name={tabGroup.name}
+                  tabs={tabGroup.tabs}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </DragDropContext>
