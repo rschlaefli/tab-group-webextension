@@ -121,7 +121,7 @@ function TabGroup({
             </div>
           </div>
 
-          <div className={clsx('min-h-2', tabs.length > 0 && isCollapsed && 'hidden', 'md:block')}>
+          <div className={clsx('min-h-4', tabs.length > 0 && isCollapsed && 'hidden', 'md:block')}>
             {tabs
               .filter((tab) => typeof tab.id !== 'undefined')
               .map((tab: ITab, index: number) => [
