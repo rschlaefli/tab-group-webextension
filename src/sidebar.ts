@@ -2,60 +2,25 @@
 
 import { browser } from 'webextension-polyfill-ts'
 
-function setupSidebar(): any {
-  const newSidebar = document.createElement('iframe')
-  newSidebar.id = 'grouping-ui'
-  newSidebar.src = browser.runtime.getURL('ui.html')
-  newSidebar.setAttribute(
-    'style',
-    `
-      flex: 0 0 300px;
-    `
-  )
-  return newSidebar
-}
+const sidebar = document.createElement('iframe')
+sidebar.id = 'tabs-sidebar'
+sidebar.src = browser.runtime.getURL('ui.html')
 
-const oldSidebar = document.querySelector('#grouping-ui')
+const sidebarWrapper = document.createElement('div')
+sidebarWrapper.id = 'tabs-sidebar-wrapper'
+sidebarWrapper.appendChild(sidebar)
 
-if (oldSidebar) {
-  oldSidebar.remove()
-} else {
-  let newRoot = document.querySelector('#document-wrapper')
-  if (!newRoot) {
-    newRoot = document.createElement('div')
-    newRoot.id = 'document-wrapper'
-    newRoot.setAttribute(
-      'style',
-      `
-        z-index: 0;
-        height: 100%;
-        display: flex;
-        flex-flow: row nowrap;
-
-        @media (max-width: 768px) {
-          #grouping-ui {
-            display: none !important;
-          }
-        }
-      `
-    )
-
-    const currentBody = document.body
-    currentBody.setAttribute(
-      'style',
-      `
-      flex: 1;
-    `
-    )
-
-    const newSidebar = setupSidebar()
-
-    newRoot.appendChild(newSidebar)
-    newRoot.appendChild(currentBody)
-
-    document.documentElement.appendChild(newRoot)
+const sidebarToggle = document.createElement('button')
+sidebarToggle.id = 'tabs-sidebar-toggle'
+sidebarToggle.addEventListener('click', (e) => {
+  e.preventDefault()
+  if (sidebarWrapper.className.includes('open')) {
+    sidebarWrapper.setAttribute('class', '')
   } else {
-    const newSidebar = setupSidebar()
-    newRoot.prepend(newSidebar)
+    sidebarWrapper.setAttribute('class', 'open')
   }
-}
+})
+
+sidebarWrapper.appendChild(sidebarToggle)
+
+document.body.appendChild(sidebarWrapper)

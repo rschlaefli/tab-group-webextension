@@ -32,6 +32,7 @@ const PATHS = {
   optionsTemplate: path.join(__dirname, 'public/options.html'),
   output: path.join(__dirname, 'build'),
   sidebar: path.join(__dirname, 'src/sidebar.ts'),
+  sidebarCss: path.join(__dirname, 'public/sidebar.css'),
   tutorial: path.join(__dirname, 'src/tutorial.tsx'),
   tutorialTemplate: path.join(__dirname, 'public/tutorial.html'),
   src: path.join(__dirname, 'src'),
@@ -163,6 +164,9 @@ module.exports = function (webpackEnv) {
         cleanStaleWebpackAssets: false,
       }),
       new CopyWebpackPlugin([
+        {
+          from: PATHS.sidebarCss,
+        },
         // copy the extension manifest
         {
           from: PATHS.manifest,
