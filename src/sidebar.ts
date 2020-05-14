@@ -1,5 +1,7 @@
 // ref: https://github.com/lusakasa/saka/blob/master/src/content_script/toggle_saka.js
 
+import optionsStorage from './optionsStorage'
+
 import { browser } from 'webextension-polyfill-ts'
 
 const sidebar = document.createElement('iframe')
@@ -24,3 +26,11 @@ sidebarToggle.addEventListener('click', (e) => {
 sidebarWrapper.appendChild(sidebarToggle)
 
 document.body.appendChild(sidebarWrapper)
+
+// TODO: this does not make sense without a pinning feature
+optionsStorage.getAll().then((options) => {
+  console.log(options)
+  if (options.openSidebarByDefault) {
+    sidebarWrapper.setAttribute('class', 'open')
+  }
+})
