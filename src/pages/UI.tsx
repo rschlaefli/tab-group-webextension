@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { DragDropContext, DropResult, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
 import { Button, Input, Typography } from '@material-ui/core'
@@ -30,15 +30,17 @@ const extractDragEventProperties = (dragEvent: DropResult): any => ({
 
 function UI(): React.ReactElement {
   const dispatch = useDispatch()
+
   const currentTabs = useSelector((state: any) => state.currentTabs)
   const tabGroups = useSelector((state: any) => state.tabGroups)
   const suggestions = useSelector((state: any) => state.suggestions)
 
+  const [heuristicsEnabled, setHeuristicsEnabled] = useState(false)
+
   useEffect(() => {
     const init = async (): Promise<void> => {
-      // initialize options data
       const result = await optionsStorage.getAll()
-      console.log(result)
+      setHeuristicsEnabled(result.enableHeuristics)
     }
     init()
   }, [dispatch])
@@ -176,26 +178,28 @@ function UI(): React.ReactElement {
             </Droppable>
           </div>
 
-          <div className="mt-4">
-            <Typography variant="body1">Suggestions</Typography>
-            <div className="flex flex-col md:flex-wrap md:flex-row">
-              {suggestions.length === 0 && (
-                <Typography variant="body2">We do not have any suggestions yet.</Typography>
-              )}
-              {suggestions.map((tabGroup: ITabGroup) => (
-                <TabGroup
-                  // TODO: pass down current tabs and mark tabs that are open
-                  // TODO: disable window display for tabs that are not open
-                  isSuggested
-                  isReadOnly
-                  key={tabGroup.id}
-                  id={tabGroup.id}
-                  name={tabGroup.name}
-                  tabs={tabGroup.tabs}
-                />
-              ))}
+          {heuristicsEnabled && (
+            <div className="mt-4">
+              <Typography variant="body1">Suggestions</Typography>
+              <div className="flex flex-col md:flex-wrap md:flex-row">
+                {suggestions.length === 0 && (
+                  <Typography variant="body2">We do not have any suggestions yet.</Typography>
+                )}
+                {suggestions.map((tabGroup: ITabGroup) => (
+                  <TabGroup
+                    // TODO: pass down current tabs and mark tabs that are open
+                    // TODO: disable window display for tabs that are not open
+                    isSuggested
+                    isReadOnly
+                    key={tabGroup.id}
+                    id={tabGroup.id}
+                    name={tabGroup.name}
+                    tabs={tabGroup.tabs}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </DragDropContext>
     </Layout>
