@@ -13,15 +13,20 @@
     "notifications",
     "contextMenus"
   ],
-  "browser_action": {
-    "default_popup": "ui.html"
-  },
   "background": {
     "scripts": ["background.bundle.js"]
   },
   "chrome_url_overrides": {
     "newtab": "ui.html"
   },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "run_at": "document_idle",
+      "js": ["sidebar.bundle.js"],
+      "css": ["sidebar.css"]
+    }
+  ],
   "options_ui": {
     "chrome_style": true,
     "page": "options.html",
@@ -33,5 +38,6 @@
       "strict_min_version": "50.0"
     }
   },
-  "web_accessible_resources": ["ui.html", "tutorial.html"]
+  "web_accessible_resources": ["ui.html", "tutorial.html"],
+  "externally_connectable": {}
 }

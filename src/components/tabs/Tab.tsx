@@ -100,7 +100,7 @@ function Tab({
 
             {onRemoveTab && !isReadOnly && (
               <button
-                className="flex-auto ml-2 text-sm text-right text-gray-600 dark:text-gray-100"
+                className="flex-auto ml-2 text-sm text-right text-gray-600 dark:text-gray-400"
                 onClick={onRemoveTab}
                 title="remove tab"
               >
@@ -110,7 +110,7 @@ function Tab({
 
             {onCloseTab && (
               <button
-                className="flex-auto ml-2 text-sm text-right text-gray-600 dark:text-gray-100"
+                className="flex-auto ml-2 text-sm text-right text-gray-600 dark:text-gray-400"
                 onClick={onCloseTab}
                 title="close tab"
               >

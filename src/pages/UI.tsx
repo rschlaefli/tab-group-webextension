@@ -115,8 +115,8 @@ function UI(): React.ReactElement {
   return (
     <Layout>
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="w-full h-auto p-1 min-h-64 min-w-64">
-          <div className="flex flex-row pb-1 dark:text-gray-100">
+        <div className="w-full h-auto p-2 min-h-64 min-w-64">
+          <div className="flex flex-row pb-2 dark:text-gray-100">
             <Input
               fullWidth
               disabled
@@ -168,7 +168,7 @@ function UI(): React.ReactElement {
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                   fullWidth
-                  className="min-h-8 md:min-w-xs md:max-w-xs"
+                  className="min-h-8 md:min-w-xxs md:max-w-xxs"
                   onClick={handleAddTabGroup}
                   title="add group"
                 >
@@ -179,13 +179,11 @@ function UI(): React.ReactElement {
           </div>
 
           {heuristicsEnabled && (
-            <div className="mt-4">
+            <div>
               <Typography variant="body1">Suggestions</Typography>
               <div className="flex flex-col md:flex-wrap md:flex-row">
                 {suggestions.length === 0 && (
-                  <Typography variant="body2">
-                    We are collecting data to come up with suggestions...
-                  </Typography>
+                  <Typography variant="body2">Collecting more data...</Typography>
                 )}
                 {suggestions.map((tabGroup: ITabGroup) => (
                   <TabGroup

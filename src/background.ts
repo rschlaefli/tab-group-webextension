@@ -114,19 +114,6 @@ function onTabCreate(tabData: Tabs.CreateCreatePropertiesType): void {
 function onTabUpdate(tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType, tab: Tabs.Tab): void {
   debug('UPDATE', tabId, changeInfo, tab)
 
-  if (
-    options.openSidebarByDefault &&
-    !tab.url?.startsWith('moz-extension:') &&
-    !tab.url?.startsWith('chrome:') &&
-    tab.status === 'complete'
-  ) {
-    browser.tabs.executeScript(tab.id, {
-      file: '/sidebar.bundle.js',
-      runAt: 'document_idle',
-      matchAboutBlank: false,
-    })
-  }
-
   performTabUpdate(tab)
 }
 
