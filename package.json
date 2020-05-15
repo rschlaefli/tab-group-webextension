@@ -8,9 +8,10 @@
     "url": "git+https://github.com/rschlaefli/automated-tab-organization.git"
   },
   "scripts": {
-    "build": "npm-run-all build:style build:app",
+    "build": "npm-run-all build:style build:app build:package",
     "build:app": "cross-env NODE_ENV=production webpack",
     "build:style": "postcss src/styles/index.css -o src/styles/tailwind.css",
+    "build:package": "zip -r `date +%Y-%m-%d`.zip build",
     "dev": "npm-run-all --parallel dev:style dev:app",
     "dev:app": "cross-env NODE_ENV=development nodemon --delay 2500ms -e json,html -w public -w package.json -w package-lock.json -w webpack.config.js --exec 'webpack -w'",
     "dev:style": "postcss src/styles/index.css -o src/styles/tailwind.css --watch",

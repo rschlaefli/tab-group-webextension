@@ -12,3 +12,5 @@ npm-debug.log
 
 # do not track any key files
 *.pem
+
+*.zip
