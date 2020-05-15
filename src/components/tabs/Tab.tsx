@@ -8,6 +8,7 @@ import {
 } from 'react-beautiful-dnd'
 import { Delete, Close } from '@material-ui/icons'
 import { Menu, MenuItem, Typography } from '@material-ui/core'
+import clsx from 'clsx'
 
 interface IProps {
   index: number
@@ -77,7 +78,10 @@ function Tab({
       <Draggable key={uuid} draggableId={`draggable-${uuid}`} index={index}>
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot): React.ReactElement => (
           <div
-            className="flex flex-row items-center justify-start px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0"
+            className={clsx(
+              'flex flex-row items-center justify-start px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0',
+              isOpen && 'bg-orange-200'
+            )}
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
@@ -94,7 +98,7 @@ function Tab({
               <Typography noWrap display="block" variant="inherit" title={title}>
                 {isOpen && onOpenCurrentTab && (
                   <a role="button" onClick={onOpenCurrentTab as any}>
-                    {title} (O)
+                    {title}
                   </a>
                 )}
                 {!isOpen &&
