@@ -103,7 +103,7 @@ function Tab({
                 )}
                 {!isOpen &&
                   ((!isReadOnly || isSuggested) && url ? (
-                    <a href={url} target="_blank" rel="noopener noreferrer">
+                    <a href={url} target="_self" rel="noopener noreferrer">
                       {title}
                     </a>
                   ) : (
