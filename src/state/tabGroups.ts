@@ -19,7 +19,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 import { ITabGroup, ITab } from '@src/types/Extension'
 import { getBrowserSafe } from '@src/lib/utils'
-import { closeTabsWithHashes } from './currentTabs'
+import { closeTabsWithHashes, openCurrentTab } from './currentTabs'
 
 function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): Function {
   return pipe(path([sourceGroupIndex, 'tabs', sourceTabIndex]), assoc('uuid', uuidv4()))
@@ -228,34 +228,19 @@ export const openTabGroup = createAsyncThunk(
     const tabGroup = find((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
     if (tabGroup) {
       await Promise.all(
-        tabGroup.tabs.map((tab) =>
-          browser.tabs.create({
+        tabGroup.tabs.map(async (tab) => {
+          // if the tab to be opened is already open, dispatch the openCurrentTab functionality instead
+          if (state.currentTabs.tabHashes.includes(tab.hash)) {
+            return thunkAPI.dispatch(openCurrentTab(tab.hash))
+          }
+
+          // otherwise create a new tab
+          return browser.tabs.create({
             url: tab.url,
             windowId: currentTab.windowId,
           })
-        )
+        })
       )
-    }
-  }
-)
-
-export const openCurrentTab = createAsyncThunk(
-  'tabGroups/openCurrentTab',
-  async (tabHash: string, thunkAPI): Promise<void> => {
-    const browser = await getBrowserSafe()
-    const state: any = thunkAPI.getState()
-
-    const tab = find((tab: ITab) => tab.hash === tabHash, state.currentTabs.tabs)
-
-    if (tab?.id) {
-      if (tab.pinned) {
-        await browser.tabs.update(tab.id, { pinned: false })
-      }
-      const currentTab = await browser.tabs.getCurrent()
-      await browser.tabs.move(tab.id, {
-        windowId: currentTab.windowId,
-        index: currentTab.index + 1,
-      })
     }
   }
 )

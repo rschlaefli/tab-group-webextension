@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { Tabs } from 'webextension-polyfill-ts'
-import { append, findIndex, mergeRight, remove, update } from 'ramda'
+import { append, findIndex, mergeRight, remove, update, find } from 'ramda'
 import { getBrowserSafe, augmentTabExtras } from '@src/lib/utils'
 import { ITab } from '@src/types/Extension'
 
@@ -111,5 +111,26 @@ export const closeTabsWithHashes = createAsyncThunk(
     const matchingTabs = state.currentTabs.tabs.filter((tab) => tabHashes.includes(tab.hash))
 
     await Promise.all(matchingTabs.map((tab) => browser.tabs.remove(tab.id)))
+  }
+)
+
+export const openCurrentTab = createAsyncThunk(
+  'currentTabs/openCurrentTab',
+  async (tabHash: string, thunkAPI): Promise<void> => {
+    const browser = await getBrowserSafe()
+    const state: any = thunkAPI.getState()
+
+    const tab = find((tab: ITab) => tab.hash === tabHash, state.currentTabs.tabs)
+
+    if (tab?.id) {
+      if (tab.pinned) {
+        await browser.tabs.update(tab.id, { pinned: false })
+      }
+      const currentTab = await browser.tabs.getCurrent()
+      await browser.tabs.move(tab.id, {
+        windowId: currentTab.windowId,
+        index: currentTab.index + 1,
+      })
+    }
   }
 )

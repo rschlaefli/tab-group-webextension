@@ -18,10 +18,9 @@ import {
   openTabGroup,
   moveCurrentTab,
   collapseGroup,
-  openCurrentTab,
   closeTabGroup,
 } from '@src/state/tabGroups'
-import { collapseCurrentTabs, closeCurrentTab } from '@src/state/currentTabs'
+import { collapseCurrentTabs, closeCurrentTab, openCurrentTab } from '@src/state/currentTabs'
 
 const extractDragEventProperties = (dragEvent: DropResult): any => ({
   sourceGroupId: dragEvent.source.droppableId,
