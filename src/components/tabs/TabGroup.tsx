@@ -1,7 +1,15 @@
 import React from 'react'
 import clsx from 'clsx'
 import { Droppable, DroppableProvided, DroppableStateSnapshot } from 'react-beautiful-dnd'
-import { Save, Delete, Launch, ArrowDropDown, ArrowDropUp, InfoOutlined } from '@material-ui/icons'
+import {
+  Save,
+  Delete,
+  Launch,
+  ArrowDropDown,
+  ArrowDropUp,
+  InfoOutlined,
+  Close,
+} from '@material-ui/icons'
 // import { Rating } from '@material-ui/lab'
 
 import Input from '../common/Input'
@@ -12,6 +20,7 @@ interface IProps {
   id: string
   name: string
   tabs: ITab[]
+  currentTabs?: string[]
   isReadOnly?: boolean
   isCollapsed?: boolean
   isSuggested?: boolean
@@ -22,6 +31,8 @@ interface IProps {
   onOpenTabGroup?: () => void
   onCloseTab?: (tabId: number) => () => void
   onSaveSuggestion?: () => void
+  onOpenCurrentTab?: (tabHash: string) => () => void
+  onCloseTabGroup?: () => void
 }
 
 const getListStyle = (isDraggingOver: boolean): {} => ({
@@ -32,6 +43,10 @@ function TabGroup({
   id,
   name,
   tabs,
+  currentTabs,
+  isReadOnly,
+  isCollapsed,
+  isSuggested,
   onCollapseGroup,
   onChangeGroupName,
   onOpenTabGroup,
@@ -39,9 +54,8 @@ function TabGroup({
   onRemoveTabGroup,
   onCloseTab,
   onSaveSuggestion,
-  isReadOnly,
-  isCollapsed,
-  isSuggested,
+  onOpenCurrentTab,
+  onCloseTabGroup,
 }: IProps): React.ReactElement {
   return (
     <Droppable ignoreContainerClipping droppableId={id} isDropDisabled={isSuggested}>
@@ -88,7 +102,15 @@ function TabGroup({
                 </button>
               )}
 
-              {!isReadOnly && (
+              {!isReadOnly && [
+                <button
+                  key="close"
+                  className="ml-2 text-sm text-gray-600 dark:text-gray-400"
+                  onClick={onCloseTabGroup}
+                  title="close group"
+                >
+                  <Close fontSize="inherit" />
+                </button>,
                 <button
                   key="remove"
                   className="ml-2 text-sm text-gray-600 dark:text-gray-400"
@@ -96,8 +118,8 @@ function TabGroup({
                   title="remove group"
                 >
                   <Delete fontSize="inherit" />
-                </button>
-              )}
+                </button>,
+              ]}
 
               {isSuggested && [
                 <button
@@ -134,9 +156,11 @@ function TabGroup({
                   faviconUrl={tab.favIconUrl}
                   windowId={tab.windowId}
                   isReadOnly={isReadOnly}
+                  isOpen={currentTabs && currentTabs.includes(tab.hash)}
                   isSuggested={isSuggested}
                   onRemoveTab={onRemoveTab && onRemoveTab(index)}
                   onCloseTab={onCloseTab && onCloseTab(tab.id as number)}
+                  onOpenCurrentTab={onOpenCurrentTab && onOpenCurrentTab(tab.hash)}
                 />,
               ])}
           </div>

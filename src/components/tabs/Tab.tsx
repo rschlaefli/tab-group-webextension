@@ -8,6 +8,7 @@ import {
 } from 'react-beautiful-dnd'
 import { Delete, Close } from '@material-ui/icons'
 import { Menu, MenuItem, Typography } from '@material-ui/core'
+import clsx from 'clsx'
 
 interface IProps {
   index: number
@@ -15,11 +16,13 @@ interface IProps {
   title?: string
   url?: string
   windowId?: number
+  isOpen?: boolean
   isReadOnly?: boolean
   isSuggested?: boolean
   faviconUrl?: string
   onRemoveTab?: (() => void) | false
   onCloseTab?: (() => void) | false
+  onOpenCurrentTab?: (() => void) | false
   // onOpenContextMenu: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   // onCloseContextMenu: () => void
 }
@@ -48,11 +51,13 @@ function Tab({
   uuid,
   title,
   url,
+  isOpen,
   isReadOnly,
   isSuggested,
   faviconUrl,
   onRemoveTab,
   onCloseTab,
+  onOpenCurrentTab,
 }: IProps): React.ReactElement {
   const [mousePosition, setMousePosition] = useState<IMousePosition>(initialMousePosition)
 
@@ -73,7 +78,10 @@ function Tab({
       <Draggable key={uuid} draggableId={`draggable-${uuid}`} index={index}>
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot): React.ReactElement => (
           <div
-            className="flex flex-row items-center justify-start px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0"
+            className={clsx(
+              'flex flex-row items-center justify-start px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0',
+              isOpen && 'bg-orange-200'
+            )}
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
@@ -88,13 +96,19 @@ function Tab({
 
             <div className="flex-1 leading-tight max-w-5/6">
               <Typography noWrap display="block" variant="inherit" title={title}>
-                {(!isReadOnly || isSuggested) && url ? (
-                  <a href={url} target="_blank" rel="noopener noreferrer">
+                {isOpen && onOpenCurrentTab && (
+                  <a role="button" onClick={onOpenCurrentTab as any}>
                     {title}
                   </a>
-                ) : (
-                  title
                 )}
+                {!isOpen &&
+                  ((!isReadOnly || isSuggested) && url ? (
+                    <a href={url} target="_blank" rel="noopener noreferrer">
+                      {title}
+                    </a>
+                  ) : (
+                    title
+                  ))}
               </Typography>
             </div>
 

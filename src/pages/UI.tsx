@@ -18,6 +18,8 @@ import {
   openTabGroup,
   moveCurrentTab,
   collapseGroup,
+  openCurrentTab,
+  closeTabGroup,
 } from '@src/state/tabGroups'
 import { collapseCurrentTabs, closeCurrentTab } from '@src/state/currentTabs'
 
@@ -108,6 +110,14 @@ function UI(): React.ReactElement {
     dispatch(closeCurrentTab(tabId))
   }
 
+  const handleOpenCurrentTab = (tabHash: string) => (): void => {
+    dispatch(openCurrentTab(tabHash))
+  }
+
+  const handleCloseTabGroup = (sourceGroupId: string) => (): void => {
+    dispatch(closeTabGroup(sourceGroupId))
+  }
+
   if (!tabGroups) {
     return <div>Loading</div>
   }
@@ -152,6 +162,7 @@ function UI(): React.ReactElement {
                 id={tabGroup.id}
                 name={tabGroup.name}
                 tabs={tabGroup.tabs}
+                currentTabs={currentTabs.tabHashes}
                 isCollapsed={tabGroup.collapsed}
                 isReadOnly={tabGroup.readOnly}
                 onCollapseGroup={handleCollapseTabGroup(tabGroup.id)}
@@ -159,6 +170,8 @@ function UI(): React.ReactElement {
                 onRemoveTabGroup={handleRemoveTabGroup(tabGroup.id)}
                 onOpenTabGroup={handleOpenTabGroup(tabGroup.id)}
                 onChangeGroupName={handleRenameTabGroup(tabGroup.id)}
+                onOpenCurrentTab={handleOpenCurrentTab}
+                onCloseTabGroup={handleCloseTabGroup(tabGroup.id)}
               />
             ))}
 

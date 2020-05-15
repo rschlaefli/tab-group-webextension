@@ -29,7 +29,6 @@ document.body.appendChild(sidebarWrapper)
 
 // TODO: this does not make sense without a pinning feature
 optionsStorage.getAll().then((options) => {
-  console.log(options)
   if (options.openSidebarByDefault) {
     sidebarWrapper.setAttribute('class', 'open')
   }

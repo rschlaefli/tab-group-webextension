@@ -108,6 +108,7 @@ describe('currentTabsReducer', () => {
     activeTab: number
     activeWindow: number
     tabs: ITab[]
+    tabHashes: string[]
     collapsed: boolean
   }
 
@@ -116,7 +117,8 @@ describe('currentTabsReducer', () => {
       previousTabId: -1,
       activeTab: -1,
       activeWindow: 0,
-      tabs: [TABS[0]],
+      tabs: [],
+      tabHashes: [],
       collapsed: false,
     }
   })
@@ -124,14 +126,21 @@ describe('currentTabsReducer', () => {
   it('should return the initial state', () => {
     currentState = currentTabsReducer(currentState, { type: 'DEFAULT' })
 
-    expect(currentState.tabs).toHaveLength(1)
+    expect(currentState.tabs).toHaveLength(0)
+    expect(currentState.tabHashes).toHaveLength(0)
   })
 
   it('creates a new tab', () => {
     currentState = currentTabsReducer(currentState, createTab({ tabData: TABS[1] }))
 
-    expect(currentState.tabs).toHaveLength(2)
-    expect(currentState.tabs[1].title).toEqual('test tab 2')
+    expect(currentState.tabs).toHaveLength(1)
+    expect(currentState.tabs[0].title).toEqual('test tab 2')
+
+    expect(currentState.tabHashes).toMatchInlineSnapshot(`
+      Array [
+        "bcde",
+      ]
+    `)
   })
 
   it('activates the new tab', () => {
@@ -143,14 +152,42 @@ describe('currentTabsReducer', () => {
   it('updates the new tab to another url', () => {
     currentState = currentTabsReducer(currentState, updateTab({ tabId: 1, tabData: TABS[2] }))
 
+    expect(currentState.tabs).toHaveLength(1)
+    expect(currentState.tabs[0].title).toEqual('test tab 3')
+
+    expect(currentState.tabHashes).toMatchInlineSnapshot(`
+      Array [
+        "cdef",
+      ]
+    `)
+  })
+
+  it('creates another new tab', () => {
+    currentState = currentTabsReducer(currentState, createTab({ tabData: TABS[0] }))
+
     expect(currentState.tabs).toHaveLength(2)
-    expect(currentState.tabs[1].title).toEqual('test tab 3')
+    expect(currentState.tabHashes).toHaveLength(2)
+    expect(currentState.tabs[1].title).toEqual('test tab 1')
+
+    expect(currentState.tabHashes).toMatchInlineSnapshot(`
+      Array [
+        "cdef",
+        "abcd",
+      ]
+    `)
   })
 
   it('removes the new tab', () => {
     currentState = currentTabsReducer(currentState, removeTab({ tabId: 2 }))
 
     expect(currentState.tabs).toHaveLength(1)
+    expect(currentState.tabHashes).toHaveLength(1)
+
+    expect(currentState.tabHashes).toMatchInlineSnapshot(`
+      Array [
+        "abcd",
+      ]
+    `)
   })
 
   it('can be collapsed', () => {
