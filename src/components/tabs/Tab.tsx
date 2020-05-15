@@ -103,7 +103,16 @@ function Tab({
                 )}
                 {!isOpen &&
                   ((!isReadOnly || isSuggested) && url ? (
-                    <a href={url} target="_self" rel="noopener noreferrer">
+                    <a
+                      role="button"
+                      onClick={(): void => {
+                        if (window.location !== window.parent.location) {
+                          window.parent.location.replace(url)
+                        } else {
+                          window.location.replace(url)
+                        }
+                      }}
+                    >
                       {title}
                     </a>
                   ) : (
