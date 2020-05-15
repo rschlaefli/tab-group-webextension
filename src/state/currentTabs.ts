@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { Tabs } from 'webextension-polyfill-ts'
-import { append, findIndex, mergeRight, remove } from 'ramda'
+import { append, findIndex, mergeRight, remove, update } from 'ramda'
 import { getBrowserSafe, augmentTabExtras } from '@src/lib/utils'
 import { ITab } from '@src/types/Extension'
 
@@ -11,7 +11,7 @@ const currentTabsSlice = createSlice({
     activeTab: -1,
     activeWindow: 0,
     tabs: [] as ITab[],
-    // tabHashes: new Set(),
+    tabHashes: [] as string[],
     collapsed: false,
   },
   reducers: {
@@ -22,7 +22,9 @@ const currentTabsSlice = createSlice({
       state.tabs = action.payload.map(augmentTabExtras)
     },
     createTab(state, action): void {
-      state.tabs = append(augmentTabExtras(action.payload.tabData), state.tabs)
+      const augmentedTab = augmentTabExtras(action.payload.tabData)
+      state.tabs = append(augmentedTab, state.tabs)
+      state.tabHashes = append(augmentedTab.hash, state.tabHashes)
     },
     activateTab(state, action): void {
       state.activeTab = action.payload.tabId
@@ -32,7 +34,12 @@ const currentTabsSlice = createSlice({
       const tabIndex = findIndex((tab) => tab.id === action.payload.tabId, state.tabs)
 
       if (tabIndex > -1) {
-        state.tabs[tabIndex] = mergeRight(state.tabs[tabIndex], action.payload.tabData)
+        const augmentedTab = augmentTabExtras(
+          mergeRight(state.tabs[tabIndex], action.payload.tabData)
+        )
+
+        state.tabs[tabIndex] = augmentedTab
+        state.tabHashes = update(tabIndex, augmentedTab.hash, state.tabHashes)
       } else {
         // this.createTab(state, action.payload.tabData)
       }
@@ -42,6 +49,7 @@ const currentTabsSlice = createSlice({
 
       if (tabIndex > -1) {
         state.tabs = remove(tabIndex, 1, state.tabs)
+        state.tabHashes = remove(tabIndex, 1, state.tabHashes)
       }
     },
     // moveTab(state, action) {
