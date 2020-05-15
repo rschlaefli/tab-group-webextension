@@ -15,11 +15,13 @@ interface IProps {
   title?: string
   url?: string
   windowId?: number
+  isOpen?: boolean
   isReadOnly?: boolean
   isSuggested?: boolean
   faviconUrl?: string
   onRemoveTab?: (() => void) | false
   onCloseTab?: (() => void) | false
+  onOpenCurrentTab?: (() => void) | false
   // onOpenContextMenu: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   // onCloseContextMenu: () => void
 }
@@ -48,11 +50,13 @@ function Tab({
   uuid,
   title,
   url,
+  isOpen,
   isReadOnly,
   isSuggested,
   faviconUrl,
   onRemoveTab,
   onCloseTab,
+  onOpenCurrentTab,
 }: IProps): React.ReactElement {
   const [mousePosition, setMousePosition] = useState<IMousePosition>(initialMousePosition)
 
@@ -88,13 +92,19 @@ function Tab({
 
             <div className="flex-1 leading-tight max-w-5/6">
               <Typography noWrap display="block" variant="inherit" title={title}>
-                {(!isReadOnly || isSuggested) && url ? (
-                  <a href={url} target="_blank" rel="noopener noreferrer">
-                    {title}
+                {isOpen && onOpenCurrentTab && (
+                  <a role="button" onClick={onOpenCurrentTab as any}>
+                    {title} (O)
                   </a>
-                ) : (
-                  title
                 )}
+                {!isOpen &&
+                  ((!isReadOnly || isSuggested) && url ? (
+                    <a href={url} target="_blank" rel="noopener noreferrer">
+                      {title}
+                    </a>
+                  ) : (
+                    title
+                  ))}
               </Typography>
             </div>
 
