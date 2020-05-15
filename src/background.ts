@@ -157,20 +157,20 @@ function onTabRemoved(tabId: number, removeInfo: Tabs.OnRemovedRemoveInfoType): 
 browser.runtime.onMessage.addListener(async (message: any) => {
   debug('received message in background', message)
 
-  if (message.type === 'SIDEBAR') {
-    const currentTab = (
-      await browser.tabs.query({
-        active: true,
-        currentWindow: true,
-      })
-    )[0]
+  // if (message.type === 'SIDEBAR') {
+  //   const currentTab = (
+  //     await browser.tabs.query({
+  //       active: true,
+  //       currentWindow: true,
+  //     })
+  //   )[0]
 
-    await browser.tabs.executeScript(currentTab.id, {
-      file: '/sidebar.bundle.js',
-      runAt: 'document_start',
-      matchAboutBlank: true,
-    })
-  }
+  //   await browser.tabs.executeScript(currentTab.id, {
+  //     file: '/sidebar.bundle.js',
+  //     runAt: 'document_start',
+  //     matchAboutBlank: true,
+  //   })
+  // }
 })
 
 // setup the listener for the onCreated event

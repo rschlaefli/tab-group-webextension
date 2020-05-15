@@ -223,9 +223,18 @@ export const openTabGroup = createAsyncThunk(
     const browser = await getBrowserSafe()
     const state: any = thunkAPI.getState()
 
+    const currentTab = await browser.tabs.getCurrent()
+
     const tabGroup = find((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
     if (tabGroup) {
-      await Promise.all(tabGroup.tabs.map((tab) => browser.tabs.create({ url: tab.url })))
+      await Promise.all(
+        tabGroup.tabs.map((tab) =>
+          browser.tabs.create({
+            url: tab.url,
+            windowId: currentTab.windowId,
+          })
+        )
+      )
     }
   }
 )
@@ -236,20 +245,16 @@ export const openCurrentTab = createAsyncThunk(
     const browser = await getBrowserSafe()
     const state: any = thunkAPI.getState()
 
-    // const activeTabIndex = findIndex(
-    //   (tab: ITab) => tab.id === state.currentTabs.activeTab,
-    //   state.currentTabs.tabs
-    // )
     const tab = find((tab: ITab) => tab.hash === tabHash, state.currentTabs.tabs)
 
     if (tab?.id) {
       if (tab.pinned) {
         await browser.tabs.update(tab.id, { pinned: false })
       }
+      const currentTab = await browser.tabs.getCurrent()
       await browser.tabs.move(tab.id, {
-        // windowId: state.currentTabs.activeWindow,
-        // index: activeTabIndex ? activeTabIndex + 1 : -1,
-        index: -1,
+        windowId: currentTab.windowId,
+        index: currentTab.index + 1,
       })
     }
   }

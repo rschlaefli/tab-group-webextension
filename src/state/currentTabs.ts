@@ -113,12 +113,3 @@ export const closeTabsWithHashes = createAsyncThunk(
     await Promise.all(matchingTabs.map((tab) => browser.tabs.remove(tab.id)))
   }
 )
-
-export const reorderCurrentTabs = createAsyncThunk(
-  'currentTabs/reorder',
-  async ({ fromWindow, toWindow, fromIndex, toIndex }: any, thunkAPI): Promise<void> => {
-    const browser = await getBrowserSafe()
-
-    console.log(`> Reordering current tab from ${fromIndex} to ${toIndex}`)
-  }
-)
