@@ -19,6 +19,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 import { ITabGroup, ITab } from '@src/types/Extension'
 import { getBrowserSafe } from '@src/lib/utils'
+import { closeTabsWithHashes } from './currentTabs'
 
 function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): Function {
   return pipe(path([sourceGroupIndex, 'tabs', sourceTabIndex]), assoc('uuid', uuidv4()))
@@ -203,6 +204,19 @@ export const {
 export default reducer
 
 // THUNKS
+export const closeTabGroup = createAsyncThunk(
+  'tabGroups/closeTabGroup',
+  async (tabGroupId: string, thunkAPI): Promise<void> => {
+    const state: any = thunkAPI.getState()
+
+    const tabGroup = find((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
+    if (tabGroup) {
+      const tabHashes = tabGroup.tabs.map((tab) => tab.hash)
+      await thunkAPI.dispatch(closeTabsWithHashes(tabHashes))
+    }
+  }
+)
+
 export const openTabGroup = createAsyncThunk(
   'tabGroups/openTabGroup',
   async (tabGroupId: string, thunkAPI): Promise<void> => {
@@ -212,6 +226,31 @@ export const openTabGroup = createAsyncThunk(
     const tabGroup = find((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
     if (tabGroup) {
       await Promise.all(tabGroup.tabs.map((tab) => browser.tabs.create({ url: tab.url })))
+    }
+  }
+)
+
+export const openCurrentTab = createAsyncThunk(
+  'tabGroups/openCurrentTab',
+  async (tabHash: string, thunkAPI): Promise<void> => {
+    const browser = await getBrowserSafe()
+    const state: any = thunkAPI.getState()
+
+    // const activeTabIndex = findIndex(
+    //   (tab: ITab) => tab.id === state.currentTabs.activeTab,
+    //   state.currentTabs.tabs
+    // )
+    const tab = find((tab: ITab) => tab.hash === tabHash, state.currentTabs.tabs)
+
+    if (tab?.id) {
+      if (tab.pinned) {
+        await browser.tabs.update(tab.id, { pinned: false })
+      }
+      await browser.tabs.move(tab.id, {
+        // windowId: state.currentTabs.activeWindow,
+        // index: activeTabIndex ? activeTabIndex + 1 : -1,
+        index: -1,
+      })
     }
   }
 )

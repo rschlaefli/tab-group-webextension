@@ -19,7 +19,9 @@ const currentTabsSlice = createSlice({
       state.collapsed = !state.collapsed
     },
     updateTabs(state, action): void {
-      state.tabs = action.payload.map(augmentTabExtras)
+      const allTabs = action.payload.map(augmentTabExtras)
+      state.tabs = allTabs
+      state.tabHashes = allTabs.map((tab) => tab.hash)
     },
     createTab(state, action): void {
       const augmentedTab = augmentTabExtras(action.payload.tabData)
@@ -97,6 +99,18 @@ export const closeCurrentTab = createAsyncThunk(
   async (tabId: number, _): Promise<void> => {
     const browser = await getBrowserSafe()
     await browser.tabs.remove(tabId)
+  }
+)
+
+export const closeTabsWithHashes = createAsyncThunk(
+  'currentTabs/closeTabsWithHashes',
+  async (tabHashes: string[], thunkAPI): Promise<void> => {
+    const browser = await getBrowserSafe()
+    const state: any = thunkAPI.getState()
+
+    const matchingTabs = state.currentTabs.tabs.filter((tab) => tabHashes.includes(tab.hash))
+
+    await Promise.all(matchingTabs.map((tab) => browser.tabs.remove(tab.id)))
   }
 )
 
