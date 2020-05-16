@@ -183,7 +183,7 @@ module.exports = function (webpackEnv) {
         },
       ]),
       new WebextensionPlugin({
-        vendor: 'chrome',
+        vendor: process.env.BROWSER || 'chrome',
       }),
       // new MiniCssExtractPlugin({
       //   filename: 'style.css'
