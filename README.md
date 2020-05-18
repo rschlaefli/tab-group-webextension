@@ -32,7 +32,7 @@ Install all dependencies:
 
 Run the extension in development mode:
 
-> Run `npm run dev`
+> `npm run dev`
 
 Package the extension for deployment:
 
