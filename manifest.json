@@ -39,5 +39,5 @@
     }
   },
   "web_accessible_resources": ["ui.html", "tutorial.html"],
-  "__chrome__externally_connectable": {}
+  "__opera__externally_connectable": {}
 }
