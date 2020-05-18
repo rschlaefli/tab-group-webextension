@@ -1,8 +1,5 @@
 {
   "manifest_version": 2,
-  "name": "Automated Tab Organization",
-  "description": "A WebExtension for automated tab organization",
-  "version": "0.0.1",
   "incognito": "not_allowed",
   "permissions": [
     "<all_urls>",

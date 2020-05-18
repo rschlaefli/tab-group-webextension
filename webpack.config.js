@@ -31,7 +31,11 @@ const PATHS = {
   manifest: path.resolve(__dirname, 'manifest.json'),
   options: path.resolve(__dirname, 'src/options.tsx'),
   optionsTemplate: path.resolve(__dirname, 'public/options.html'),
-  output: path.resolve(__dirname, 'build'),
+  output: path.resolve(__dirname, 'build/dev'),
+  output_chrome: path.resolve(__dirname, 'build/chrome'),
+  output_edge: path.resolve(__dirname, 'build/edge'),
+  output_firefox: path.resolve(__dirname, 'build/firefox'),
+  output_opera: path.resolve(__dirname, 'build/opera'),
   public: path.resolve(__dirname, 'public'),
   sidebar: path.resolve(__dirname, 'src/sidebar.ts'),
   sidebarCss: path.resolve(__dirname, 'public/sidebar.css'),
@@ -47,6 +51,8 @@ const PATHS = {
 module.exports = function (webpackEnv, _) {
   const isEnvDevelopment = !webpackEnv || !webpackEnv.production
   const isEnvProduction = webpackEnv && !!webpackEnv.production
+
+  const PACKAGE = require('./package.json')
 
   return {
     mode: isEnvProduction ? 'production' : 'development',
@@ -70,7 +76,7 @@ module.exports = function (webpackEnv, _) {
       ui: PATHS.ui,
     },
     output: {
-      path: PATHS.output,
+      path: PATHS[webpackEnv && webpackEnv.browser ? `output_${webpackEnv.browser}` : 'output'],
       filename: '[name].bundle.js',
     },
     cache: {
@@ -171,35 +177,25 @@ module.exports = function (webpackEnv, _) {
       isEnvProduction && webpackEnv.analyze && new BundleAnalyzerPlugin({ analyzerMode: 'static' }),
       // get additional information for errors regarding "module not found"
       new ModuleNotFoundPlugin(PATHS.cwd),
-      // TODO: setup define plugin (using env.js from CRA?)
       // new webpack.DefinePlugin(env.stringified),
       new CleanWebpackPlugin({
         // prevent clean plugin from deleting manifest and html pages
         cleanStaleWebpackAssets: false,
+      }),
+      new WebextensionPlugin({
+        vendor: (webpackEnv && webpackEnv.browser) || 'chrome',
+        manifestDefaults: {
+          name: PACKAGE.name,
+          version: PACKAGE.version,
+          description: PACKAGE.description,
+        },
       }),
       new CopyWebpackPlugin({
         patterns: [
           {
             from: PATHS.sidebarCss,
           },
-          // copy the extension manifest
-          {
-            from: PATHS.manifest,
-            // inject dynamic content into the manifest
-            transform: function (content, path) {
-              return Buffer.from(
-                JSON.stringify({
-                  description: process.env.npm_package_description,
-                  version: process.env.npm_package_version,
-                  ...JSON.parse(content.toString()),
-                })
-              )
-            },
-          },
         ],
-      }),
-      new WebextensionPlugin({
-        vendor: (webpackEnv && webpackEnv.browser) || 'chrome',
       }),
       // new MiniCssExtractPlugin({
       //   filename: 'style.css'
