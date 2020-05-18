@@ -10,10 +10,11 @@
 @import 'tailwindcss/utilities';
 
 html {
-  font-size: 18px;
+  font-size: 17px;
 }
 
 :root {
+  background: #fff;
   margin: initial !important;
   max-width: initial !important;
   min-width: initial !important;

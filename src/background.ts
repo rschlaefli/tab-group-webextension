@@ -6,13 +6,21 @@ import { browser, Tabs, Runtime } from 'webextension-polyfill-ts'
 import {
   TAB_ACTION,
   IHeuristicsAction,
-  HEURISTICS_ACTION
+  HEURISTICS_ACTION,
+  ITab,
   // TAB_GROUP_ACTION
 } from './types/Extension'
 import configureStore from './state/configureStore'
-
-import './optionsStorage'
-import { createTab, updateTab, activateTab, removeTab } from './state/currentTabs'
+import optionsStorage from './optionsStorage'
+import {
+  createTab,
+  updateTab,
+  activateTab,
+  removeTab,
+  initializeCurrentTabs,
+} from './state/currentTabs'
+import { updateSuggestedGroups } from './state/suggestions'
+import { postNativeMessage, augmentTabExtras } from './lib/utils'
 
 // setup a redux store
 const { store } = configureStore({})
@@ -20,124 +28,150 @@ const { store } = configureStore({})
 // wrap the redux store for webext communication
 wrapStore(store, { portName: 'tabGrouping' })
 
+// initialize the state for current tabs
+store.dispatch(initializeCurrentTabs() as any)
+
 // connect to the native port
-const nativePort: Runtime.Port = browser.runtime.connectNative('tabs')
-console.log('> Opened native port: ', nativePort)
+let options: any
+let nativePort: Runtime.Port
+optionsStorage.getAll().then((opt) => {
+  options = opt
+  if (opt.enableHeuristics) {
+    nativePort = browser.runtime.connectNative('tabs')
+    console.log('> Opened native port: ', nativePort)
 
-// setup a listener for native communcation
-nativePort.onMessage.addListener(async (response: IHeuristicsAction) => {
-  console.log(`Received message over native port:`, response)
+    // setup a listener for native communcation
+    if (nativePort) {
+      nativePort.onMessage.addListener(async (messageFromHeuristics: IHeuristicsAction) => {
+        console.log(`> Received message over native port:`, messageFromHeuristics)
 
-  try {
-    if (response.action === HEURISTICS_ACTION.NEW_TAB) {
-      await browser.tabs.create({ url: response.payload.url })
-    }
+        try {
+          switch (messageFromHeuristics.action) {
+            case HEURISTICS_ACTION.UPDATE_GROUPS:
+              store.dispatch(updateSuggestedGroups(messageFromHeuristics.payload))
+              break
 
-    if (response.action === HEURISTICS_ACTION.NOTIFY) {
-      await browser.notifications.create('heuristics-notify', {
-        title: 'New Event',
-        type: 'basic',
-        message: response.payload.message,
-        iconUrl:
-          'data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7'
+            case HEURISTICS_ACTION.NEW_TAB:
+              await browser.tabs.create({ url: messageFromHeuristics.payload.url })
+              break
+
+            case HEURISTICS_ACTION.NOTIFY:
+              await browser.notifications.create('heuristics-notify', {
+                title: 'New Event',
+                type: 'basic',
+                message: messageFromHeuristics.payload.message,
+                iconUrl:
+                  'data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7',
+              })
+              break
+
+            case HEURISTICS_ACTION.QUERY_TABS:
+              const currentTabs = store.getState().currentTabs?.tabs as ITab[]
+              console.log(`> Initializing current tabs in heuristics:`, currentTabs)
+              postNativeMessage(nativePort, {
+                action: TAB_ACTION.INIT_TABS,
+                payload: { currentTabs },
+              })
+              break
+          }
+        } catch (e) {
+          console.error(e)
+        }
       })
+      console.log('> Prepared a listener for native communication events')
     }
-  } catch (e) {
-    console.error(e)
+  }
+  if (opt.tutorialProgress < 3) {
+    browser.tabs.create({ url: 'tutorial.html' })
   }
 })
 
-// setup a listener for communication from the popup
-browser.runtime.onMessage.addListener(async (message: any) => {
-  console.log('received message in background', message)
+export function debug(...content: any[]): void {
+  if (!options || options.debugLogging) console.log(...content)
+}
 
-  if (message.type === 'SIDEBAR') {
-    const currentTab = (
-      await browser.tabs.query({
-        active: true,
-        currentWindow: true
-      })
-    )[0]
+async function performTabUpdate(tab: Partial<ITab>): Promise<void> {
+  const augmentedTabData = augmentTabExtras(tab)
 
-    await browser.tabs.executeScript(currentTab.id, {
-      file: '/sidebar.bundle.js',
-      runAt: 'document_start',
-      matchAboutBlank: true
+  store.dispatch(updateTab({ tabId: tab.id, tabData: augmentedTabData }))
+
+  if (tab.status !== 'loading') {
+    postNativeMessage(nativePort, {
+      action: TAB_ACTION.UPDATE,
+      payload: augmentedTabData,
     })
-  }
-})
-
-async function performTabUpdate(tab: Partial<Tabs.Tab>): Promise<void> {
-  store.dispatch(updateTab({ tabId: tab.id, tabData: tab }))
-
-  try {
-    nativePort.postMessage({ action: TAB_ACTION.UPDATE, payload: tab })
-  } catch (e) {
-    console.error(e)
-    return Promise.reject(e)
   }
 }
 
 function onTabCreate(tabData: Tabs.CreateCreatePropertiesType): void {
-  console.log('CREATE', tabData)
+  const augmentedTabData = augmentTabExtras(tabData)
 
-  store.dispatch(createTab({ tabData }))
+  debug('CREATE', augmentedTabData)
 
-  try {
-    nativePort.postMessage({ action: TAB_ACTION.CREATE, payload: tabData })
-  } catch (e) {
-    console.error(e)
-  }
+  store.dispatch(createTab({ tabData: augmentedTabData }))
 }
 
 function onTabUpdate(tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType, tab: Tabs.Tab): void {
-  console.log('UPDATE', tabId, changeInfo, tab)
+  debug('UPDATE', tabId, changeInfo, tab)
 
   performTabUpdate(tab)
 }
 
 function onTabMoved(tabId: number, moveInfo: Tabs.OnMovedMoveInfoType): void {
-  console.log('MOVED', tabId, moveInfo)
-
-  // store.dispatch(createTab({ tabData }))
+  debug('MOVED', tabId, moveInfo)
 
   performTabUpdate({ id: tabId, ...moveInfo })
 }
 
 function onTabActivated(activeInfo: Tabs.OnActivatedActiveInfoType): void {
-  console.log('ACTIVATED', activeInfo)
+  debug('ACTIVATED', activeInfo)
 
   store.dispatch(activateTab({ tabId: activeInfo.tabId, previousTabId: activeInfo.previousTabId }))
 
-  try {
-    nativePort.postMessage({ action: TAB_ACTION.ACTIVATE, payload: activeInfo })
-  } catch (e) {
-    console.error(e)
-  }
+  // TODO: lookup hashes of new and previous active tab and send to the heuristics engine?
+
+  postNativeMessage(nativePort, {
+    action: TAB_ACTION.ACTIVATE,
+    payload: { id: activeInfo.tabId, ...activeInfo },
+  })
 }
 
 function onTabAttached(tabId: number, attachInfo: Tabs.OnAttachedAttachInfoType): void {
-  console.log('ATTACHED', tabId, attachInfo)
-
-  // store.dispatch(createTab({ tabData }))
+  debug('ATTACHED', tabId, attachInfo)
 
   performTabUpdate({ id: tabId, ...attachInfo })
 }
 
 function onTabRemoved(tabId: number, removeInfo: Tabs.OnRemovedRemoveInfoType): void {
-  console.log('REMOVED', tabId, removeInfo)
+  debug('REMOVED', tabId, removeInfo)
 
   store.dispatch(removeTab({ tabId }))
 
-  try {
-    nativePort.postMessage({
-      action: TAB_ACTION.REMOVE,
-      payload: { id: tabId, ...removeInfo }
-    })
-  } catch (e) {
-    console.error(e)
-  }
+  postNativeMessage(nativePort, {
+    action: TAB_ACTION.REMOVE,
+    payload: { id: tabId, ...removeInfo },
+  })
 }
+
+// setup a listener for communication from the popup
+browser.runtime.onMessage.addListener(async (message: any) => {
+  debug('received message in background', message)
+
+  // if (message.type === 'SIDEBAR') {
+  //   const currentTab = (
+  //     await browser.tabs.query({
+  //       active: true,
+  //       currentWindow: true,
+  //     })
+  //   )[0]
+
+  //   await browser.tabs.executeScript(currentTab.id, {
+  //     file: '/sidebar.bundle.js',
+  //     runAt: 'document_start',
+  //     matchAboutBlank: true,
+  //   })
+  // }
+})
 
 // setup the listener for the onCreated event
 browser.tabs.onCreated.addListener(onTabCreate)
@@ -164,3 +198,7 @@ browser.tabs.onAttached.addListener(onTabAttached)
 
 // setup the listener for the onRemoved event
 browser.tabs.onRemoved.addListener(onTabRemoved)
+
+// setup context menu entries
+// browser.contextMenus.create({ title: 'group this', contexts: ['tab'] }, () => null)
+// browser.contextMenus.removeAll()

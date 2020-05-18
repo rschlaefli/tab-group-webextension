@@ -1,10 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { Tabs } from 'webextension-polyfill-ts'
-import { append, findIndex, mergeRight, remove, assoc } from 'ramda'
-import { v4 as uuidv4 } from 'uuid'
-import { getBrowserSafe } from '@src/lib/utils'
-
-const assocWithUuid = (tab: Tabs.Tab) => assoc('uuid', uuidv4(), tab)
+import { append, findIndex, mergeRight, remove, update, find } from 'ramda'
+import { getBrowserSafe, augmentTabExtras } from '@src/lib/utils'
+import { ITab } from '@src/types/Extension'
 
 const currentTabsSlice = createSlice({
   name: 'currentTabs',
@@ -12,52 +10,74 @@ const currentTabsSlice = createSlice({
     previousTabId: -1,
     activeTab: -1,
     activeWindow: 0,
-    tabs: [] as Tabs.Tab[]
+    tabs: [] as ITab[],
+    tabHashes: [] as string[],
+    collapsed: false,
   },
   reducers: {
-    updateTabs(state, action) {
-      state.tabs = action.payload.map(assocWithUuid)
+    collapseCurrentTabs(state): void {
+      state.collapsed = !state.collapsed
     },
-    createTab(state, action) {
-      state.tabs = append(assocWithUuid(action.payload.tabData), state.tabs)
+    updateTabs(state, action): void {
+      const allTabs = action.payload.map(augmentTabExtras)
+      state.tabs = allTabs
+      state.tabHashes = allTabs.map((tab) => tab.hash)
     },
-    activateTab(state, action) {
+    createTab(state, action): void {
+      const augmentedTab = augmentTabExtras(action.payload.tabData)
+      state.tabs = append(augmentedTab, state.tabs)
+      state.tabHashes = append(augmentedTab.hash, state.tabHashes)
+    },
+    activateTab(state, action): void {
       state.activeTab = action.payload.tabId
       state.previousTabId = action.payload.previousTabId
     },
-    updateTab(state, action) {
-      const tabIndex = findIndex(tab => tab.id === action.payload.tabId, state.tabs)
+    updateTab(state, action): void {
+      const tabIndex = findIndex((tab) => tab.id === action.payload.tabId, state.tabs)
 
       if (tabIndex > -1) {
-        state.tabs[tabIndex] = mergeRight(state.tabs[tabIndex], action.payload.tabData)
+        const augmentedTab = augmentTabExtras(
+          mergeRight(state.tabs[tabIndex], action.payload.tabData)
+        )
+
+        state.tabs[tabIndex] = augmentedTab
+        state.tabHashes = update(tabIndex, augmentedTab.hash, state.tabHashes)
       } else {
         // this.createTab(state, action.payload.tabData)
       }
     },
-    removeTab(state, action) {
-      const tabIndex = findIndex(tab => tab.id === action.payload.tabId, state.tabs)
+    removeTab(state, action): void {
+      const tabIndex = findIndex((tab) => tab.id === action.payload.tabId, state.tabs)
 
       if (tabIndex > -1) {
         state.tabs = remove(tabIndex, 1, state.tabs)
+        state.tabHashes = remove(tabIndex, 1, state.tabHashes)
       }
-    }
+    },
     // moveTab(state, action) {
     //   return state
     // },
     // attachTab(state, action) {
     //   return state
     // },
-  }
+  },
 })
 
 const { actions, reducer } = currentTabsSlice
-export const { createTab, updateTab, removeTab, activateTab, updateTabs } = actions
+export const {
+  collapseCurrentTabs,
+  createTab,
+  updateTab,
+  removeTab,
+  activateTab,
+  updateTabs,
+} = actions
 export default reducer
 
 // THUNKS
 export const initializeCurrentTabs = createAsyncThunk(
   'currentTabs/initialize',
-  async (arg, thunkAPI): Promise<void> => {
+  async (_, thunkAPI): Promise<void> => {
     const browser = await getBrowserSafe()
 
     // query for all browser tabs that are currently open
@@ -67,7 +87,50 @@ export const initializeCurrentTabs = createAsyncThunk(
     // firefox can hide tabs that have been closed but might be reopened soon
     const visibleTabs = tabs.filter((tab: Tabs.Tab) => !tab.hidden)
 
+    console.log(`> Initializing current tabs to:`, visibleTabs)
+
     // initialize the tabs
     await thunkAPI.dispatch(updateTabs(visibleTabs))
+  }
+)
+
+export const closeCurrentTab = createAsyncThunk(
+  'currentTabs/closeTab',
+  async (tabId: number, _): Promise<void> => {
+    const browser = await getBrowserSafe()
+    await browser.tabs.remove(tabId)
+  }
+)
+
+export const closeTabsWithHashes = createAsyncThunk(
+  'currentTabs/closeTabsWithHashes',
+  async (tabHashes: string[], thunkAPI): Promise<void> => {
+    const browser = await getBrowserSafe()
+    const state: any = thunkAPI.getState()
+
+    const matchingTabs = state.currentTabs.tabs.filter((tab) => tabHashes.includes(tab.hash))
+
+    await Promise.all(matchingTabs.map((tab) => browser.tabs.remove(tab.id)))
+  }
+)
+
+export const openCurrentTab = createAsyncThunk(
+  'currentTabs/openCurrentTab',
+  async (tabHash: string, thunkAPI): Promise<void> => {
+    const browser = await getBrowserSafe()
+    const state: any = thunkAPI.getState()
+
+    const tab = find((tab: ITab) => tab.hash === tabHash, state.currentTabs.tabs)
+
+    if (tab?.id) {
+      if (tab.pinned) {
+        await browser.tabs.update(tab.id, { pinned: false })
+      }
+      const currentTab = await browser.tabs.getCurrent()
+      await browser.tabs.move(tab.id, {
+        windowId: currentTab.windowId,
+        index: currentTab.index + 1,
+      })
+    }
   }
 )

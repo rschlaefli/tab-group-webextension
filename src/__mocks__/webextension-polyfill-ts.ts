@@ -6,10 +6,10 @@ export const browser: Partial<Browser> = {
   tabs: {
     query(): Promise<Tabs.Tab[]> {
       return Promise.resolve([])
-    }
-  } as any
+    },
+  } as any,
 }
 
 export const chrome: any = {
-  runtime: { id: 'test' }
+  runtime: { id: 'test' },
 }

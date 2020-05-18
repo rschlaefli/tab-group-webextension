@@ -14,7 +14,7 @@ export default async function withProxyStore(Component: React.FC): Promise<React
     // if we are in a webextension context, use a proxy store
     const proxyStore = new Store({
       state: {},
-      portName: 'tabGrouping'
+      portName: 'tabGrouping',
     })
 
     // apply middleware

@@ -11,13 +11,15 @@ import {
   path,
   update,
   find,
-  nth
+  nth,
+  pick,
 } from 'ramda'
 import { v4 as uuidv4 } from 'uuid'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 import { ITabGroup, ITab } from '@src/types/Extension'
 import { getBrowserSafe } from '@src/lib/utils'
+import { closeTabsWithHashes, openCurrentTab } from './currentTabs'
 
 function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): Function {
   return pipe(path([sourceGroupIndex, 'tabs', sourceTabIndex]), assoc('uuid', uuidv4()))
@@ -25,18 +27,45 @@ function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): 
 
 function removeTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): Function {
   return (state: ITabGroup[]): ITabGroup[] =>
-    pipe(pathOr([], [sourceGroupIndex, 'tabs']), remove(sourceTabIndex, 1), sourceTabsWithoutTab =>
-      adjust(
-        sourceGroupIndex,
-        (tabGroup: ITabGroup) => assoc('tabs', sourceTabsWithoutTab, tabGroup),
-        state
-      )
+    pipe(
+      pathOr([], [sourceGroupIndex, 'tabs']),
+      remove(sourceTabIndex, 1),
+      (sourceTabsWithoutTab) =>
+        adjust(
+          sourceGroupIndex,
+          (tabGroup: ITabGroup) => assoc('tabs', sourceTabsWithoutTab, tabGroup),
+          state
+        )
     )(state)
 }
 
-function injectTab(state: ITabGroup[], action: any, tabData: ITab) {
+function updateGroupOrDefault(existingTabGroup?: ITabGroup, payload?: any): ITabGroup {
+  const defaults = {
+    id: `droppable-${uuidv4()}`,
+    name: new Date().toISOString(),
+    tabs: [],
+    readOnly: false,
+    collapsed: false,
+  }
+
+  return Object.assign(
+    {},
+    defaults,
+    existingTabGroup,
+    pick(['name', 'tabs', 'readOnly', 'collapsed'], payload),
+    payload?.sourceGroupId && { id: payload.sourceGroupId }
+  )
+}
+
+function injectTab(state: ITabGroup[], action: any, tabData: ITab): ITabGroup[] {
+  // if we are injecting a tab into a new group
+  if (action.payload.targetGroupId === 'newGroup') {
+    const newGroup = updateGroupOrDefault(undefined, { tabs: [tabData] })
+    return append(newGroup, state)
+  }
+
   // compute the index of the target group
-  const targetGroupIndex = findIndex(el => el.id === action.payload.targetGroupId, state)
+  const targetGroupIndex = findIndex((el) => el.id === action.payload.targetGroupId, state)
   if (targetGroupIndex === -1) {
     return state
   }
@@ -44,7 +73,7 @@ function injectTab(state: ITabGroup[], action: any, tabData: ITab) {
   return pipe(
     pathOr([], [targetGroupIndex, 'tabs']),
     insert(action.payload.targetTabIndex as number, tabData),
-    targetTabsWithTab =>
+    (targetTabsWithTab) =>
       adjust(
         targetGroupIndex,
         (tabGroup: ITabGroup) => assoc('tabs', targetTabsWithTab, tabGroup),
@@ -53,24 +82,34 @@ function injectTab(state: ITabGroup[], action: any, tabData: ITab) {
   )(state)
 }
 
+// TODO: extend each tab by the hash
+// TODO: deduplicate storage according to the hash of tabs
+// TODO: can we replace the uuid with the hash? uuid + tabgroup id?
 const tabGroupsSlice = createSlice({
   name: 'tabGroups',
   initialState: [] as ITabGroup[],
   reducers: {
-    updateGroup(state, action): ITabGroup[] {
-      const sourceGroupIndex = findIndex(el => el.id === action.payload.sourceGroupId, state)
+    collapseGroup(state, action): ITabGroup[] {
+      const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
+      if (sourceGroupIndex === -1) {
+        return state
+      }
+
       const existingTabGroup = sourceGroupIndex > -1 ? nth(sourceGroupIndex, state) : null
 
+      // update a tab group that already exists
+      return update(
+        sourceGroupIndex,
+        assoc('collapsed', !existingTabGroup?.collapsed, existingTabGroup),
+        state
+      )
+    },
+    updateGroup(state, action): ITabGroup[] {
+      const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
+      const existingTabGroup = sourceGroupIndex > -1 ? nth(sourceGroupIndex, state) : undefined
+
       // if trying to update a group that does not exist, append it
-      const tabGroup: ITabGroup = {
-        id: action?.payload?.sourceGroupId ?? existingTabGroup?.id ?? `droppable-${uuidv4()}`,
-        name: action?.payload?.name ?? existingTabGroup?.name ?? new Date().toISOString(),
-        tabs:
-          action?.payload?.tabs?.map((tab: ITab) => ({ ...tab, uuid: uuidv4() })) ??
-          existingTabGroup?.tabs ??
-          [],
-        readOnly: action?.payload?.readOnly ?? existingTabGroup?.readOnly ?? false
-      }
+      const tabGroup = updateGroupOrDefault(existingTabGroup, action.payload)
 
       if (sourceGroupIndex === -1) {
         return append(tabGroup, state)
@@ -80,9 +119,8 @@ const tabGroupsSlice = createSlice({
       return update(sourceGroupIndex, tabGroup, state)
     },
     removeGroup(state, action): ITabGroup[] {
-      const sourceGroupIndex = findIndex(el => el.id === action.payload.sourceGroupId, state)
+      const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
       if (sourceGroupIndex === -1) {
-        console.error('EARLY_RETURN')
         return state
       }
 
@@ -95,15 +133,8 @@ const tabGroupsSlice = createSlice({
       return remove(sourceGroupIndex, 1, state)
     },
     moveTab(state, action): ITabGroup[] {
-      const sourceGroupIndex = findIndex(el => el.id === action.payload.sourceGroupId, state)
+      const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
       if (sourceGroupIndex === -1) {
-        console.error('EARLY_RETURN')
-        return state
-      }
-
-      // compute the index of the target group
-      const targetGroupIndex = findIndex(el => el.id === action.payload.targetGroupId, state)
-      if (sourceGroupIndex === -1 || targetGroupIndex === -1) {
         return state
       }
 
@@ -130,9 +161,8 @@ const tabGroupsSlice = createSlice({
       return injectTab(state, action, { ...action.payload.currentTab, uuid: uuidv4() })
     },
     reorderTab(state, action): ITabGroup[] {
-      const sourceGroupIndex = findIndex(el => el.id === action.payload.sourceGroupId, state)
+      const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
       if (sourceGroupIndex === -1) {
-        console.error('EARLY_RETURN')
         return state
       }
 
@@ -143,7 +173,7 @@ const tabGroupsSlice = createSlice({
           move(action.payload.sourceTabIndex as number, action.payload.targetTabIndex as number)
         ),
         // inject the reordered tabs into the source group
-        reorderedTabs =>
+        (reorderedTabs) =>
           adjust(
             sourceGroupIndex,
             (tabGroup: ITabGroup) => assoc('tabs', reorderedTabs, tabGroup),
@@ -152,30 +182,65 @@ const tabGroupsSlice = createSlice({
       )(state)
     },
     removeTab(state, action): ITabGroup[] {
-      const sourceGroupIndex = findIndex(el => el.id === action.payload.sourceGroupId, state)
+      const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
       if (sourceGroupIndex === -1) {
-        console.error('EARLY_RETURN')
         return state
       }
       return removeTabFromGroup(sourceGroupIndex, action.payload.sourceTabIndex as number)(state)
-    }
-  }
+    },
+  },
 })
 
 const { actions, reducer } = tabGroupsSlice
-export const { updateGroup, removeGroup, moveTab, reorderTab, removeTab, moveCurrentTab } = actions
+export const {
+  collapseGroup,
+  updateGroup,
+  removeGroup,
+  moveTab,
+  reorderTab,
+  removeTab,
+  moveCurrentTab,
+} = actions
 export default reducer
 
 // THUNKS
+export const closeTabGroup = createAsyncThunk(
+  'tabGroups/closeTabGroup',
+  async (tabGroupId: string, thunkAPI): Promise<void> => {
+    const state: any = thunkAPI.getState()
+
+    const tabGroup = find((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
+    if (tabGroup) {
+      const tabHashes = tabGroup.tabs.map((tab) => tab.hash)
+      await thunkAPI.dispatch(closeTabsWithHashes(tabHashes))
+    }
+  }
+)
+
 export const openTabGroup = createAsyncThunk(
   'tabGroups/openTabGroup',
   async (tabGroupId: string, thunkAPI): Promise<void> => {
     const browser = await getBrowserSafe()
     const state: any = thunkAPI.getState()
 
+    const currentTab = await browser.tabs.getCurrent()
+
     const tabGroup = find((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
     if (tabGroup) {
-      await Promise.all(tabGroup.tabs.map(tab => browser.tabs.create({ url: tab.url })))
+      await Promise.all(
+        tabGroup.tabs.map(async (tab) => {
+          // if the tab to be opened is already open, dispatch the openCurrentTab functionality instead
+          if (state.currentTabs.tabHashes.includes(tab.hash)) {
+            return thunkAPI.dispatch(openCurrentTab(tab.hash))
+          }
+
+          // otherwise create a new tab
+          return browser.tabs.create({
+            url: tab.url,
+            windowId: currentTab.windowId,
+          })
+        })
+      )
     }
   }
 )

@@ -7,7 +7,7 @@ import {
   PAUSE,
   PERSIST,
   PURGE,
-  REGISTER
+  REGISTER,
 } from 'redux-persist'
 
 import rootReducer from './reducers'
@@ -19,9 +19,9 @@ export default ({ persistence = true }: any): { store: Store; persistor?: Persis
       serializableCheck: {
         // we need to disable these to prevent issues in conjunction with redux-persist
         // ref: https://github.com/rt2zz/redux-persist/issues/988
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
-      }
-    })
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
   })
 
   if (persistence) {

@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react'
-import { DragDropContext, DropResult } from 'react-beautiful-dnd'
+import React, { useEffect, useState } from 'react'
+import { DragDropContext, DropResult, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
+import { Button, Input, Typography } from '@material-ui/core'
+import { Add, Settings } from '@material-ui/icons'
 
 import optionsStorage from '@src/optionsStorage'
-import TabGroup from '@src/components/TabGroup'
-import Button from '@src/components/Button'
+import TabGroup from '@src/components/tabs/TabGroup'
 import { ITabGroup } from '@src/types/Extension'
 import { getBrowserSafe } from '@src/lib/utils'
+import Layout from '@src/lib/Layout'
 import {
   removeTab,
   moveTab,
@@ -14,37 +16,37 @@ import {
   removeGroup,
   updateGroup,
   openTabGroup,
-  moveCurrentTab
+  moveCurrentTab,
+  collapseGroup,
+  closeTabGroup,
 } from '@src/state/tabGroups'
-import { initializeCurrentTabs } from '@src/state/currentTabs'
+import { collapseCurrentTabs, closeCurrentTab, openCurrentTab } from '@src/state/currentTabs'
 
 const extractDragEventProperties = (dragEvent: DropResult): any => ({
   sourceGroupId: dragEvent.source.droppableId,
   targetGroupId: dragEvent?.destination?.droppableId,
   sourceTabIndex: dragEvent.source.index,
-  targetTabIndex: dragEvent?.destination?.index
+  targetTabIndex: dragEvent?.destination?.index,
 })
 
 function UI(): React.ReactElement {
   const dispatch = useDispatch()
+
   const currentTabs = useSelector((state: any) => state.currentTabs)
   const tabGroups = useSelector((state: any) => state.tabGroups)
+  const suggestions = useSelector((state: any) => state.suggestions)
 
-  const [number, setNumber] = useState(-1)
+  const [heuristicsEnabled, setHeuristicsEnabled] = useState(false)
 
   useEffect(() => {
     const init = async (): Promise<void> => {
-      // initialize current tabs
-      await dispatch(initializeCurrentTabs())
-
-      // initialize options data
       const result = await optionsStorage.getAll()
-      if (result.number) setNumber(result.number)
+      setHeuristicsEnabled(result.enableHeuristics)
     }
     init()
   }, [dispatch])
 
-  const handleDragEnd = (dragEvent: DropResult): any => {
+  const handleDragEnd = async (dragEvent: DropResult): Promise<any> => {
     const properties = extractDragEventProperties(dragEvent)
 
     // if the destination is empty, return
@@ -52,6 +54,9 @@ function UI(): React.ReactElement {
 
     // if we are reordering within a droppable
     if (properties.sourceGroupId === properties.targetGroupId) {
+      // do not allow reordering in current tabs
+      if (properties.sourceGroupId === 'current') return
+
       // if we are reordering to the same position,, return
       if (properties.sourceTabIndex === properties.targetGroupIndex) return
 
@@ -79,14 +84,9 @@ function UI(): React.ReactElement {
     dispatch(updateGroup({}))
   }
 
-  const handleReloadExtension = async (): Promise<void> => {
+  const handleOpenOptions = async (): Promise<void> => {
     const browser = await getBrowserSafe()
-    browser.runtime.reload()
-  }
-
-  const handleSendMessage = async (): Promise<void> => {
-    const browser = await getBrowserSafe()
-    browser.runtime.sendMessage({ type: 'SIDEBAR' })
+    browser.runtime.openOptionsPage()
   }
 
   const handleOpenTabGroup = (sourceGroupId: string) => async (): Promise<void> => {
@@ -97,41 +97,124 @@ function UI(): React.ReactElement {
     dispatch(updateGroup({ sourceGroupId, name }))
   }
 
+  const handleCollapseTabGroup = (sourceGroupId: string) => (): void => {
+    dispatch(collapseGroup({ sourceGroupId }))
+  }
+
+  const handleCollapseCurrentTabs = (): void => {
+    dispatch(collapseCurrentTabs())
+  }
+
+  const handleCloseCurrentTab = (tabId: number) => (): void => {
+    dispatch(closeCurrentTab(tabId))
+  }
+
+  const handleOpenCurrentTab = (tabHash: string) => (): void => {
+    dispatch(openCurrentTab(tabHash))
+  }
+
+  const handleCloseTabGroup = (sourceGroupId: string) => (): void => {
+    dispatch(closeTabGroup(sourceGroupId))
+  }
+
   if (!tabGroups) {
     return <div>Loading</div>
   }
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <div className="w-full h-auto p-1 min-h-64 min-w-64">
-        <div className="flex flex-col md:flex-wrap md:flex-row">
-          <TabGroup isReadOnly id="current" name="Current Tabs" tabs={currentTabs.tabs} />
-          {tabGroups.map((tabGroup: ITabGroup) => (
-            <TabGroup
-              // TODO: pass down current tabs and mark tabs that are open
-              // TODO: disable window display for tabs that are not open
-              key={tabGroup.id}
-              id={tabGroup.id}
-              name={tabGroup.name}
-              tabs={tabGroup.tabs}
-              isReadOnly={tabGroup.readOnly}
-              onRemoveTab={handleRemoveTab(tabGroup.id)}
-              onRemoveTabGroup={handleRemoveTabGroup(tabGroup.id)}
-              onOpenTabGroup={handleOpenTabGroup(tabGroup.id)}
-              onChangeGroupName={handleRenameTabGroup(tabGroup.id)}
+    <Layout>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div className="w-full h-auto p-2 min-h-64 min-w-64">
+          <div className="flex flex-row pb-2 dark:text-gray-100">
+            <Input
+              fullWidth
+              disabled
+              placeholder="Search..."
+              value=""
+              onChange={(): void => undefined}
             />
-          ))}
-        </div>
+            <button
+              className="text-lg text-gray-600 dark:text-gray-100"
+              onClick={handleOpenOptions}
+              title="open settings"
+            >
+              <Settings fontSize="inherit" />
+            </button>
+          </div>
 
-        <div>hello from synced settings: {number}</div>
+          <div className="flex flex-col md:flex-wrap md:flex-row">
+            <TabGroup
+              isReadOnly
+              id="current"
+              name="Current Tabs"
+              tabs={currentTabs.tabs}
+              isCollapsed={currentTabs.collapsed}
+              onCollapseGroup={handleCollapseCurrentTabs}
+              onCloseTab={handleCloseCurrentTab}
+            />
 
-        <div className="flex flex-row">
-          <Button onClick={handleAddTabGroup}>New Group</Button>
-          <Button onClick={handleReloadExtension}>Reload Ext.</Button>
-          <Button onClick={handleSendMessage}>Sidebar</Button>
+            {tabGroups.map((tabGroup: ITabGroup) => (
+              <TabGroup
+                // TODO: pass down current tabs and mark tabs that are open
+                // TODO: disable window display for tabs that are not open
+                key={tabGroup.id}
+                id={tabGroup.id}
+                name={tabGroup.name}
+                tabs={tabGroup.tabs}
+                currentTabs={currentTabs.tabHashes}
+                isCollapsed={tabGroup.collapsed}
+                isReadOnly={tabGroup.readOnly}
+                onCollapseGroup={handleCollapseTabGroup(tabGroup.id)}
+                onRemoveTab={handleRemoveTab(tabGroup.id)}
+                onRemoveTabGroup={handleRemoveTabGroup(tabGroup.id)}
+                onOpenTabGroup={handleOpenTabGroup(tabGroup.id)}
+                onChangeGroupName={handleRenameTabGroup(tabGroup.id)}
+                onOpenCurrentTab={handleOpenCurrentTab}
+                onCloseTabGroup={handleCloseTabGroup(tabGroup.id)}
+              />
+            ))}
+
+            <Droppable ignoreContainerClipping droppableId="newGroup">
+              {(provided: DroppableProvided): React.ReactElement => (
+                <Button
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  fullWidth
+                  className="min-h-8 md:min-w-xxs md:max-w-xxs"
+                  onClick={handleAddTabGroup}
+                  title="add group"
+                >
+                  <Add />
+                </Button>
+              )}
+            </Droppable>
+          </div>
+
+          {heuristicsEnabled && (
+            <div>
+              <Typography variant="body1">Suggestions</Typography>
+              <div className="flex flex-col md:flex-wrap md:flex-row">
+                {suggestions.length === 0 && (
+                  <Typography variant="body2">Collecting more data...</Typography>
+                )}
+                {suggestions.map((tabGroup: ITabGroup) => (
+                  <TabGroup
+                    // TODO: pass down current tabs and mark tabs that are open
+                    // TODO: disable window display for tabs that are not open
+                    isSuggested
+                    isReadOnly
+                    key={tabGroup.id}
+                    id={tabGroup.id}
+                    name={tabGroup.name}
+                    tabs={tabGroup.tabs}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      </div>
-    </DragDropContext>
+      </DragDropContext>
+    </Layout>
   )
 }
 
