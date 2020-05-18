@@ -15,7 +15,7 @@ However, it is still possible to use the core feature-set (manually):
 - Create and use tab groups (in New Tab and sidebar views)
 - Synchronize groups across devices
 
-As it is planned to conduct a user study and write an accompanying scientific report, this code shall remain closed-source until said publication is finished. After publication, it is planned to further develop the extension as an open-source project and distribute it over official channels (i.e. Firefox AMO and Chrome Web Stores).
+As it is planned to conduct a user study and write an accompanying scientific report, this code shall remain closed-source and manually distributed until said publication is finished. After publication, it is planned to further develop the extension as an open-source project and distribute it over official channels (i.e. Firefox AMO and Chrome Web Stores).
 
 For feature requests, bug reports, and feedback of any kind, please refer to the following form:
 <https://docs.google.com/forms/d/1pLqMgDVgzzf7yAmn6JLd0jJbrn3QlFZNVaYlKWVie78/edit>
