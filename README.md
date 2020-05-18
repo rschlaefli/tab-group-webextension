@@ -30,10 +30,10 @@ Install all dependencies:
 
 > `npm install`
 
-Run the extension in development mode:
+Run the extension in development mode (installation using developer/debug mode):
 
 > `npm run dev`
 
-Package the extension for deployment:
+Package the extension for deployment (creates `.zip` and `.xpi` files):
 
 > `npm run package`
