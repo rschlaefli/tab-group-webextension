@@ -31,7 +31,7 @@
     "dev:serve": "cross-env NODE_ENV=development nodemon --delay 2500ms -e json,html -w public -w package.json -w package-lock.json -w webpack.config.js --exec 'webpack-dev-server'",
     "format": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\" && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "format:ci": "prettier --check \"**/*.+(js|jsx|ts|tsx|json|css|md)\"",
-    "lint": "npm run typ-check && eslint '*/**/*.{js,ts,tsx}'",
+    "lint": "npm run type-check && eslint '*/**/*.{js,ts,tsx}'",
     "package:all": "npm-run-all --parallel package:chrome package:firefox",
     "package:chrome": "zip -jo `date +%Y-%m-%d`-chrome.zip build/chrome/*",
     "package:edge": "zip -jo `date +%Y-%m-%d`-edge.zip build/edge/*",
