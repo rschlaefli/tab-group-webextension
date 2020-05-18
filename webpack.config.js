@@ -5,6 +5,7 @@
 // https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/config/webpack.config.js
 // https://github.com/aeksco/react-typescript-web-extension-starter
 // https://github.com/notlmn/browser-extension-template/blob/master/webpack.config.js
+// https://github.com/salsita/chrome-extension-skeleton
 
 const fs = require('fs')
 const path = require('path')
@@ -41,11 +42,11 @@ const PATHS = {
 }
 
 module.exports = function (webpackEnv) {
-  const isEnvDevelopment = webpackEnv === 'development'
-  const isEnvProduction = webpackEnv === 'production'
+  const isEnvDevelopment = !webpackEnv.production
+  const isEnvProduction = !!webpackEnv.production
 
   return {
-    mode: webpackEnv || 'development',
+    mode: isEnvProduction ? 'production' : 'development',
     bail: isEnvProduction,
     devtool: isEnvProduction ? 'source-map' : 'inline-source-map',
     devServer: {
@@ -67,7 +68,7 @@ module.exports = function (webpackEnv) {
     },
     output: {
       path: PATHS.output,
-      filename: '[name].bundle.js',
+      filename: isEnvProduction ? '[name].[contenthash].bundle.js' : '[name].bundle.js',
     },
     module: {
       rules: [
@@ -109,14 +110,14 @@ module.exports = function (webpackEnv) {
                   loader: require.resolve('css-loader'),
                   options: { importLoaders: 1, sourceMap: isEnvProduction },
                 },
-                // MiniCssExtractPlugin.loader
                 // {
                 //   loader: 'postcss-loader',
                 //   options: {
                 //     ident: 'postcss',
-                //     sourceMap: isEnvProduction
-                //   }
-                // }
+                //     sourceMap: isEnvProduction,
+                //   },
+                // },
+                // MiniCssExtractPlugin.loader,
               ],
             },
             {
@@ -138,6 +139,7 @@ module.exports = function (webpackEnv) {
       },
     },
     optimization: {
+      moduleIds: 'hashed',
       minimize: isEnvProduction,
       minimizer: [
         new TerserPlugin({
@@ -151,6 +153,16 @@ module.exports = function (webpackEnv) {
           },
         }),
       ],
+      runtimeChunk: 'single',
+      splitChunks: {
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+        },
+      },
     },
     plugins: [
       // automatically reload if a missing module is newly installed
