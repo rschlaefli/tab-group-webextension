@@ -24,6 +24,16 @@ export function performBrowserActionSafe(func: (browser: Browser) => void): Func
   }
 }
 
+export function normalizeStringForHashing(input: string): string {
+  // replace special characters with spaces
+  const normalizedString = input.replace(/[^a-zA-Z ]/g, ' ')
+
+  // replace multiple spaces with single ones
+  const compactedString = normalizedString.replace(/\s\s+/g, ' ')
+
+  return compactedString
+}
+
 interface IHashResult {
   hash: string
   origin: string
@@ -43,9 +53,9 @@ export function computeTabHash(url: string, title?: string): IHashResult {
   }
 
   if (typeof title !== 'undefined') {
-    result['hash'] = md5(result.baseUrl + title)
+    result['hash'] = md5(result.baseUrl + ' ' + normalizeStringForHashing(title))
   } else {
-    result['hash'] = result.baseHash
+    result['hash'] = result.hash
   }
 
   return result as IHashResult
