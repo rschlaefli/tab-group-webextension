@@ -163,25 +163,27 @@ module.exports = function (webpackEnv) {
         // prevent clean plugin from deleting manifest and html pages
         cleanStaleWebpackAssets: false,
       }),
-      new CopyWebpackPlugin([
-        {
-          from: PATHS.sidebarCss,
-        },
-        // copy the extension manifest
-        {
-          from: PATHS.manifest,
-          // inject dynamic content into the manifest
-          transform: function (content, path) {
-            return Buffer.from(
-              JSON.stringify({
-                description: process.env.npm_package_description,
-                version: process.env.npm_package_version,
-                ...JSON.parse(content.toString()),
-              })
-            )
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: PATHS.sidebarCss,
           },
-        },
-      ]),
+          // copy the extension manifest
+          {
+            from: PATHS.manifest,
+            // inject dynamic content into the manifest
+            transform: function (content, path) {
+              return Buffer.from(
+                JSON.stringify({
+                  description: process.env.npm_package_description,
+                  version: process.env.npm_package_version,
+                  ...JSON.parse(content.toString()),
+                })
+              )
+            },
+          },
+        ],
+      }),
       new WebextensionPlugin({
         vendor: process.env.BROWSER || 'chrome',
       }),
