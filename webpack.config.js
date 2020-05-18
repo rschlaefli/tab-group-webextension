@@ -9,7 +9,6 @@
 
 const fs = require('fs')
 const path = require('path')
-const webpack = require('webpack')
 const CleanWebpackPlugin = require('clean-webpack-plugin').CleanWebpackPlugin
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -18,7 +17,8 @@ const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeM
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin')
 const WebextensionPlugin = require('webpack-webextension-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
-// const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
 const { pipe, __ } = require('ramda')
 
@@ -32,18 +32,21 @@ const PATHS = {
   options: path.join(__dirname, 'src/options.tsx'),
   optionsTemplate: path.join(__dirname, 'public/options.html'),
   output: path.join(__dirname, 'build'),
+  public: path.join(__dirname, 'public'),
   sidebar: path.join(__dirname, 'src/sidebar.ts'),
   sidebarCss: path.join(__dirname, 'public/sidebar.css'),
+  styles: path.join(__dirname, 'src/styles'),
   tutorial: path.join(__dirname, 'src/tutorial.tsx'),
   tutorialTemplate: path.join(__dirname, 'public/tutorial.html'),
   src: path.join(__dirname, 'src'),
   ui: path.join(__dirname, 'src/ui.tsx'),
   uiTemplate: path.join(__dirname, 'public/ui.html'),
+  vendor: path.join(__dirname, 'node_modules'),
 }
 
-module.exports = function (webpackEnv) {
-  const isEnvDevelopment = !webpackEnv.production
-  const isEnvProduction = !!webpackEnv.production
+module.exports = function (webpackEnv, _) {
+  const isEnvDevelopment = !webpackEnv || !webpackEnv.production
+  const isEnvProduction = webpackEnv && !!webpackEnv.production
 
   return {
     mode: isEnvProduction ? 'production' : 'development',
@@ -68,7 +71,7 @@ module.exports = function (webpackEnv) {
     },
     output: {
       path: PATHS.output,
-      filename: isEnvProduction ? '[name].[contenthash].bundle.js' : '[name].bundle.js',
+      filename: '[name].bundle.js',
     },
     module: {
       rules: [
@@ -77,14 +80,16 @@ module.exports = function (webpackEnv) {
             {
               test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
               loader: require.resolve('url-loader'),
+              include: PATHS.public,
               options: {
                 limit: '10000',
                 name: 'media/[name].[hash:8].[ext]',
               },
             },
             {
-              exclude: /node_modules/,
-              test: /\.tsx?$/,
+              test: /\.(js|ts)x?$/,
+              include: PATHS.src,
+              // exclude: PATHS.vendor,
               use: [
                 {
                   loader: require.resolve('babel-loader'),
@@ -102,6 +107,7 @@ module.exports = function (webpackEnv) {
             {
               // exclude: /node_modules/,
               test: /\.css$/,
+              include: PATHS.styles,
               use: [
                 {
                   loader: require.resolve('style-loader'),
@@ -110,14 +116,6 @@ module.exports = function (webpackEnv) {
                   loader: require.resolve('css-loader'),
                   options: { importLoaders: 1, sourceMap: isEnvProduction },
                 },
-                // {
-                //   loader: 'postcss-loader',
-                //   options: {
-                //     ident: 'postcss',
-                //     sourceMap: isEnvProduction,
-                //   },
-                // },
-                // MiniCssExtractPlugin.loader,
               ],
             },
             {
@@ -139,9 +137,8 @@ module.exports = function (webpackEnv) {
       },
     },
     optimization: {
-      moduleIds: 'hashed',
       minimize: isEnvProduction,
-      minimizer: [
+      minimizer: isEnvProduction && [
         new TerserPlugin({
           terserOptions: {
             mangle: isEnvProduction,
@@ -153,20 +150,24 @@ module.exports = function (webpackEnv) {
           },
         }),
       ],
-      runtimeChunk: 'single',
-      splitChunks: {
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-        },
-      },
+      // runtimeChunk: 'single',
+      // splitChunks: isEnvProduction && {
+      //   cacheGroups: {
+      //     vendor: {
+      //       test: /[\\/]node_modules[\\/]/,
+      //       name: 'vendors',
+      //       chunks: 'all',
+      //     },
+      //   },
+      // },
     },
     plugins: [
+      // fork a ts typechecker
+      new ForkTsCheckerWebpackPlugin(),
       // automatically reload if a missing module is newly installed
       isEnvDevelopment && new WatchMissingNodeModulesPlugin('node_modules'),
+      // bundle analysis
+      isEnvProduction && webpackEnv.analyze && new BundleAnalyzerPlugin({ analyzerMode: 'static' }),
       // get additional information for errors regarding "module not found"
       new ModuleNotFoundPlugin(PATHS.cwd),
       // TODO: setup define plugin (using env.js from CRA?)
@@ -197,7 +198,7 @@ module.exports = function (webpackEnv) {
         ],
       }),
       new WebextensionPlugin({
-        vendor: process.env.BROWSER || 'chrome',
+        vendor: (webpackEnv && webpackEnv.browser) || 'chrome',
       }),
       // new MiniCssExtractPlugin({
       //   filename: 'style.css'
