@@ -1,6 +1,6 @@
 {
   "name": "automated-tab-organization",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Roland Schlaefli <rolandschlaefli@gmail.com>",
   "description": "A WebExtension for automated tab organization",
   "repository": {
@@ -19,7 +19,8 @@
     "build:firefox": "cross-env BROWSER=firefox npm run build:app",
     "build:opera": "cross-env BROWSER=opera npm run build:app",
     "build:style": "cross-env NODE_ENV=production postcss src/styles/index.css -o src/styles/tailwind.css",
-    "deploy": "npm-run-all deploy:chrome deploy:firefox",
+    "deploy": "npm-run-all deploy:chrome deploy:firefox deploy:sources",
+    "deploy:sources": "zip -o `date +%Y-%m-%d`-sources.zip public/* src/* .eslintignore .eslintrc.js .prettierignore .prettierrc.js babel.config.js jest.config.js manifest.json package-lock.json package.json postcss.config.js README.md tailwind.config.js tsconfig.json webpack.config.js",
     "deploy:chrome": "npm-run-all build:chrome package:chrome",
     "deploy:edge": "npm-run-all build:edge package:edge",
     "deploy:firefox": "npm-run-all build:firefox package:firefox",

@@ -36,4 +36,4 @@ Run the extension in development mode (installation using developer/debug mode):
 
 Package the extension for deployment (creates `.zip` and `.xpi` files):
 
-> `npm run package`
+> `npm run deploy`

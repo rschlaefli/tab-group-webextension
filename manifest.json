@@ -1,5 +1,4 @@
 {
-  "__chrome__key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArcRa7+x2kvLCLShv3xlv7siadx3gwzFzoc2nmRbORL4PEXA2Jp0bd0WtPs3PBOQ7kLKdZ8kJ3aiTiTTfO7nutzS5c5MuJg6L4InHXvXFCOMxH8+E708dBtDZ3I+FO8aNbfz7UNj+Iu6Q6AtP5k/SN+eAod5oSbQd17eDiTTEkxlprKbJjgqHXE9cxgy3ANiVvLRLG7qULPrUz6Uv80RM7SBsUX5zwFau552FQ1j0c8zPGENF6lRPgxTQSpu6MXUQvgNtoz7IgW3AUGjhULNY4UInnsDew0mjdGk846Jo9I6PZxYprmapuibCQLQ7qibxdtR7VJPDDBsY1VivQM7GxQIDAQAB",
   "manifest_version": 2,
   "name": "Automated Tab Organization",
   "description": "A WebExtension for automated tab organization",
