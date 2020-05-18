@@ -26,22 +26,22 @@ const resolveCwd = pipe(process.cwd, fs.realpathSync)
 
 const PATHS = {
   cwd: path.resolve(resolveCwd(), '.'),
-  background: path.join(__dirname, 'src/background.ts'),
-  backgroundTemplate: path.join(__dirname, 'public/background.html'),
-  manifest: path.join(__dirname, 'manifest.json'),
-  options: path.join(__dirname, 'src/options.tsx'),
-  optionsTemplate: path.join(__dirname, 'public/options.html'),
-  output: path.join(__dirname, 'build'),
-  public: path.join(__dirname, 'public'),
-  sidebar: path.join(__dirname, 'src/sidebar.ts'),
-  sidebarCss: path.join(__dirname, 'public/sidebar.css'),
-  styles: path.join(__dirname, 'src/styles'),
-  tutorial: path.join(__dirname, 'src/tutorial.tsx'),
-  tutorialTemplate: path.join(__dirname, 'public/tutorial.html'),
-  src: path.join(__dirname, 'src'),
-  ui: path.join(__dirname, 'src/ui.tsx'),
-  uiTemplate: path.join(__dirname, 'public/ui.html'),
-  vendor: path.join(__dirname, 'node_modules'),
+  background: path.resolve(__dirname, 'src/background.ts'),
+  backgroundTemplate: path.resolve(__dirname, 'public/background.html'),
+  manifest: path.resolve(__dirname, 'manifest.json'),
+  options: path.resolve(__dirname, 'src/options.tsx'),
+  optionsTemplate: path.resolve(__dirname, 'public/options.html'),
+  output: path.resolve(__dirname, 'build'),
+  public: path.resolve(__dirname, 'public'),
+  sidebar: path.resolve(__dirname, 'src/sidebar.ts'),
+  sidebarCss: path.resolve(__dirname, 'public/sidebar.css'),
+  styles: path.resolve(__dirname, 'src/styles'),
+  tutorial: path.resolve(__dirname, 'src/tutorial.tsx'),
+  tutorialTemplate: path.resolve(__dirname, 'public/tutorial.html'),
+  src: path.resolve(__dirname, 'src'),
+  ui: path.resolve(__dirname, 'src/ui.tsx'),
+  uiTemplate: path.resolve(__dirname, 'public/ui.html'),
+  vendor: path.resolve(__dirname, 'node_modules'),
 }
 
 module.exports = function (webpackEnv, _) {
@@ -89,7 +89,6 @@ module.exports = function (webpackEnv, _) {
             {
               test: /\.(js|ts)x?$/,
               include: PATHS.src,
-              // exclude: PATHS.vendor,
               use: [
                 {
                   loader: require.resolve('babel-loader'),
@@ -99,13 +98,9 @@ module.exports = function (webpackEnv, _) {
                     compact: isEnvProduction,
                   },
                 },
-                {
-                  loader: require.resolve('ts-loader'),
-                },
               ],
             },
             {
-              // exclude: /node_modules/,
               test: /\.css$/,
               include: PATHS.styles,
               use: [

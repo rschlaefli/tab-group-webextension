@@ -1,12 +1,12 @@
 module.exports = {
-  presets: ['@babel/preset-env', '@babel/preset-typescript'],
+  presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
   plugins: [
     [
       'babel-plugin-import',
       {
         libraryName: 'ramda',
         // Use "'libraryDirectory': ''," if your bundler does not support ES modules
-        libraryDirectory: 'esm',
+        libraryDirectory: 'es',
         camel2DashComponentName: false,
       },
       'ramda',

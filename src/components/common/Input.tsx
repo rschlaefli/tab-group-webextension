@@ -1,5 +1,6 @@
 import React from 'react'
-import { Input as MuiInput, makeStyles } from '@material-ui/core'
+import { Input as MuiInput } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core/styles'
 
 interface IProps {
   fullWidth?: boolean
