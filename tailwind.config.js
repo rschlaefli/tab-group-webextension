@@ -761,4 +761,5 @@ module.exports = {
   },
   corePlugins: {},
   plugins: [],
+  purge: ['./public/**/*.html', './src/**/*.ts', './src/**/*.tsx'],
 }
