@@ -73,6 +73,12 @@ module.exports = function (webpackEnv, _) {
       path: PATHS.output,
       filename: '[name].bundle.js',
     },
+    cache: {
+      type: 'filesystem',
+      buildDependencies: {
+        config: [__filename],
+      },
+    },
     module: {
       rules: [
         {
