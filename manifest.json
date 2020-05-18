@@ -35,7 +35,7 @@
   "__firefox__applications": {
     "gecko": {
       "id": "automated-tab-organization@rschlaefli",
-      "strict_min_version": "50.0"
+      "strict_min_version": "70.0"
     }
   },
   "web_accessible_resources": ["ui.html", "tutorial.html"],
