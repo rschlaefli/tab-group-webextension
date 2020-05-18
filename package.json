@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "npm-run-all build:style build:app",
-    "build:app": "cross-env NODE_ENV=production webpack",
+    "build:app": "cross-env NODE_ENV=production webpack --env.production",
     "build:chrome": "cross-env BROWSER=chrome npm run build:app",
     "build:edge": "cross-env BROWSER=edge npm run build:app",
     "build:firefox": "cross-env BROWSER=firefox npm run build:app",
