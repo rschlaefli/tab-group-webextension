@@ -70,21 +70,21 @@ function injectTab(state: ITabGroup[], action: any, tabData: ITab): ITabGroup[] 
     return state
   }
 
-  return pipe(
-    pathOr([], [targetGroupIndex, 'tabs']),
-    insert(action.payload.targetTabIndex as number, tabData),
-    (targetTabsWithTab) =>
-      adjust(
-        targetGroupIndex,
-        (tabGroup: ITabGroup) => assoc('tabs', targetTabsWithTab, tabGroup),
-        state
-      )
-  )(state)
+  // check whether the given hash is already member of the target group
+  const targetTabs: ITab[] = pathOr([], [targetGroupIndex, 'tabs'], state)
+  if (targetTabs.map((tab) => tab.hash).includes(tabData.hash)) {
+    return state
+  }
+
+  return pipe(insert(action.payload.targetTabIndex as number, tabData), (targetTabsWithTab) =>
+    adjust(
+      targetGroupIndex,
+      (tabGroup: ITabGroup) => assoc('tabs', targetTabsWithTab, tabGroup),
+      state
+    )
+  )(targetTabs)
 }
 
-// TODO: extend each tab by the hash
-// TODO: deduplicate storage according to the hash of tabs
-// TODO: can we replace the uuid with the hash? uuid + tabgroup id?
 const tabGroupsSlice = createSlice({
   name: 'tabGroups',
   initialState: [] as ITabGroup[],
@@ -154,7 +154,6 @@ const tabGroupsSlice = createSlice({
         )(state)
       }
 
-      // TODO: only move the tab if it does not already exist in the group?
       return injectTab(sourceGroup, action, removedTab)
     },
     moveCurrentTab(state, action): ITabGroup[] {
