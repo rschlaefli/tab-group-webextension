@@ -20,15 +20,21 @@ const currentTabsSlice = createSlice({
     },
     updateTabs(state, action): void {
       const allTabs = action.payload.map(augmentTabExtras)
+      console.log('UPDATE', allTabs)
+
       state.tabs = allTabs
       state.tabHashes = allTabs.map((tab) => tab.hash)
     },
     createTab(state, action): void {
       const augmentedTab = augmentTabExtras(action.payload.tabData)
+      console.log('CREATE', augmentedTab)
+
       state.tabs = append(augmentedTab, state.tabs)
       state.tabHashes = append(augmentedTab.hash, state.tabHashes)
     },
     activateTab(state, action): void {
+      console.log('ACTIVATE', action.payload)
+
       state.activeTab = action.payload.tabId
       state.previousTabId = action.payload.previousTabId
     },
@@ -36,30 +42,26 @@ const currentTabsSlice = createSlice({
       const tabIndex = findIndex((tab) => tab.id === action.payload.tabId, state.tabs)
 
       if (tabIndex > -1) {
-        const augmentedTab = augmentTabExtras(
-          mergeRight(state.tabs[tabIndex], action.payload.tabData)
-        )
+        const mergedTab = mergeRight(state.tabs[tabIndex], action.payload.tabData)
+        console.log('UPDATE', action.payload.tabData, mergedTab)
 
-        state.tabs[tabIndex] = augmentedTab
-        state.tabHashes = update(tabIndex, augmentedTab.hash, state.tabHashes)
-      } else {
-        // this.createTab(state, action.payload.tabData)
+        state.tabs[tabIndex] = mergedTab
+
+        if (typeof action.payload.tabData.hash !== 'undefined') {
+          state.tabHashes = update(tabIndex, mergedTab.hash, state.tabHashes)
+        }
       }
     },
     removeTab(state, action): void {
       const tabIndex = findIndex((tab) => tab.id === action.payload.tabId, state.tabs)
 
       if (tabIndex > -1) {
+        console.log('REMOVE', state.tabs[tabIndex])
+
         state.tabs = remove(tabIndex, 1, state.tabs)
         state.tabHashes = remove(tabIndex, 1, state.tabHashes)
       }
     },
-    // moveTab(state, action) {
-    //   return state
-    // },
-    // attachTab(state, action) {
-    //   return state
-    // },
   },
 })
 
