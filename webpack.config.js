@@ -19,6 +19,8 @@ const WebextensionPlugin = require('webpack-webextension-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 
 const { pipe, __ } = require('ramda')
 
@@ -114,10 +116,13 @@ module.exports = function (webpackEnv, _) {
             },
             {
               test: /\.css$/,
-              include: PATHS.styles,
+              include: [PATHS.styles, path.resolve(__dirname, 'node_modules/webext-base-css')],
               use: [
                 {
-                  loader: require.resolve('style-loader'),
+                  loader: MiniCssExtractPlugin.loader,
+                  options: {
+                    hmr: isEnvDevelopment,
+                  },
                 },
                 {
                   loader: require.resolve('css-loader'),
@@ -156,7 +161,18 @@ module.exports = function (webpackEnv, _) {
             },
           },
         }),
+        new OptimizeCSSAssetsPlugin(),
       ],
+      splitChunks: {
+        cacheGroups: {
+          styles: {
+            name: 'styles',
+            test: /\.css$/,
+            chunks: 'all',
+            enforce: true,
+          },
+        },
+      },
       // runtimeChunk: 'single',
       // splitChunks: isEnvProduction && {
       //   cacheGroups: {
@@ -169,6 +185,7 @@ module.exports = function (webpackEnv, _) {
       // },
     },
     plugins: [
+      new MiniCssExtractPlugin(),
       // fork a ts typechecker
       new ForkTsCheckerWebpackPlugin(),
       // automatically reload if a missing module is newly installed
@@ -183,7 +200,7 @@ module.exports = function (webpackEnv, _) {
         cleanStaleWebpackAssets: false,
       }),
       new WebextensionPlugin({
-        vendor: (webpackEnv && webpackEnv.browser) || 'chrome',
+        vendor: (webpackEnv && webpackEnv.browser) || 'firefox',
         manifestDefaults: {
           name: PACKAGE.name,
           version: PACKAGE.version,
