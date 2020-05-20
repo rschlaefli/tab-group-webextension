@@ -51,7 +51,7 @@ export function normalizeStringForHashing(input: string): string {
   // replace multiple spaces with single ones
   const compactedString = normalizedString.replace(/\s\s+/g, ' ')
 
-  return compactedString
+  return compactedString.trim()
 }
 
 interface IHashResult {
@@ -72,9 +72,9 @@ export function computeTabHash(url: string, title?: string): IHashResult {
   result = { origin, baseUrl: origin + pathname }
 
   if (typeof title !== 'undefined') {
-    result['hash'] = md5(result.baseUrl + ' ' + normalizeStringForHashing(title))
+    result['hash'] = md5(result.baseUrl + ' ' + title)
   } else {
-    result['hash'] = result.hash
+    result['hash'] = md5(result.baseUrl)
   }
 
   return result as IHashResult
@@ -88,17 +88,18 @@ export function augmentTabExtras(tabData: Partial<ITab>): ITab {
   const augmentedTabData: Partial<ITab> = { ...tabData }
 
   // ensure that no query params can ever be in the title
-  if (typeof tabData.title !== 'undefined') {
+  if (tabData.title) {
     if (isURL(tabData.title)) {
       const { origin, pathname } = new URL(tabData.title)
       augmentedTabData.title = origin + pathname
     } else {
       augmentedTabData.title = tabData.title
     }
+    augmentedTabData.normalizedTitle = normalizeStringForHashing(augmentedTabData.title)
   }
 
   if (!tabData.hash && tabData.url) {
-    const { hash, origin, baseUrl } = computeTabHash(tabData.url, augmentedTabData.title)
+    const { hash, origin, baseUrl } = computeTabHash(tabData.url, augmentedTabData.normalizedTitle)
     augmentedTabData.hash = hash
     augmentedTabData.origin = origin
     augmentedTabData.baseUrl = baseUrl
