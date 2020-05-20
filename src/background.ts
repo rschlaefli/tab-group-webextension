@@ -103,17 +103,12 @@ async function performTabUpdate(changeData: Partial<ITab>, tab?: Partial<ITab>):
       'url',
     ])
   ) {
-    const augmentedTabData = augmentTabExtras(changeData)
-
-    store.dispatch(updateTab({ tabId: id, tabData: augmentedTabData }))
+    store.dispatch(updateTab({ tabId: id, tabData: changeData }))
 
     if (tab && status === 'completed') {
       postNativeMessage(nativePort, {
         action: TAB_ACTION.UPDATE,
-        payload: {
-          ...tab,
-          ...augmentedTabData,
-        },
+        payload: { ...tab, ...augmentTabExtras(changeData) },
       })
     }
   }
