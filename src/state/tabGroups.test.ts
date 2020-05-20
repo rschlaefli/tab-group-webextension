@@ -21,7 +21,6 @@ function expectIdsInGroups(expectedState: number[][], result: ITabGroup[]): void
 
 const TABS: ITab[] = [
   {
-    uuid: 'abcd',
     id: 0,
     index: 0,
     windowId: 1,
@@ -44,14 +43,11 @@ const TABS: ITab[] = [
     successorTabId: 1,
     hash: 'abcd',
     origin: '',
-    originHash: '',
     baseUrl: 'https://qwertz.ch',
-    baseHash: '345',
     title: 'test tab 1',
     favIconUrl: 'xyz',
   },
   {
-    uuid: 'bcde',
     id: 1,
     index: 1,
     windowId: 1,
@@ -75,14 +71,11 @@ const TABS: ITab[] = [
     url: 'https://abc.ch',
     hash: 'bcde',
     origin: '',
-    originHash: '',
     baseUrl: 'https://qwertz.ch',
-    baseHash: '345',
     title: 'test tab 2',
     favIconUrl: 'abc',
   },
   {
-    uuid: 'cdef',
     id: 2,
     index: 2,
     windowId: 1,
@@ -106,9 +99,7 @@ const TABS: ITab[] = [
     url: 'https://qwertz.ch',
     hash: 'cdef',
     origin: '',
-    originHash: '',
     baseUrl: 'https://qwertz.ch',
-    baseHash: '345',
     title: 'test tab 3',
     favIconUrl: 'qwertz',
   },
