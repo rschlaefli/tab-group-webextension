@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { Tabs } from 'webextension-polyfill-ts'
-import { append, findIndex, mergeRight, remove, update, find } from 'ramda'
-import { getBrowserSafe, augmentTabExtras } from '@src/lib/utils'
-import { ITab } from '@src/types/Extension'
+import { append, findIndex, mergeRight, remove, update, find, keys, any } from 'ramda'
+import { getBrowserSafe, augmentTabExtras, postNativeMessage } from '@src/lib/utils'
+import { ITab, TAB_ACTION } from '@src/types/Extension'
 
 const currentTabsSlice = createSlice({
   name: 'currentTabs',
@@ -134,5 +134,66 @@ export const openCurrentTab = createAsyncThunk(
         index: currentTab.index + 1,
       })
     }
+  }
+)
+
+export const updateTabAndNotify = createAsyncThunk(
+  'currentTabs/updateTabAndNotify',
+  async (args: any, thunkAPI): Promise<void> => {
+    const { id, changeData, newTab, nativePort } = args
+    const { status, ...rest } = changeData
+
+    const updatedKeys = keys(rest)
+
+    if (
+      any((propertyName: any) => updatedKeys.includes(propertyName), [
+        'pinned',
+        'title',
+        'favIconUrl',
+        'url',
+      ])
+    ) {
+      // update the internal representation of the tab
+      thunkAPI.dispatch(updateTab({ id, status, ...rest }))
+
+      // notify the heuristics engine about the new tab if the tab change has completed
+      if (nativePort && newTab && status === 'completed') {
+        postNativeMessage(nativePort, {
+          action: TAB_ACTION.UPDATE,
+          payload: { ...newTab, ...augmentTabExtras(changeData) },
+        })
+      }
+    }
+  }
+)
+
+export const activateTabAndNotify = createAsyncThunk(
+  'currentTabs/activateTabAndNotify',
+  async ({ activeInfo, nativePort }: any, thunkAPI): Promise<void> => {
+    // TODO: lookup hashes of new and previous active tab and send to the heuristics engine?
+
+    thunkAPI.dispatch(
+      activateTab({
+        tabId: activeInfo.tabId,
+        previousTabId: activeInfo.previousTabId,
+      })
+    )
+
+    postNativeMessage(nativePort, {
+      action: TAB_ACTION.ACTIVATE,
+      payload: { id: activeInfo.tabId, ...activeInfo },
+    })
+  }
+)
+
+export const removeTabAndNotify = createAsyncThunk(
+  'currentTabs/removeTabAndNotify',
+  async ({ tabId, removeInfo, nativePort }: any, thunkAPI): Promise<void> => {
+    thunkAPI.dispatch(removeTab({ tabId }))
+
+    postNativeMessage(nativePort, {
+      action: TAB_ACTION.REMOVE,
+      payload: { id: tabId, ...removeInfo },
+    })
   }
 )

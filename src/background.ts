@@ -15,13 +15,13 @@ import configureStore from './state/configureStore'
 import optionsStorage from './optionsStorage'
 import {
   createTab,
-  updateTab,
-  activateTab,
-  removeTab,
   initializeCurrentTabs,
+  updateTabAndNotify,
+  activateTabAndNotify,
+  removeTabAndNotify,
 } from './state/currentTabs'
 import { updateSuggestedGroups } from './state/suggestions'
-import { postNativeMessage, augmentTabExtras, debug } from './lib/utils'
+import { postNativeMessage, debug } from './lib/utils'
 
 const RELEVANT_TAB_PROPS = ['pinned', 'title', 'status', 'favIconUrl']
 
@@ -91,69 +91,6 @@ optionsStorage.getAll().then((opt) => {
   }
 })
 
-async function performTabUpdate(changeData: Partial<ITab>, tab?: Partial<ITab>): Promise<void> {
-  const { id, status, ...rest } = changeData
-  const updatedKeys = keys(rest)
-
-  if (
-    any((propertyName: any) => updatedKeys.includes(propertyName), [
-      'pinned',
-      'title',
-      'favIconUrl',
-      'url',
-    ])
-  ) {
-    store.dispatch(updateTab({ tabId: id, tabData: changeData }))
-
-    if (tab && status === 'completed') {
-      postNativeMessage(nativePort, {
-        action: TAB_ACTION.UPDATE,
-        payload: { ...tab, ...augmentTabExtras(changeData) },
-      })
-    }
-  }
-}
-
-function onTabCreate(tabData: Tabs.CreateCreatePropertiesType): void {
-  store.dispatch(createTab({ tabData }))
-}
-
-function onTabUpdate(tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType, tab: Tabs.Tab): void {
-  performTabUpdate({ id: tabId, ...changeInfo }, tab)
-}
-
-function onTabMoved(tabId: number, moveInfo: Tabs.OnMovedMoveInfoType): void {
-  debug(options)('MOVED', tabId, moveInfo)
-
-  performTabUpdate({ id: tabId, ...moveInfo })
-}
-
-function onTabActivated(activeInfo: Tabs.OnActivatedActiveInfoType): void {
-  // TODO: lookup hashes of new and previous active tab and send to the heuristics engine?
-
-  store.dispatch(activateTab({ tabId: activeInfo.tabId, previousTabId: activeInfo.previousTabId }))
-
-  postNativeMessage(nativePort, {
-    action: TAB_ACTION.ACTIVATE,
-    payload: { id: activeInfo.tabId, ...activeInfo },
-  })
-}
-
-function onTabAttached(tabId: number, attachInfo: Tabs.OnAttachedAttachInfoType): void {
-  debug(options)('ATTACHED', tabId, attachInfo)
-
-  performTabUpdate({ id: tabId, ...attachInfo })
-}
-
-function onTabRemoved(tabId: number, removeInfo: Tabs.OnRemovedRemoveInfoType): void {
-  store.dispatch(removeTab({ tabId }))
-
-  postNativeMessage(nativePort, {
-    action: TAB_ACTION.REMOVE,
-    payload: { id: tabId, ...removeInfo },
-  })
-}
-
 // setup a listener for communication from the popup
 browser.runtime.onMessage.addListener(async (message: any) => {
   debug(options)('received message in background', message)
@@ -175,13 +112,19 @@ browser.runtime.onMessage.addListener(async (message: any) => {
 })
 
 // setup the listener for the onCreated event
-browser.tabs.onCreated.addListener(onTabCreate)
+browser.tabs.onCreated.addListener((tabData: Tabs.CreateCreatePropertiesType) => {
+  store.dispatch(createTab({ tabData }))
+})
 
 // setup the listener for the onUpdated event
 // available properties that we can filter updates for (in FF):
-// "attention", "audible", "discarded", "favIconUrl"
-// "hidden", "isArticle", "mutedInfo", "pinned"
-// "sharingState", "status", "title"
+// "attention", "audible", "discarded", "favIconUrl", "hidden", "isArticle",
+// "mutedInfo", "pinned", "sharingState", "status", "title"
+function onTabUpdate(tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType, tab: Tabs.Tab): void {
+  store.dispatch(
+    updateTabAndNotify({ id: tabId, changeData: changeInfo, nativePort, newTab: tab }) as any
+  )
+}
 try {
   browser.tabs.onUpdated.addListener(onTabUpdate, {
     properties: RELEVANT_TAB_PROPS as any,
@@ -191,16 +134,24 @@ try {
 }
 
 // setup the listener for the onMoved event
-browser.tabs.onMoved.addListener(onTabMoved)
+browser.tabs.onMoved.addListener((tabId: number, moveInfo: Tabs.OnMovedMoveInfoType) => {
+  store.dispatch(updateTabAndNotify({ id: tabId, changeData: moveInfo, nativePort }) as any)
+})
 
 // setup the listener for the onActivated event
-browser.tabs.onActivated.addListener(onTabActivated)
+browser.tabs.onActivated.addListener((activeInfo: Tabs.OnActivatedActiveInfoType) => {
+  store.dispatch(activateTabAndNotify({ activeInfo, nativePort }) as any)
+})
 
 // setup the listener for the onAttached event
-browser.tabs.onAttached.addListener(onTabAttached)
+browser.tabs.onAttached.addListener((tabId: number, attachInfo: Tabs.OnAttachedAttachInfoType) => {
+  store.dispatch(updateTabAndNotify({ id: tabId, changeData: attachInfo, nativePort }) as any)
+})
 
 // setup the listener for the onRemoved event
-browser.tabs.onRemoved.addListener(onTabRemoved)
+browser.tabs.onRemoved.addListener((tabId: number, removeInfo: Tabs.OnRemovedRemoveInfoType) => {
+  store.dispatch(removeTabAndNotify({ tabId, removeInfo, nativePort }) as any)
+})
 
 // setup context menu entries
 // browser.contextMenus.create({ title: 'group this', contexts: ['tab'] }, () => null)
