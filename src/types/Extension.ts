@@ -31,6 +31,7 @@ export interface IHeuristicsAction {
 }
 
 export interface ITab extends Tabs.Tab {
+  normalizedTitle: string
   hash: string
   origin: string
   baseUrl: string
