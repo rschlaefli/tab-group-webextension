@@ -34,5 +34,4 @@ export interface ITab extends Tabs.Tab {
   hash: string
   origin: string
   baseUrl: string
-  uuid: string
 }
