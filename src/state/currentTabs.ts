@@ -42,7 +42,7 @@ const currentTabsSlice = createSlice({
       const tabIndex = findIndex((tab) => tab.id === action.payload.tabId, state.tabs)
 
       if (tabIndex > -1) {
-        const mergedTab = mergeRight(state.tabs[tabIndex], action.payload.tabData)
+        const mergedTab = mergeRight(state.tabs[tabIndex], augmentTabExtras(action.payload.tabData))
         console.log('UPDATE', action.payload.tabData, mergedTab)
 
         state.tabs[tabIndex] = mergedTab
