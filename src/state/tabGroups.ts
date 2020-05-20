@@ -157,7 +157,7 @@ const tabGroupsSlice = createSlice({
       return injectTab(sourceGroup, action, removedTab)
     },
     moveCurrentTab(state, action): ITabGroup[] {
-      return injectTab(state, action, { ...action.payload.currentTab, uuid: uuidv4() })
+      return injectTab(state, action, { ...action.payload.currentTab })
     },
     reorderTab(state, action): ITabGroup[] {
       const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
