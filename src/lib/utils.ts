@@ -65,19 +65,25 @@ interface IHashResult {
  * @param url the url of a tab
  * @param title the title of a tab
  */
-export function computeTabHash(url: string, title?: string): IHashResult {
-  let result: Partial<IHashResult> = {}
-
-  const { origin, pathname } = new URL(url)
-  result = { origin, baseUrl: origin + pathname }
-
-  if (typeof title !== 'undefined') {
-    result['hash'] = md5(result.baseUrl + ' ' + title)
-  } else {
-    result['hash'] = md5(result.baseUrl)
+export function computeTabHash(url?: string, title?: string): IHashResult | null {
+  // we only want to hash once we have both the title and url (i.e., after the final UPDATE)
+  if (typeof url === 'undefined' || typeof title === 'undefined') {
+    return null
   }
 
-  return result as IHashResult
+  try {
+    const { origin, pathname } = new URL(url)
+    const baseUrl = origin + pathname
+
+    return {
+      origin,
+      baseUrl,
+      hash: md5(baseUrl + ' ' + title),
+    }
+  } catch (e) {
+    console.error(e)
+    return null
+  }
 }
 
 /**
@@ -98,11 +104,11 @@ export function augmentTabExtras(tabData: Partial<ITab>): ITab {
     augmentedTabData.normalizedTitle = normalizeStringForHashing(augmentedTabData.title)
   }
 
-  if (!tabData.hash && tabData.url) {
-    const { hash, origin, baseUrl } = computeTabHash(tabData.url, augmentedTabData.normalizedTitle)
-    augmentedTabData.hash = hash
-    augmentedTabData.origin = origin
-    augmentedTabData.baseUrl = baseUrl
+  const hashResult = computeTabHash(tabData.url, augmentedTabData.normalizedTitle)
+  if (hashResult) {
+    augmentedTabData.hash = hashResult.hash
+    augmentedTabData.origin = hashResult.origin
+    augmentedTabData.baseUrl = hashResult.baseUrl
   }
 
   return augmentedTabData as ITab
