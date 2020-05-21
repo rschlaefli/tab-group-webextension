@@ -149,11 +149,11 @@ function TabGroup({
                     faviconUrl={tab.favIconUrl}
                     windowId={tab.windowId}
                     isReadOnly={isReadOnly}
-                    isOpen={currentTabs && currentTabs.includes(tab.hash)}
+                    isOpen={!!tab.hash && currentTabs && currentTabs.includes(tab.hash)}
                     isSuggested={isSuggested}
                     onRemoveTab={onRemoveTab && onRemoveTab(index)}
                     onCloseTab={onCloseTab && onCloseTab(tab.id as number)}
-                    onOpenCurrentTab={onOpenCurrentTab && onOpenCurrentTab(tab.hash)}
+                    onOpenCurrentTab={!!tab.hash && onOpenCurrentTab && onOpenCurrentTab(tab.hash)}
                   />
                 )
               })}
