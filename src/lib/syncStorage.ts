@@ -3,7 +3,7 @@
 import { browser } from 'webextension-polyfill-ts'
 import { Storage } from 'redux-persist'
 
-import StorageAPI from '../lib/storageAPI'
+import StorageAPI from './storageAPI'
 
 // shim requestIdleCallback in case of it not being available
 // ref: https://developer.mozilla.org/en-US/docs/Web/API/Background_Tasks_API
