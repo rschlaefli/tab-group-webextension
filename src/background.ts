@@ -27,6 +27,7 @@ const RELEVANT_TAB_PROPS = ['pinned', 'title', 'status', 'favIconUrl']
 
 // setup a redux store
 const { store } = configureStore({})
+export type AppDispatch = typeof store.dispatch
 
 // wrap the redux store for webext communication
 wrapStore(store, { portName: 'tabGrouping' })
