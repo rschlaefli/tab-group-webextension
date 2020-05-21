@@ -94,7 +94,7 @@ export default function syncStorage(): Storage {
     // if the update timestamps are the same, we could either compare hashes and merge states
     // or we could simply do nothing and wait for the next update (could get inconsistencies)
   }
-  setInterval(() => window.requestIdleCallback(syncLocalStorage, { timeout: 5000 }), 10000)
+  setInterval(() => window.requestIdleCallback(syncLocalStorage, { timeout: 5000 }), 30000)
 
   return {
     getItem: StorageAPI.local.getItem,
