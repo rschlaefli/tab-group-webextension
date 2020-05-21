@@ -64,8 +64,6 @@ export default function syncStorage(): Storage {
     const lastUpdateLocal: number = await StorageAPI.local.getItem('lastUpdate')
     const lastUpdate = await StorageAPI.sync.getItem('lastUpdate')
 
-    console.log(lastUpdate, lastUpdateLocal)
-
     // if the local version is more current than the one on sync
     // we want to upload our changes
     if (lastUpdateLocal > lastUpdate) {
