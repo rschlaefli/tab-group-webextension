@@ -80,7 +80,7 @@ function Tab({
           <div
             className={clsx(
               'flex flex-row items-center justify-start px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0',
-              isOpen && 'bg-orange-200 dark:bg-gray-700'
+              !isReadOnly && isOpen && 'bg-orange-200 dark:bg-gray-700'
             )}
             ref={provided.innerRef}
             {...provided.draggableProps}

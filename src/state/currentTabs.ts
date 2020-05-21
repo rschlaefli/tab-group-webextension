@@ -143,14 +143,31 @@ export const openCurrentTab = createAsyncThunk<void, string, { dispatch: AppDisp
     const tab = find((tab: ITab) => tab.hash === tabHash, state.currentTabs.tabs)
 
     if (tab?.id) {
-      if (tab.pinned) {
-        await browser.tabs.update(tab.id, { pinned: false })
-      }
+      // get the selected tab
+      const selectedTab = await browser.tabs.get(tab.id)
+
+      // get the currently active tab
       const currentTab = await browser.tabs.getCurrent()
-      await browser.tabs.move(tab.id, {
-        windowId: currentTab.windowId,
-        index: currentTab.index + 1,
-      })
+
+      // move the tab to the current window (if it is in another one)
+      // we need to do this as we cannot switch focus to another window
+      if (currentTab.windowId !== selectedTab.windowId) {
+        await browser.tabs.move(tab.id, {
+          windowId: currentTab.windowId,
+          index: -1,
+        })
+      }
+
+      // activate the tab
+      await browser.tabs.update(tab.id, { active: true, pinned: tab.pinned })
+
+      // remove the current tab if it was a "New Tab" page
+      if (
+        currentTab.id &&
+        (currentTab.url === 'about:blank' || currentTab.url === 'chrome://newtab')
+      ) {
+        await browser.tabs.remove(currentTab.id)
+      }
     }
   }
 )

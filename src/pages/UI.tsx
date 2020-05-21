@@ -148,9 +148,11 @@ function UI(): React.ReactElement {
               id="current"
               name="Current Tabs"
               tabs={currentTabs.tabs}
+              currentTabs={currentTabs.tabHashes}
               isCollapsed={currentTabs.collapsed}
               onCollapseGroup={handleCollapseCurrentTabs}
               onCloseTab={handleCloseCurrentTab}
+              onOpenCurrentTab={handleOpenCurrentTab}
             />
 
             {tabGroups.map((tabGroup: ITabGroup) => (
