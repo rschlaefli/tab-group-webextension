@@ -4,6 +4,7 @@ import { browser } from 'webextension-polyfill-ts'
 import { Storage } from 'redux-persist'
 
 import StorageAPI from './storageAPI'
+import { persistor } from '@src/background'
 
 // shim requestIdleCallback in case of it not being available
 // ref: https://developer.mozilla.org/en-US/docs/Web/API/Background_Tasks_API
@@ -35,7 +36,11 @@ export default function syncStorage(): Storage {
           StorageAPI.local.setItem('persist:root', data['persist:root']),
           StorageAPI.local.setItem('lastUpdate', data.lastUpdate),
         ])
+
+        console.log('> hydrated latest state from sync data')
       }
+
+      persistor?.persist()
 
       // setup a listener to watch for sync storage changes
       // browser.storage.onChanged.addListener(async (changes, areaName) => {
@@ -64,6 +69,8 @@ export default function syncStorage(): Storage {
     const lastUpdateLocal: number = await StorageAPI.local.getItem('lastUpdate')
     const lastUpdate = await StorageAPI.sync.getItem('lastUpdate')
 
+    console.log('> triggering local<->sync update')
+
     // if the local version is more current than the one on sync
     // we want to upload our changes
     if (lastUpdateLocal > lastUpdate) {
@@ -73,6 +80,8 @@ export default function syncStorage(): Storage {
         StorageAPI.sync.setItem('persist:root', localData),
         StorageAPI.sync.setItem('lastUpdate', lastUpdateLocal),
       ])
+
+      console.log('> updated sync storage with local changes')
 
       return
     }
@@ -86,6 +95,8 @@ export default function syncStorage(): Storage {
         StorageAPI.local.setItem('persist:root', syncData),
         StorageAPI.local.setItem('lastUpdate', lastUpdate),
       ])
+
+      console.log('> updated local storage with remote changes')
 
       return
     }
