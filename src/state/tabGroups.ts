@@ -20,6 +20,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { ITabGroup, ITab } from '@src/types/Extension'
 import { getBrowserSafe } from '@src/lib/utils'
 import { closeTabsWithHashes, openCurrentTab } from './currentTabs'
+import { AppDispatch } from '@src/background'
 
 function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): Function {
   return pipe(path([sourceGroupIndex, 'tabs', sourceTabIndex]), assoc('uuid', uuidv4()))
@@ -58,6 +59,11 @@ function updateGroupOrDefault(existingTabGroup?: ITabGroup, payload?: any): ITab
 }
 
 function injectTab(state: ITabGroup[], action: any, tabData: ITab): ITabGroup[] {
+  // if we don't have a hash yet, do not inject anything
+  if (!tabData.hash) {
+    return state
+  }
+
   // if we are injecting a tab into a new group
   if (action.payload.targetGroupId === 'newGroup') {
     const newGroup = updateGroupOrDefault(undefined, { tabs: [tabData] })
@@ -70,21 +76,21 @@ function injectTab(state: ITabGroup[], action: any, tabData: ITab): ITabGroup[] 
     return state
   }
 
-  return pipe(
-    pathOr([], [targetGroupIndex, 'tabs']),
-    insert(action.payload.targetTabIndex as number, tabData),
-    (targetTabsWithTab) =>
-      adjust(
-        targetGroupIndex,
-        (tabGroup: ITabGroup) => assoc('tabs', targetTabsWithTab, tabGroup),
-        state
-      )
-  )(state)
+  // check whether the given hash is already member of the target group
+  const targetTabs: ITab[] = pathOr([], [targetGroupIndex, 'tabs'], state)
+  if (targetTabs.map((tab) => tab.hash).includes(tabData.hash)) {
+    return state
+  }
+
+  return pipe(insert(action.payload.targetTabIndex as number, tabData), (targetTabsWithTab) =>
+    adjust(
+      targetGroupIndex,
+      (tabGroup: ITabGroup) => assoc('tabs', targetTabsWithTab, tabGroup),
+      state
+    )
+  )(targetTabs)
 }
 
-// TODO: extend each tab by the hash
-// TODO: deduplicate storage according to the hash of tabs
-// TODO: can we replace the uuid with the hash? uuid + tabgroup id?
 const tabGroupsSlice = createSlice({
   name: 'tabGroups',
   initialState: [] as ITabGroup[],
@@ -154,11 +160,10 @@ const tabGroupsSlice = createSlice({
         )(state)
       }
 
-      // TODO: only move the tab if it does not already exist in the group?
       return injectTab(sourceGroup, action, removedTab)
     },
     moveCurrentTab(state, action): ITabGroup[] {
-      return injectTab(state, action, { ...action.payload.currentTab, uuid: uuidv4() })
+      return injectTab(state, action, action.payload.currentTab)
     },
     reorderTab(state, action): ITabGroup[] {
       const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
@@ -204,7 +209,7 @@ export const {
 export default reducer
 
 // THUNKS
-export const closeTabGroup = createAsyncThunk(
+export const closeTabGroup = createAsyncThunk<void, string, { dispatch: AppDispatch }>(
   'tabGroups/closeTabGroup',
   async (tabGroupId: string, thunkAPI): Promise<void> => {
     const state: any = thunkAPI.getState()
@@ -212,14 +217,14 @@ export const closeTabGroup = createAsyncThunk(
     const tabGroup = find((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
     if (tabGroup) {
       const tabHashes = tabGroup.tabs.map((tab) => tab.hash)
-      await thunkAPI.dispatch(closeTabsWithHashes(tabHashes))
+      await thunkAPI.dispatch(closeTabsWithHashes(tabHashes) as any)
     }
   }
 )
 
-export const openTabGroup = createAsyncThunk(
+export const openTabGroup = createAsyncThunk<void, string, { dispatch: AppDispatch }>(
   'tabGroups/openTabGroup',
-  async (tabGroupId: string, thunkAPI): Promise<void> => {
+  async (tabGroupId, thunkAPI): Promise<void> => {
     const browser = await getBrowserSafe()
     const state: any = thunkAPI.getState()
 
@@ -230,15 +235,14 @@ export const openTabGroup = createAsyncThunk(
       await Promise.all(
         tabGroup.tabs.map(async (tab) => {
           // if the tab to be opened is already open, dispatch the openCurrentTab functionality instead
-          if (state.currentTabs.tabHashes.includes(tab.hash)) {
-            return thunkAPI.dispatch(openCurrentTab(tab.hash))
+          if (tab.hash && state.currentTabs.tabHashes.includes(tab.hash)) {
+            await thunkAPI.dispatch(openCurrentTab(tab.hash) as any)
+          } else {
+            await browser.tabs.create({
+              url: tab.url,
+              windowId: currentTab.windowId,
+            })
           }
-
-          // otherwise create a new tab
-          return browser.tabs.create({
-            url: tab.url,
-            windowId: currentTab.windowId,
-          })
         })
       )
     }

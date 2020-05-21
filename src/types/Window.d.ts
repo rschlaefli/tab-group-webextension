@@ -4,6 +4,7 @@
 
 declare interface Window {
   browser: any
+  requestIdleCallback: Function
 }
 
 declare const browser: any

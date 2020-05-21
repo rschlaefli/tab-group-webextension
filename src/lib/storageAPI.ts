@@ -1,23 +1,11 @@
 // ref: https://github.com/ssorallen/redux-persist-webextension-storage/blob/master/src/createStorage.js
 
-import { browser } from 'webextension-polyfill-ts'
-import storage from 'redux-persist/lib/storage'
+import { Storage } from 'redux-persist'
 
-export default function syncStorage(): any {
-  console.log('initializing storage')
-
-  try {
-    browser.storage.sync.get({})
-  } catch (e) {
-    console.error(e)
-    return storage
-  }
-
-  console.log('sync storage')
-
+function createStorageAPI(type: 'sync' | 'local'): Storage {
   return {
     async getItem(key: string): Promise<string> {
-      const value = await browser.storage.sync.get(key)
+      const value = await browser.storage[type].get(key)
       if (browser.runtime.lastError == null) {
         // Chrome Storage returns the value in an Object of with its original key. Unwrap the
         // value from the returned Object to match the `getItem` API.
@@ -27,15 +15,15 @@ export default function syncStorage(): any {
       }
     },
     async removeItem(key: string): Promise<any> {
-      await browser.storage.sync.remove(key)
+      await browser.storage[type].remove(key)
       if (browser.runtime.lastError == null) {
         return
       } else {
         throw new Error()
       }
     },
-    async setItem(key: string, value: any): Promise<any> {
-      browser.storage.sync.set({ [key]: value })
+    async setItem(key: string, value: any): Promise<void> {
+      await browser.storage[type].set({ [key]: value })
       if (browser.runtime.lastError == null) {
         return
       } else {
@@ -43,4 +31,9 @@ export default function syncStorage(): any {
       }
     },
   }
+}
+
+export default {
+  local: createStorageAPI('local'),
+  sync: createStorageAPI('sync'),
 }

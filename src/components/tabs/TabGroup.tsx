@@ -1,16 +1,7 @@
 import React from 'react'
 import clsx from 'clsx'
 import { Droppable, DroppableProvided, DroppableStateSnapshot } from 'react-beautiful-dnd'
-import {
-  Save,
-  Delete,
-  Launch,
-  ArrowDropDown,
-  ArrowDropUp,
-  InfoOutlined,
-  Close,
-} from '@material-ui/icons'
-// import { Rating } from '@material-ui/lab'
+import { Save, Delete, Launch, ArrowDropDown, ArrowDropUp, Close } from '@material-ui/icons'
 
 import Input from '../common/Input'
 import Tab from './Tab'
@@ -146,28 +137,29 @@ function TabGroup({
           <div className={clsx('min-h-8', tabs.length > 0 && isCollapsed && 'hidden', 'md:block')}>
             {tabs
               .filter((tab) => typeof tab.id !== 'undefined')
-              .map((tab: ITab, index: number) => [
-                <Tab
-                  key={tab.uuid}
-                  uuid={tab.uuid}
-                  title={tab.title}
-                  index={index}
-                  url={tab.url}
-                  faviconUrl={tab.favIconUrl}
-                  windowId={tab.windowId}
-                  isReadOnly={isReadOnly}
-                  isOpen={currentTabs && currentTabs.includes(tab.hash)}
-                  isSuggested={isSuggested}
-                  onRemoveTab={onRemoveTab && onRemoveTab(index)}
-                  onCloseTab={onCloseTab && onCloseTab(tab.id as number)}
-                  onOpenCurrentTab={onOpenCurrentTab && onOpenCurrentTab(tab.hash)}
-                />,
-              ])}
+              .map((tab: ITab, index: number) => {
+                const uniqueId = `${tab.id}-${tab.hash}-${id}`
+                return (
+                  <Tab
+                    uniqueId={uniqueId}
+                    key={uniqueId}
+                    title={tab.title}
+                    index={index}
+                    url={tab.url}
+                    faviconUrl={tab.favIconUrl}
+                    windowId={tab.windowId}
+                    isReadOnly={isReadOnly}
+                    isOpen={!!tab.hash && currentTabs && currentTabs.includes(tab.hash)}
+                    isSuggested={isSuggested}
+                    onRemoveTab={onRemoveTab && onRemoveTab(index)}
+                    onCloseTab={onCloseTab && onCloseTab(tab.id as number)}
+                    onOpenCurrentTab={!!tab.hash && onOpenCurrentTab && onOpenCurrentTab(tab.hash)}
+                  />
+                )
+              })}
           </div>
 
           {provided.placeholder}
-
-          <div>{/* <Rating value={4} size="small" /> */}</div>
         </div>
       )}
     </Droppable>

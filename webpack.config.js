@@ -118,12 +118,13 @@ module.exports = function (webpackEnv, _) {
               test: /\.css$/,
               include: [PATHS.styles, path.resolve(__dirname, 'node_modules/webext-base-css')],
               use: [
-                {
-                  loader: MiniCssExtractPlugin.loader,
-                  options: {
-                    hmr: isEnvDevelopment,
-                  },
-                },
+                isEnvProduction
+                  ? {
+                      loader: MiniCssExtractPlugin.loader,
+                    }
+                  : {
+                      loader: require.resolve('style-loader'),
+                    },
                 {
                   loader: require.resolve('css-loader'),
                   options: { importLoaders: 1, sourceMap: isEnvProduction },
@@ -185,7 +186,7 @@ module.exports = function (webpackEnv, _) {
       // },
     },
     plugins: [
-      new MiniCssExtractPlugin(),
+      isEnvProduction && new MiniCssExtractPlugin(),
       // fork a ts typechecker
       new ForkTsCheckerWebpackPlugin(),
       // automatically reload if a missing module is newly installed
@@ -200,6 +201,7 @@ module.exports = function (webpackEnv, _) {
         cleanStaleWebpackAssets: false,
       }),
       new WebextensionPlugin({
+        autoreload: true,
         vendor: (webpackEnv && webpackEnv.browser) || 'firefox',
         manifestDefaults: {
           name: PACKAGE.name,
@@ -208,15 +210,8 @@ module.exports = function (webpackEnv, _) {
         },
       }),
       new CopyWebpackPlugin({
-        patterns: [
-          {
-            from: PATHS.sidebarCss,
-          },
-        ],
+        patterns: [{ from: PATHS.sidebarCss }],
       }),
-      // new MiniCssExtractPlugin({
-      //   filename: 'style.css'
-      // }),
       // dynamically generate the main extension ui page
       new HtmlWebpackPlugin({
         template: PATHS.uiTemplate,

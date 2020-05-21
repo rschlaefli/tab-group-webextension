@@ -30,11 +30,24 @@ export interface IHeuristicsAction {
   payload: any
 }
 
-export interface ITab extends Tabs.Tab {
-  hash: string
-  origin: string
-  originHash: string
-  baseUrl: string
-  baseHash: string
-  uuid: string
+export interface ITab {
+  // Tabs.Tab properties that are important for grouping
+  favIconUrl?: string
+  id: number
+  index: number
+  lastAccessed?: number
+  openerTabId?: number
+  pinned: boolean
+  sessionId?: string
+  status?: 'loading' | 'complete'
+  successorTabId?: number
+  title?: string
+  url?: string
+  windowId: number
+
+  // derived properties
+  normalizedTitle?: string
+  hash: string | null
+  origin?: string
+  baseUrl?: string
 }

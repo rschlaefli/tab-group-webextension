@@ -1,7 +1,27 @@
 import md5 from 'blueimp-md5'
 import { Browser, Runtime } from 'webextension-polyfill-ts'
 import { TAB_ACTION, ITab } from '@src/types/Extension'
-import { v4 as uuidv4 } from 'uuid'
+
+export const debug = (options: any) => (...content: any[]): void => {
+  if (!options || options.debugLogging) console.log(...content)
+}
+
+/**
+ * Check whether a string is a valid URL
+ * @param input an arbitrary string
+ */
+export function isURL(input: string): boolean {
+  const regex = RegExp(
+    '(https?:\\/\\/)((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|((\\d{1,3}\\.){3}\\d{1,3}))(\\:\\d+)?(\\/[-a-z\\d%_.~+@]*)*(\\?[;&a-z\\d%_.~+=-@]*)?(\\#[-a-z\\d_@]*)?$',
+    'i'
+  )
+
+  try {
+    return regex.test(input)
+  } catch (e) {
+    return false
+  }
+}
 
 export function hasExtensionContext(): boolean {
   return !(typeof chrome != 'object' || !chrome || !chrome.runtime || !chrome.runtime.id)
@@ -31,71 +51,83 @@ export function normalizeStringForHashing(input: string): string {
   // replace multiple spaces with single ones
   const compactedString = normalizedString.replace(/\s\s+/g, ' ')
 
-  return compactedString
+  return compactedString.trim()
 }
 
 interface IHashResult {
   hash: string
   origin: string
-  originHash: string
   baseUrl: string
-  baseHash: string
-}
-export function computeTabHash(url: string, title?: string): IHashResult {
-  let result: Partial<IHashResult> = {}
-
-  const { origin, pathname } = new URL(url)
-  result = {
-    origin,
-    originHash: md5(origin),
-    baseUrl: origin + pathname,
-    baseHash: md5(origin + pathname),
-  }
-
-  if (typeof title !== 'undefined') {
-    result['hash'] = md5(result.baseUrl + ' ' + normalizeStringForHashing(title))
-  } else {
-    result['hash'] = result.hash
-  }
-
-  return result as IHashResult
 }
 
+/**
+ * Derive the unique hash of a tab given its url and title (if available)
+ * @param url the url of a tab
+ * @param title the title of a tab
+ */
+export function computeTabHash(url?: string, title?: string): IHashResult | null {
+  // we only want to hash once we have both the title and url (i.e., after the final UPDATE)
+  if (typeof url === 'undefined' || typeof title === 'undefined') {
+    return null
+  }
+
+  try {
+    const { origin, pathname } = new URL(url)
+    const baseUrl = origin + pathname
+
+    return {
+      origin,
+      baseUrl,
+      hash: md5(baseUrl + ' ' + title),
+    }
+  } catch (e) {
+    console.error(e)
+    return null
+  }
+}
+
+/**
+ * Augment tab data with extra properties (e.g., hash)
+ * @param tabData
+ */
 export function augmentTabExtras(tabData: Partial<ITab>): ITab {
   const augmentedTabData: Partial<ITab> = { ...tabData }
 
   // ensure that no query params can ever be in the title
-  if (typeof tabData.title !== 'undefined') {
-    try {
+  if (tabData.title) {
+    if (isURL(tabData.title)) {
       const { origin, pathname } = new URL(tabData.title)
       augmentedTabData.title = origin + pathname
-    } catch {}
+    } else {
+      augmentedTabData.title = tabData.title
+    }
+    augmentedTabData.normalizedTitle = normalizeStringForHashing(augmentedTabData.title)
   }
 
-  if (typeof tabData.baseHash === 'undefined' && tabData.url) {
-    const { hash, origin, originHash, baseUrl, baseHash } = computeTabHash(
-      tabData.url,
-      tabData.title
-    )
-    augmentedTabData.hash = hash
-    augmentedTabData.origin = origin
-    augmentedTabData.originHash = originHash
-    augmentedTabData.baseUrl = baseUrl
-    augmentedTabData.baseHash = baseHash
-  }
-
-  if (typeof tabData.uuid === 'undefined') {
-    augmentedTabData.uuid = uuidv4()
+  const hashResult = computeTabHash(tabData.url, augmentedTabData.normalizedTitle)
+  if (hashResult) {
+    augmentedTabData.hash = hashResult.hash
+    augmentedTabData.origin = hashResult.origin
+    augmentedTabData.baseUrl = hashResult.baseUrl
   }
 
   return augmentedTabData as ITab
 }
 
+/**
+ * Post a message over a native port
+ * @param nativePort
+ * @param message
+ */
 export async function postNativeMessage(
   nativePort: Runtime.Port,
   message: { action: TAB_ACTION; payload: any }
 ): Promise<void> {
-  if (!nativePort) return Promise.resolve()
+  if (!nativePort) {
+    console.warn('> Missing native port')
+    return Promise.resolve()
+  }
+
   try {
     nativePort.postMessage(message)
     return Promise.resolve()

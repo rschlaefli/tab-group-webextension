@@ -11,8 +11,8 @@ import { Menu, MenuItem, Typography } from '@material-ui/core'
 import clsx from 'clsx'
 
 interface IProps {
+  uniqueId: string
   index: number
-  uuid: string
   title?: string
   url?: string
   windowId?: number
@@ -47,8 +47,8 @@ const initialMousePosition = {
 }
 
 function Tab({
+  uniqueId,
   index,
-  uuid,
   title,
   url,
   isOpen,
@@ -75,7 +75,7 @@ function Tab({
 
   return (
     <>
-      <Draggable key={uuid} draggableId={`draggable-${uuid}`} index={index}>
+      <Draggable key={uniqueId} draggableId={`draggable-${uniqueId}`} index={index}>
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot): React.ReactElement => (
           <div
             className={clsx(

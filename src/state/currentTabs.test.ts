@@ -9,95 +9,50 @@ import { ITab } from '@src/types/Extension'
 
 const TABS: ITab[] = [
   {
-    uuid: 'abcd',
     id: 0,
     index: 0,
     windowId: 1,
-    highlighted: false,
-    active: false,
-    attention: false,
     pinned: false,
     status: 'complete',
-    hidden: false,
-    discarded: false,
-    incognito: false,
-    width: 1,
-    height: 1,
     lastAccessed: 1,
-    audible: false,
-    mutedInfo: { muted: false },
-    isArticle: false,
-    isInReaderMode: false,
-    sharingState: { camera: false, microphone: false },
     successorTabId: 1,
     hash: 'abcd',
     origin: '',
-    originHash: '',
     baseUrl: 'https://qwertz.ch',
-    baseHash: '345',
     title: 'test tab 1',
+    normalizedTitle: 'test tab 1',
     favIconUrl: 'xyz',
   },
   {
-    uuid: 'bcde',
     id: 1,
     index: 1,
     windowId: 1,
-    highlighted: false,
-    active: false,
-    attention: false,
     pinned: false,
     status: 'complete',
-    hidden: false,
-    discarded: false,
-    incognito: false,
-    width: 1,
-    height: 1,
     lastAccessed: 1,
-    audible: false,
-    mutedInfo: { muted: false },
-    isArticle: false,
-    isInReaderMode: false,
-    sharingState: { camera: false, microphone: false },
     successorTabId: 2,
     url: 'https://abc.ch',
     hash: 'bcde',
     origin: '',
-    originHash: '',
     baseUrl: 'https://qwertz.ch',
-    baseHash: '345',
     title: 'test tab 2',
+    normalizedTitle: 'test tab 2',
     favIconUrl: 'abc',
   },
   {
-    uuid: 'cdef',
     id: 2,
     index: 2,
     windowId: 1,
-    highlighted: false,
-    active: false,
-    attention: false,
     pinned: false,
     status: 'complete',
-    hidden: false,
-    discarded: false,
-    incognito: false,
-    width: 1,
-    height: 1,
     lastAccessed: 1,
-    audible: false,
-    mutedInfo: { muted: false },
-    isArticle: false,
-    isInReaderMode: false,
-    sharingState: { camera: false, microphone: false },
     successorTabId: -1,
     url: 'https://qwertz.ch',
     hash: 'cdef',
     origin: '',
-    originHash: '',
     baseUrl: 'https://qwertz.ch',
-    baseHash: '345',
     title: 'test tab 3',
+    normalizedTitle: 'test tab 3',
     favIconUrl: 'qwertz',
   },
 ]
@@ -108,7 +63,7 @@ describe('currentTabsReducer', () => {
     activeTab: number
     activeWindow: number
     tabs: ITab[]
-    tabHashes: string[]
+    tabHashes: (string | null)[]
     collapsed: boolean
   }
 
@@ -138,7 +93,7 @@ describe('currentTabsReducer', () => {
 
     expect(currentState.tabHashes).toMatchInlineSnapshot(`
       Array [
-        "bcde",
+        "85d49141cd0b73f5e6203c8b2e340b70",
       ]
     `)
   })
@@ -157,7 +112,7 @@ describe('currentTabsReducer', () => {
 
     expect(currentState.tabHashes).toMatchInlineSnapshot(`
       Array [
-        "cdef",
+        "839fe8e384092f11a81cc1452e214407",
       ]
     `)
   })
@@ -171,7 +126,7 @@ describe('currentTabsReducer', () => {
 
     expect(currentState.tabHashes).toMatchInlineSnapshot(`
       Array [
-        "cdef",
+        "839fe8e384092f11a81cc1452e214407",
         "abcd",
       ]
     `)
