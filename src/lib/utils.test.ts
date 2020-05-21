@@ -30,9 +30,6 @@ describe('utils', () => {
 
     expect(augmentedTab).toMatchInlineSnapshot(`
       Object {
-        "baseUrl": "https://github.com/rschlaefli",
-        "hash": "f07cdb4d914e183b894c4f266123548d",
-        "origin": "https://github.com",
         "url": "https://github.com/rschlaefli",
       }
     `)
@@ -62,8 +59,10 @@ describe('utils', () => {
 
     expect(augmentedTab).toMatchInlineSnapshot(`
       Object {
-        "hash": "someHashThatShouldStay",
+        "baseUrl": "https://github.com/rschlaefli",
+        "hash": "12b2e7c94f58b9cd0616bde70e6817fc",
         "normalizedTitle": "Github",
+        "origin": "https://github.com",
         "title": "Github",
         "url": "https://github.com/rschlaefli",
       }

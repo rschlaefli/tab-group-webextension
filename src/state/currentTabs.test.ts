@@ -93,7 +93,7 @@ describe('currentTabsReducer', () => {
 
     expect(currentState.tabHashes).toMatchInlineSnapshot(`
       Array [
-        "bcde",
+        "85d49141cd0b73f5e6203c8b2e340b70",
       ]
     `)
   })
@@ -112,7 +112,7 @@ describe('currentTabsReducer', () => {
 
     expect(currentState.tabHashes).toMatchInlineSnapshot(`
       Array [
-        "cdef",
+        "839fe8e384092f11a81cc1452e214407",
       ]
     `)
   })
@@ -126,7 +126,7 @@ describe('currentTabsReducer', () => {
 
     expect(currentState.tabHashes).toMatchInlineSnapshot(`
       Array [
-        "cdef",
+        "839fe8e384092f11a81cc1452e214407",
         "abcd",
       ]
     `)
