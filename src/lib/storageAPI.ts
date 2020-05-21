@@ -1,5 +1,6 @@
 // ref: https://github.com/ssorallen/redux-persist-webextension-storage/blob/master/src/createStorage.js
 
+import { browser } from 'webextension-polyfill-ts'
 import { Storage } from 'redux-persist'
 
 function createStorageAPI(type: 'sync' | 'local'): Storage {
