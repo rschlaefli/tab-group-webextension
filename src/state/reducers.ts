@@ -13,7 +13,7 @@ export default persistReducer(
   {
     key: 'root',
     storage: syncStorage(),
-    blacklist: ['currentTabs', 'suggestions'],
+    blacklist: ['currentTabs'],
     transforms: [compressor],
   },
   combineReducers({
