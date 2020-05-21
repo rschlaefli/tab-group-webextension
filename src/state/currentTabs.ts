@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { Tabs } from 'webextension-polyfill-ts'
-import { append, findIndex, mergeRight, remove, update, find, keys, any } from 'ramda'
+import { append, findIndex, remove, update, find, keys, any } from 'ramda'
 import { getBrowserSafe, augmentTabExtras, postNativeMessage } from '@src/lib/utils'
 import { ITab, TAB_ACTION } from '@src/types/Extension'
+import { AppDispatch } from '@src/background'
 
 const currentTabsSlice = createSlice({
   name: 'currentTabs',
@@ -11,7 +12,7 @@ const currentTabsSlice = createSlice({
     activeTab: -1,
     activeWindow: 0,
     tabs: [] as ITab[],
-    tabHashes: [] as string[],
+    tabHashes: [] as (string | null)[],
     collapsed: false,
   },
   reducers: {
@@ -19,47 +20,60 @@ const currentTabsSlice = createSlice({
       state.collapsed = !state.collapsed
     },
     updateTabs(state, action): void {
+      // initialize derived properties for all existing tabs
       const allTabs = action.payload.map(augmentTabExtras)
-      console.log('UPDATE', allTabs)
 
       state.tabs = allTabs
       state.tabHashes = allTabs.map((tab) => tab.hash)
+
+      console.log('UPDATE', allTabs)
     },
     createTab(state, action): void {
       const augmentedTab = augmentTabExtras(action.payload.tabData)
-      console.log('CREATE', augmentedTab)
 
       state.tabs = append(augmentedTab, state.tabs)
       state.tabHashes = append(augmentedTab.hash, state.tabHashes)
+
+      console.log('CREATE', augmentedTab)
     },
     activateTab(state, action): void {
-      console.log('ACTIVATE', action.payload)
-
       state.activeTab = action.payload.tabId
       state.previousTabId = action.payload.previousTabId
+
+      console.log('ACTIVATE', action.payload)
     },
     updateTab(state, action): void {
       const tabIndex = findIndex((tab) => tab.id === action.payload.tabId, state.tabs)
 
       if (tabIndex > -1) {
-        const mergedTab = mergeRight(state.tabs[tabIndex], augmentTabExtras(action.payload.tabData))
-        console.log('UPDATE', action.payload.tabData, mergedTab)
+        // merge the existing tab with the changed properties
+        let mergedTab = { ...state.tabs[tabIndex], ...action.payload.tabData }
 
-        state.tabs[tabIndex] = mergedTab
+        // check whether a property relevant for the tab hash has been changed
+        const hashInvalidated = keys(action.payload.tabData).some((key) =>
+          ['url', 'title'].includes(key as string)
+        )
 
-        if (typeof action.payload.tabData.hash !== 'undefined') {
+        // if the hash has been invalidated, recompute any dependent properties
+        if (hashInvalidated) {
+          mergedTab = augmentTabExtras(mergedTab)
           state.tabHashes = update(tabIndex, mergedTab.hash, state.tabHashes)
         }
+
+        // update the tab in state
+        state.tabs[tabIndex] = mergedTab
+
+        console.log('UPDATE', action.payload.tabData, mergedTab)
       }
     },
     removeTab(state, action): void {
       const tabIndex = findIndex((tab) => tab.id === action.payload.tabId, state.tabs)
 
       if (tabIndex > -1) {
-        console.log('REMOVE', state.tabs[tabIndex])
-
         state.tabs = remove(tabIndex, 1, state.tabs)
         state.tabHashes = remove(tabIndex, 1, state.tabHashes)
+
+        console.log('REMOVE', state.tabs[tabIndex])
       }
     },
   },
@@ -77,7 +91,7 @@ export const {
 export default reducer
 
 // THUNKS
-export const initializeCurrentTabs = createAsyncThunk(
+export const initializeCurrentTabs = createAsyncThunk<void, void, { dispatch: AppDispatch }>(
   'currentTabs/initialize',
   async (_, thunkAPI): Promise<void> => {
     const browser = await getBrowserSafe()
@@ -96,17 +110,21 @@ export const initializeCurrentTabs = createAsyncThunk(
   }
 )
 
-export const closeCurrentTab = createAsyncThunk(
+export const closeCurrentTab = createAsyncThunk<void, number, { dispatch: AppDispatch }>(
   'currentTabs/closeTab',
-  async (tabId: number, _): Promise<void> => {
+  async (tabId, _): Promise<void> => {
     const browser = await getBrowserSafe()
     await browser.tabs.remove(tabId)
   }
 )
 
-export const closeTabsWithHashes = createAsyncThunk(
+export const closeTabsWithHashes = createAsyncThunk<
+  void,
+  (string | null)[],
+  { dispatch: AppDispatch }
+>(
   'currentTabs/closeTabsWithHashes',
-  async (tabHashes: string[], thunkAPI): Promise<void> => {
+  async (tabHashes, thunkAPI): Promise<void> => {
     const browser = await getBrowserSafe()
     const state: any = thunkAPI.getState()
 
@@ -116,9 +134,9 @@ export const closeTabsWithHashes = createAsyncThunk(
   }
 )
 
-export const openCurrentTab = createAsyncThunk(
+export const openCurrentTab = createAsyncThunk<void, string, { dispatch: AppDispatch }>(
   'currentTabs/openCurrentTab',
-  async (tabHash: string, thunkAPI): Promise<void> => {
+  async (tabHash, thunkAPI): Promise<void> => {
     const browser = await getBrowserSafe()
     const state: any = thunkAPI.getState()
 
@@ -137,10 +155,9 @@ export const openCurrentTab = createAsyncThunk(
   }
 )
 
-export const updateTabAndNotify = createAsyncThunk(
+export const updateTabAndNotify = createAsyncThunk<void, any, { dispatch: AppDispatch }>(
   'currentTabs/updateTabAndNotify',
-  async (args: any, thunkAPI): Promise<void> => {
-    const { id, changeData, newTab, nativePort } = args
+  async ({ id, changeData, newTab, nativePort }, thunkAPI): Promise<void> => {
     const { status, ...rest } = changeData
 
     const updatedKeys = keys(rest)
@@ -154,11 +171,11 @@ export const updateTabAndNotify = createAsyncThunk(
       ])
     ) {
       // update the internal representation of the tab
-      thunkAPI.dispatch(updateTab({ id, status, ...rest }))
+      await thunkAPI.dispatch(updateTab({ tabId: id, tabData: changeData }))
 
       // notify the heuristics engine about the new tab if the tab change has completed
       if (nativePort && newTab && status === 'completed') {
-        postNativeMessage(nativePort, {
+        await postNativeMessage(nativePort, {
           action: TAB_ACTION.UPDATE,
           payload: { ...newTab, ...augmentTabExtras(changeData) },
         })
@@ -167,31 +184,31 @@ export const updateTabAndNotify = createAsyncThunk(
   }
 )
 
-export const activateTabAndNotify = createAsyncThunk(
+export const activateTabAndNotify = createAsyncThunk<void, any, { dispatch: AppDispatch }>(
   'currentTabs/activateTabAndNotify',
-  async ({ activeInfo, nativePort }: any, thunkAPI): Promise<void> => {
+  async ({ activeInfo, nativePort }, thunkAPI): Promise<void> => {
     // TODO: lookup hashes of new and previous active tab and send to the heuristics engine?
 
-    thunkAPI.dispatch(
+    await thunkAPI.dispatch(
       activateTab({
         tabId: activeInfo.tabId,
         previousTabId: activeInfo.previousTabId,
       })
     )
 
-    postNativeMessage(nativePort, {
+    await postNativeMessage(nativePort, {
       action: TAB_ACTION.ACTIVATE,
       payload: { id: activeInfo.tabId, ...activeInfo },
     })
   }
 )
 
-export const removeTabAndNotify = createAsyncThunk(
+export const removeTabAndNotify = createAsyncThunk<void, any, { dispatch: AppDispatch }>(
   'currentTabs/removeTabAndNotify',
-  async ({ tabId, removeInfo, nativePort }: any, thunkAPI): Promise<void> => {
-    thunkAPI.dispatch(removeTab({ tabId }))
+  async ({ tabId, removeInfo, nativePort }, thunkAPI): Promise<void> => {
+    await thunkAPI.dispatch(removeTab({ tabId }))
 
-    postNativeMessage(nativePort, {
+    await postNativeMessage(nativePort, {
       action: TAB_ACTION.REMOVE,
       payload: { id: tabId, ...removeInfo },
     })
