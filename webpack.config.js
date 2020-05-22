@@ -154,10 +154,10 @@ module.exports = function (webpackEnv, _) {
       minimizer: isEnvProduction && [
         new TerserPlugin({
           terserOptions: {
-            mangle: isEnvProduction,
-            compress: isEnvProduction,
+            mangle: true,
+            compress: true,
             output: {
-              beautify: !isEnvProduction,
+              beautify: false,
               indent_level: 2,
             },
           },
