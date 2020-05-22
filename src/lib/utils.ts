@@ -124,7 +124,6 @@ export async function postNativeMessage(
   message: { action: TAB_ACTION; payload: any }
 ): Promise<void> {
   if (!nativePort) {
-    console.warn('> Missing native port')
     return Promise.resolve()
   }
 

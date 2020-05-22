@@ -3,8 +3,6 @@
 import { browser } from 'webextension-polyfill-ts'
 import Mousetrap from 'mousetrap'
 
-import optionsStorage from './optionsStorage'
-
 const sidebar = document.createElement('iframe')
 sidebar.id = 'tabs-sidebar'
 sidebar.src = browser.runtime.getURL('ui.html')
@@ -36,10 +34,3 @@ sidebarToggle.addEventListener('click', (e) => {
 sidebarWrapper.appendChild(sidebarToggle)
 
 document.body.appendChild(sidebarWrapper)
-
-// TODO: this does not make sense without a pinning feature
-optionsStorage.getAll().then((options) => {
-  if (options.openSidebarByDefault) {
-    sidebarWrapper.setAttribute('class', 'open')
-  }
-})

@@ -1,6 +1,6 @@
 {
   "name": "automated-tab-organization",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "author": "Roland Schlaefli <rolandschlaefli@gmail.com>",
   "description": "A WebExtension for automated tab organization",
   "repository": {
@@ -123,6 +123,7 @@
     "react-dom": "16.13.1",
     "react-redux": "7.2.0",
     "redux": "4.0.5",
+    "redux-logger": "3.0.6",
     "redux-persist": "6.0.0",
     "style-loader": "1.2.1",
     "tailwindcss": "1.4.6",

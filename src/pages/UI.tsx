@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { DragDropContext, DropResult, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
-import { Button, Input, Typography } from '@material-ui/core'
-import { Add, Settings } from '@material-ui/icons'
+import { Button, Switch, Typography, FormControlLabel, Tooltip } from '@material-ui/core'
+import { Add, Settings, InfoRounded } from '@material-ui/icons'
 
 import optionsStorage from '@src/optionsStorage'
 import TabGroup from '@src/components/tabs/TabGroup'
@@ -15,12 +15,18 @@ import {
   reorderTab,
   removeGroup,
   updateGroup,
-  openTabGroup,
   moveCurrentTab,
   collapseGroup,
-  closeTabGroup,
+  openTabGroupAlias,
+  closeTabGroupAlias,
 } from '@src/state/tabGroups'
-import { collapseCurrentTabs, closeCurrentTab, openCurrentTab } from '@src/state/currentTabs'
+import {
+  collapseCurrentTabs,
+  closeCurrentTabAlias,
+  openCurrentTabAlias,
+} from '@src/state/currentTabs'
+import { RootState } from '@src/state/configureStore'
+import { toggleFocusMode, openOptionsPageAlias } from '@src/state/settings'
 
 const extractDragEventProperties = (dragEvent: DropResult): any => ({
   sourceGroupId: dragEvent.source.droppableId,
@@ -32,9 +38,10 @@ const extractDragEventProperties = (dragEvent: DropResult): any => ({
 function UI(): React.ReactElement {
   const dispatch = useDispatch()
 
-  const currentTabs = useSelector((state: any) => state.currentTabs)
-  const tabGroups = useSelector((state: any) => state.tabGroups)
-  const suggestions = useSelector((state: any) => state.suggestions)
+  const currentTabs = useSelector((state: RootState) => state.currentTabs)
+  const tabGroups = useSelector((state: RootState) => state.tabGroups)
+  const suggestions = useSelector((state: RootState) => state.suggestions)
+  const focusModeEnabled = useSelector((state: RootState) => state.settings.focusModeEnabled)
 
   const [heuristicsEnabled, setHeuristicsEnabled] = useState(false)
 
@@ -44,7 +51,7 @@ function UI(): React.ReactElement {
       setHeuristicsEnabled(result.enableHeuristics)
     }
     init()
-  }, [dispatch])
+  }, [])
 
   const handleDragEnd = async (dragEvent: DropResult): Promise<any> => {
     const properties = extractDragEventProperties(dragEvent)
@@ -85,12 +92,11 @@ function UI(): React.ReactElement {
   }
 
   const handleOpenOptions = async (): Promise<void> => {
-    const browser = await getBrowserSafe()
-    browser.runtime.openOptionsPage()
+    dispatch(openOptionsPageAlias())
   }
 
   const handleOpenTabGroup = (sourceGroupId: string) => async (): Promise<void> => {
-    dispatch(openTabGroup(sourceGroupId))
+    dispatch(openTabGroupAlias(sourceGroupId))
   }
 
   const handleRenameTabGroup = (sourceGroupId: string) => (name: string): void => {
@@ -106,15 +112,19 @@ function UI(): React.ReactElement {
   }
 
   const handleCloseCurrentTab = (tabId: number) => (): void => {
-    dispatch(closeCurrentTab(tabId))
+    dispatch(closeCurrentTabAlias(tabId))
   }
 
   const handleOpenCurrentTab = (tabHash: string) => (): void => {
-    dispatch(openCurrentTab(tabHash))
+    dispatch(openCurrentTabAlias(tabHash))
   }
 
   const handleCloseTabGroup = (sourceGroupId: string) => (): void => {
-    dispatch(closeTabGroup(sourceGroupId))
+    dispatch(closeTabGroupAlias(sourceGroupId))
+  }
+
+  const handleToggleFocusMode = async (): Promise<void> => {
+    dispatch(toggleFocusMode())
   }
 
   if (!tabGroups) {
@@ -125,20 +135,32 @@ function UI(): React.ReactElement {
     <Layout>
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="w-full h-auto p-2 min-h-64 min-w-64">
-          <div className="flex flex-row pb-2 dark:text-gray-100">
-            <Input
-              fullWidth
-              disabled
-              placeholder="Search..."
-              value=""
-              onChange={(): void => undefined}
-            />
+          <div className="flex flex-row justify-between pb-2 dark:text-gray-100">
+            <span>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={focusModeEnabled}
+                    onChange={handleToggleFocusMode}
+                    name="focusModeEnabled"
+                    inputProps={{ 'aria-label': 'secondary checkbox' }}
+                  />
+                }
+                label="Focus Mode"
+              />
+              <Tooltip
+                title="Focus Mode: On opening of a tab group, close all tabs belonging to other groups"
+                aria-label="Focus Mode: On opening of a tab group, close all tabs belonging to other groups"
+              >
+                <InfoRounded className="text-blue-400" fontSize="inherit" />
+              </Tooltip>
+            </span>
             <button
               className="text-lg text-gray-600 dark:text-gray-100"
               onClick={handleOpenOptions}
               title="open settings"
             >
-              <Settings fontSize="inherit" />
+              <Settings fontSize="small" />
             </button>
           </div>
 
@@ -157,8 +179,6 @@ function UI(): React.ReactElement {
 
             {tabGroups.map((tabGroup: ITabGroup) => (
               <TabGroup
-                // TODO: pass down current tabs and mark tabs that are open
-                // TODO: disable window display for tabs that are not open
                 key={tabGroup.id}
                 id={tabGroup.id}
                 name={tabGroup.name}

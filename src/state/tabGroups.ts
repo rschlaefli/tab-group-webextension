@@ -15,12 +15,14 @@ import {
   pick,
 } from 'ramda'
 import { v4 as uuidv4 } from 'uuid'
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
 
 import { ITabGroup, ITab } from '@src/types/Extension'
 import { getBrowserSafe } from '@src/lib/utils'
 import { closeTabsWithHashes, openCurrentTab } from './currentTabs'
 import { AppDispatch } from '@src/background'
+import { RootState } from './configureStore'
+import { RootStateOrAny } from 'react-redux'
 
 function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): Function {
   return pipe(path([sourceGroupIndex, 'tabs', sourceTabIndex]), assoc('uuid', uuidv4()))
@@ -209,10 +211,14 @@ export const {
 export default reducer
 
 // THUNKS
-export const closeTabGroup = createAsyncThunk<void, string, { dispatch: AppDispatch }>(
+export const closeTabGroup = createAsyncThunk<
+  void,
+  { _sender?: any; payload: string },
+  { dispatch: AppDispatch; state: RootState }
+>(
   'tabGroups/closeTabGroup',
-  async (tabGroupId: string, thunkAPI): Promise<void> => {
-    const state: any = thunkAPI.getState()
+  async ({ payload: tabGroupId }, thunkAPI): Promise<void> => {
+    const state = thunkAPI.getState()
 
     const tabGroup = find((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
     if (tabGroup) {
@@ -222,29 +228,65 @@ export const closeTabGroup = createAsyncThunk<void, string, { dispatch: AppDispa
   }
 )
 
-export const openTabGroup = createAsyncThunk<void, string, { dispatch: AppDispatch }>(
+export const openTabGroup = createAsyncThunk<
+  void,
+  { _sender?: any; payload: string },
+  { dispatch: AppDispatch; state: RootState }
+>(
   'tabGroups/openTabGroup',
-  async (tabGroupId, thunkAPI): Promise<void> => {
+  async ({ _sender, payload: tabGroupId }, thunkAPI): Promise<void> => {
     const browser = await getBrowserSafe()
-    const state: any = thunkAPI.getState()
+    const state = thunkAPI.getState()
 
-    const currentTab = await browser.tabs.getCurrent()
+    const tabGroupIndex = findIndex((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
+    if (tabGroupIndex > -1) {
+      const tabGroup = state.tabGroups[tabGroupIndex]
 
-    const tabGroup = find((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
-    if (tabGroup) {
+      // if focus mode is enabled, close all of the tabs belonging to other groups
+      // but only if they are not also a member of the selected group
+      if (state.settings.focusModeEnabled) {
+        const currentGroupHashes = tabGroup.tabs.map((tab) => tab.hash).filter((hash) => !!hash)
+
+        const tabHashesFromOtherGroups = state.tabGroups
+          .filter((_, ix) => ix !== tabGroupIndex)
+          .flatMap((tabGroup) => tabGroup.tabs)
+          .map((tab) => tab.hash)
+          .filter((hash) => !currentGroupHashes.includes(hash))
+
+        console.log('[tabGroups] closing other tabs in focus mode', tabHashesFromOtherGroups)
+
+        await thunkAPI.dispatch(closeTabsWithHashes(tabHashesFromOtherGroups) as any)
+      }
+
       await Promise.all(
         tabGroup.tabs.map(async (tab) => {
           // if the tab to be opened is already open, dispatch the openCurrentTab functionality instead
           if (tab.hash && state.currentTabs.tabHashes.includes(tab.hash)) {
-            await thunkAPI.dispatch(openCurrentTab(tab.hash) as any)
+            await thunkAPI.dispatch(openCurrentTab({ payload: tab.hash }) as any)
           } else {
             await browser.tabs.create({
               url: tab.url,
-              windowId: currentTab.windowId,
             })
           }
         })
       )
+
+      // close the new tab page if we open a group
+      if (_sender?.tab?.url && _sender.tab.id) {
+        try {
+          if (['moz-extension', 'chrome'].includes(_sender.tab.url.split(':')[0])) {
+            await browser.tabs.remove(_sender.tab.id)
+          }
+        } catch (e) {}
+      }
     }
   }
 )
+
+// ALIASES
+export const closeTabGroupAlias = createAction<string>('tabGroups/closeTabGroupAlias')
+export const openTabGroupAlias = createAction<string>('tabGroups/openTabGroupAlias')
+export const tabGroupsAliases = {
+  [closeTabGroupAlias.type]: closeTabGroup,
+  [openTabGroupAlias.type]: openTabGroup,
+}

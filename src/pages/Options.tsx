@@ -15,7 +15,6 @@ import Layout from '../lib/Layout'
 
 function Options(): React.ReactElement {
   const [enableHeuristics, setEnableHeuristics] = useState(false)
-  const [openSidebarByDefault, setOpenSidebarByDefault] = useState(false)
   const [enableLogging, setEnableLogging] = useState(false)
   const [tutorialProgress, setTutorialProgress] = useState(-1)
 
@@ -24,7 +23,6 @@ function Options(): React.ReactElement {
       const options = await optionsStorage.getAll()
       setEnableHeuristics(options.enableHeuristics)
       setEnableLogging(options.debugLogging)
-      setOpenSidebarByDefault(options.openSidebarByDefault)
       setTutorialProgress(options.tutorialProgress)
     }
     getAll()
@@ -52,19 +50,6 @@ function Options(): React.ReactElement {
         <FormControl component="fieldset">
           <FormLabel component="legend">Browser Extension</FormLabel>
           <FormGroup>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={openSidebarByDefault}
-                  onChange={handleToggleCheckbox(
-                    'openSidebarByDefault',
-                    setOpenSidebarByDefault,
-                    reloadExtension
-                  )}
-                />
-              }
-              label="Open the sidebar by default"
-            />
             <FormControlLabel
               control={
                 <Checkbox

@@ -27,7 +27,7 @@ export default function syncStorage(): Storage {
   browser.storage.sync
     .get()
     .then(async (data) => {
-      console.log('> sync storage available', data)
+      console.log('[syncStorage] sync storage available', data)
 
       const lastUpdate = await StorageAPI.local.getItem('lastUpdate')
 
@@ -37,9 +37,10 @@ export default function syncStorage(): Storage {
           StorageAPI.local.setItem('lastUpdate', data.lastUpdate),
         ])
 
-        console.log('> hydrated latest state from sync data')
+        console.log('[syncStorage] hydrated latest state from sync data')
       }
 
+      console.log('[syncStorage] resuming redux persistor')
       persistor?.persist()
 
       // setup a listener to watch for sync storage changes
@@ -60,7 +61,7 @@ export default function syncStorage(): Storage {
       // })
     })
     .catch((e) => {
-      console.log('> fallback to local storage', e)
+      console.log('[syncStorage] fallback to local storage', e)
       return StorageAPI.local
     })
 
@@ -69,7 +70,7 @@ export default function syncStorage(): Storage {
     const lastUpdateLocal: number = await StorageAPI.local.getItem('lastUpdate')
     const lastUpdate = await StorageAPI.sync.getItem('lastUpdate')
 
-    console.log('> triggering local<->sync update')
+    console.log('[syncStorage] triggering local<->sync update')
 
     // if the local version is more current than the one on sync
     // we want to upload our changes
@@ -81,7 +82,7 @@ export default function syncStorage(): Storage {
         StorageAPI.sync.setItem('lastUpdate', lastUpdateLocal),
       ])
 
-      console.log('> updated sync storage with local changes')
+      console.log('[syncStorage] updated sync storage with local changes')
 
       return
     }
@@ -96,7 +97,7 @@ export default function syncStorage(): Storage {
         StorageAPI.local.setItem('lastUpdate', lastUpdate),
       ])
 
-      console.log('> updated local storage with remote changes')
+      console.log('[syncStorage] updated local storage with remote changes')
 
       return
     }
