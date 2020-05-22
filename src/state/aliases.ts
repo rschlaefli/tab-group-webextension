@@ -1,14 +1,9 @@
-import { closeTabGroupAlias, openTabGroup, closeTabGroup, openTabGroupAlias } from './tabGroups'
-import {
-  openCurrentTabAlias,
-  openCurrentTab,
-  closeCurrentTabAlias,
-  closeCurrentTab,
-} from './currentTabs'
+import { tabGroupsAliases } from './tabGroups'
+import { currentTabsAliases } from './currentTabs'
+import { settingsAliases } from './settings'
 
 export default {
-  [closeTabGroupAlias.type]: closeTabGroup,
-  [openTabGroupAlias.type]: openTabGroup,
-  [openCurrentTabAlias.type]: openCurrentTab,
-  [closeCurrentTabAlias.type]: closeCurrentTab,
+  ...tabGroupsAliases,
+  ...currentTabsAliases,
+  ...settingsAliases,
 }

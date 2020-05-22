@@ -149,7 +149,7 @@ export const openCurrentTab = createAsyncThunk<
   { dispatch: AppDispatch; state: RootState }
 >(
   'currentTabs/openCurrentTab',
-  async ({ payload: tabHash }, thunkAPI): Promise<void> => {
+  async ({ _sender, payload: tabHash }, thunkAPI): Promise<void> => {
     const browser = await getBrowserSafe()
     const state = thunkAPI.getState()
 
@@ -160,13 +160,13 @@ export const openCurrentTab = createAsyncThunk<
       const selectedTab = await browser.tabs.get(tab.id)
 
       // get the currently active tab
-      const currentTab = await browser.tabs.getCurrent()
+      const currentWindow = await browser.windows.getCurrent()
 
       // move the tab to the current window (if it is in another one)
       // we need to do this as we cannot switch focus to another window
-      if (currentTab.windowId !== selectedTab.windowId) {
+      if (currentWindow.id !== selectedTab.windowId) {
         await browser.tabs.move(tab.id, {
-          windowId: currentTab.windowId,
+          windowId: currentWindow.id,
           index: -1,
         })
       }
@@ -174,11 +174,11 @@ export const openCurrentTab = createAsyncThunk<
       // activate the tab
       await browser.tabs.update(tab.id, { active: true, pinned: tab.pinned })
 
-      // remove the current tab if it was a "New Tab" page
-      if (currentTab.url && currentTab.id) {
+      // close the new tab page if we open a group
+      if (_sender?.tab?.url && _sender.tab.id) {
         try {
-          if (['moz-extension', 'chrome'].includes(currentTab.url.split(':')[0])) {
-            await browser.tabs.remove(currentTab.id)
+          if (['moz-extension', 'chrome'].includes(_sender.tab.url.split(':')[0])) {
+            await browser.tabs.remove(_sender.tab.id)
           }
         } catch (e) {}
       }
@@ -257,3 +257,7 @@ export const removeTabAndNotify = createAsyncThunk<void, any, { dispatch: AppDis
 // ALIASES
 export const openCurrentTabAlias = createAction<string>('currentTabs/openCurrentTabAlias')
 export const closeCurrentTabAlias = createAction<number>('currentTabs/closeCurrentTabAlias')
+export const currentTabsAliases = {
+  [openCurrentTabAlias.type]: openCurrentTab,
+  [closeCurrentTabAlias.type]: closeCurrentTab,
+}

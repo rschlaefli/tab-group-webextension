@@ -286,3 +286,7 @@ export const openTabGroup = createAsyncThunk<
 // ALIASES
 export const closeTabGroupAlias = createAction<string>('tabGroups/closeTabGroupAlias')
 export const openTabGroupAlias = createAction<string>('tabGroups/openTabGroupAlias')
+export const tabGroupsAliases = {
+  [closeTabGroupAlias.type]: closeTabGroup,
+  [openTabGroupAlias.type]: openTabGroup,
+}

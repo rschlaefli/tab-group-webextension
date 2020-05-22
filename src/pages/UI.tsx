@@ -26,7 +26,7 @@ import {
   openCurrentTabAlias,
 } from '@src/state/currentTabs'
 import { RootState } from '@src/state/configureStore'
-import { toggleFocusMode } from '@src/state/settings'
+import { toggleFocusMode, openOptionsPageAlias } from '@src/state/settings'
 
 const extractDragEventProperties = (dragEvent: DropResult): any => ({
   sourceGroupId: dragEvent.source.droppableId,
@@ -92,8 +92,7 @@ function UI(): React.ReactElement {
   }
 
   const handleOpenOptions = async (): Promise<void> => {
-    const browser = await getBrowserSafe()
-    browser.runtime.openOptionsPage()
+    dispatch(openOptionsPageAlias())
   }
 
   const handleOpenTabGroup = (sourceGroupId: string) => async (): Promise<void> => {
