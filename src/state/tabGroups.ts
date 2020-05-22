@@ -21,6 +21,8 @@ import { ITabGroup, ITab } from '@src/types/Extension'
 import { getBrowserSafe } from '@src/lib/utils'
 import { closeTabsWithHashes, openCurrentTab } from './currentTabs'
 import { AppDispatch } from '@src/background'
+import { RootState } from './configureStore'
+import { RootStateOrAny } from 'react-redux'
 
 function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): Function {
   return pipe(path([sourceGroupIndex, 'tabs', sourceTabIndex]), assoc('uuid', uuidv4()))
@@ -209,10 +211,14 @@ export const {
 export default reducer
 
 // THUNKS
-export const closeTabGroup = createAsyncThunk<void, string, { dispatch: AppDispatch }>(
+export const closeTabGroup = createAsyncThunk<
+  void,
+  string,
+  { dispatch: AppDispatch; state: RootState }
+>(
   'tabGroups/closeTabGroup',
   async (tabGroupId: string, thunkAPI): Promise<void> => {
-    const state: any = thunkAPI.getState()
+    const state = thunkAPI.getState()
 
     const tabGroup = find((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
     if (tabGroup) {
@@ -222,16 +228,21 @@ export const closeTabGroup = createAsyncThunk<void, string, { dispatch: AppDispa
   }
 )
 
-export const openTabGroup = createAsyncThunk<void, string, { dispatch: AppDispatch }>(
+export const openTabGroup = createAsyncThunk<
+  void,
+  string,
+  { dispatch: AppDispatch; state: RootState }
+>(
   'tabGroups/openTabGroup',
   async (tabGroupId, thunkAPI): Promise<void> => {
     const browser = await getBrowserSafe()
-    const state: any = thunkAPI.getState()
+    const state = thunkAPI.getState()
 
     const currentTab = await browser.tabs.getCurrent()
 
-    const tabGroup = find((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
-    if (tabGroup) {
+    const tabGroupIndex = findIndex((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
+    if (tabGroupIndex > -1) {
+      const tabGroup = state.tabGroups[tabGroupIndex]
       await Promise.all(
         tabGroup.tabs.map(async (tab) => {
           // if the tab to be opened is already open, dispatch the openCurrentTab functionality instead
@@ -245,6 +256,31 @@ export const openTabGroup = createAsyncThunk<void, string, { dispatch: AppDispat
           }
         })
       )
+
+      // close the new tab page if we open a group
+      if (currentTab.url && currentTab.id) {
+        try {
+          if (['moz-extension', 'chrome'].includes(currentTab.url.split(':')[0])) {
+            await browser.tabs.remove(currentTab.id)
+          }
+        } catch (e) {}
+      }
+
+      // if focus mode is enabled, close all of the tabs belonging to other groups
+      // but only if they are not also a member of the selected group
+      if (state.settings.focusModeEnabled) {
+        const currentGroupHashes = tabGroup.tabs.map((tab) => tab.hash).filter((hash) => !!hash)
+
+        const tabHashesFromOtherGroups = state.tabGroups
+          .filter((_, ix) => ix !== tabGroupIndex)
+          .flatMap((tabGroup) => tabGroup.tabs)
+          .map((tab) => tab.hash)
+          .filter((hash) => !currentGroupHashes.includes(hash))
+
+        console.log('[tabGroups] closing other tabs in focus mode', tabHashesFromOtherGroups)
+
+        await thunkAPI.dispatch(closeTabsWithHashes(tabHashesFromOtherGroups) as any)
+      }
     }
   }
 )
