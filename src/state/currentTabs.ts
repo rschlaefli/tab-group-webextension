@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
 import { Tabs } from 'webextension-polyfill-ts'
 import { append, findIndex, remove, update, find, keys, any } from 'ramda'
 import { getBrowserSafe, augmentTabExtras, postNativeMessage } from '@src/lib/utils'
@@ -117,11 +117,11 @@ export const initializeCurrentTabs = createAsyncThunk<
 
 export const closeCurrentTab = createAsyncThunk<
   void,
-  number,
+  { _sender?: any; payload: number },
   { dispatch: AppDispatch; state: RootState }
 >(
-  'currentTabs/closeTab',
-  async (tabId, _): Promise<void> => {
+  'currentTabs/closeCurrentTab',
+  async ({ payload: tabId }, _): Promise<void> => {
     const browser = await getBrowserSafe()
     await browser.tabs.remove(tabId)
   }
@@ -145,11 +145,11 @@ export const closeTabsWithHashes = createAsyncThunk<
 
 export const openCurrentTab = createAsyncThunk<
   void,
-  string,
+  { _sender?: any; payload: string },
   { dispatch: AppDispatch; state: RootState }
 >(
   'currentTabs/openCurrentTab',
-  async (tabHash, thunkAPI): Promise<void> => {
+  async ({ payload: tabHash }, thunkAPI): Promise<void> => {
     const browser = await getBrowserSafe()
     const state = thunkAPI.getState()
 
@@ -253,3 +253,7 @@ export const removeTabAndNotify = createAsyncThunk<void, any, { dispatch: AppDis
     })
   }
 )
+
+// ALIASES
+export const openCurrentTabAlias = createAction<string>('currentTabs/openCurrentTabAlias')
+export const closeCurrentTabAlias = createAction<number>('currentTabs/closeCurrentTabAlias')

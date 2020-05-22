@@ -213,11 +213,11 @@ export default reducer
 // THUNKS
 export const closeTabGroup = createAsyncThunk<
   void,
-  string,
+  { _sender?: any; payload: string },
   { dispatch: AppDispatch; state: RootState }
 >(
   'tabGroups/closeTabGroup',
-  async (tabGroupId: string, thunkAPI): Promise<void> => {
+  async ({ payload: tabGroupId }, thunkAPI): Promise<void> => {
     const state = thunkAPI.getState()
 
     const tabGroup = find((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
@@ -230,7 +230,7 @@ export const closeTabGroup = createAsyncThunk<
 
 export const openTabGroup = createAsyncThunk<
   void,
-  { _sender: any; payload: string },
+  { _sender?: any; payload: string },
   { dispatch: AppDispatch; state: RootState }
 >(
   'tabGroups/openTabGroup',
@@ -262,7 +262,7 @@ export const openTabGroup = createAsyncThunk<
         tabGroup.tabs.map(async (tab) => {
           // if the tab to be opened is already open, dispatch the openCurrentTab functionality instead
           if (tab.hash && state.currentTabs.tabHashes.includes(tab.hash)) {
-            await thunkAPI.dispatch(openCurrentTab(tab.hash) as any)
+            await thunkAPI.dispatch(openCurrentTab({ payload: tab.hash }) as any)
           } else {
             await browser.tabs.create({
               url: tab.url,
@@ -283,4 +283,6 @@ export const openTabGroup = createAsyncThunk<
   }
 )
 
+// ALIASES
+export const closeTabGroupAlias = createAction<string>('tabGroups/closeTabGroupAlias')
 export const openTabGroupAlias = createAction<string>('tabGroups/openTabGroupAlias')

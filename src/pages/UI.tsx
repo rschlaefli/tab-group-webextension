@@ -17,10 +17,14 @@ import {
   updateGroup,
   moveCurrentTab,
   collapseGroup,
-  closeTabGroup,
   openTabGroupAlias,
+  closeTabGroupAlias,
 } from '@src/state/tabGroups'
-import { collapseCurrentTabs, closeCurrentTab, openCurrentTab } from '@src/state/currentTabs'
+import {
+  collapseCurrentTabs,
+  closeCurrentTabAlias,
+  openCurrentTabAlias,
+} from '@src/state/currentTabs'
 import { RootState } from '@src/state/configureStore'
 import { toggleFocusMode } from '@src/state/settings'
 
@@ -109,15 +113,15 @@ function UI(): React.ReactElement {
   }
 
   const handleCloseCurrentTab = (tabId: number) => (): void => {
-    dispatch(closeCurrentTab(tabId))
+    dispatch(closeCurrentTabAlias(tabId))
   }
 
   const handleOpenCurrentTab = (tabHash: string) => (): void => {
-    dispatch(openCurrentTab(tabHash))
+    dispatch(openCurrentTabAlias(tabHash))
   }
 
   const handleCloseTabGroup = (sourceGroupId: string) => (): void => {
-    dispatch(closeTabGroup(sourceGroupId))
+    dispatch(closeTabGroupAlias(sourceGroupId))
   }
 
   const handleToggleFocusMode = async (): Promise<void> => {
