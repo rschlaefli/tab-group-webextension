@@ -37,7 +37,7 @@
     "package:edge": "zip -jo `date +%Y-%m-%d`-edge.zip build/edge/*",
     "package:firefox": "zip -jo `date +%Y-%m-%d`-firefox.xpi build/firefox/*",
     "package:opera": "zip -jo `date +%Y-%m-%d`-opera.zip build/opera/*",
-    "package:sources": "zip -o `date +%Y-%m-%d`-sources.zip public/* src/* .eslintignore .eslintrc.js .prettierignore .prettierrc.js babel.config.js jest.config.js manifest.json package-lock.json package.json postcss.config.js README.md tailwind.config.js tsconfig.json webpack.config.js",
+    "package:sources": "zip -o `date +%Y-%m-%d`-sources.zip public/**/* src/**/* .eslintignore .eslintrc.js .prettierignore .prettierrc.js babel.config.js jest.config.js manifest.json package-lock.json package.json postcss.config.js README.md tailwind.config.js tsconfig.json webpack.config.js",
     "test": "jest --config=jest.config.js",
     "test:watch": "jest --config=jest.config.js --watch",
     "type-check": "tsc --noEmit",
