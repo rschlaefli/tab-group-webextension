@@ -15,7 +15,7 @@ import {
   pick,
 } from 'ramda'
 import { v4 as uuidv4 } from 'uuid'
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
 
 import { ITabGroup, ITab } from '@src/types/Extension'
 import { getBrowserSafe } from '@src/lib/utils'
@@ -230,41 +230,17 @@ export const closeTabGroup = createAsyncThunk<
 
 export const openTabGroup = createAsyncThunk<
   void,
-  string,
+  { _sender: any; payload: string },
   { dispatch: AppDispatch; state: RootState }
 >(
   'tabGroups/openTabGroup',
-  async (tabGroupId, thunkAPI): Promise<void> => {
+  async ({ _sender, payload: tabGroupId }, thunkAPI): Promise<void> => {
     const browser = await getBrowserSafe()
     const state = thunkAPI.getState()
-
-    const currentTab = await browser.tabs.getCurrent()
 
     const tabGroupIndex = findIndex((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
     if (tabGroupIndex > -1) {
       const tabGroup = state.tabGroups[tabGroupIndex]
-      await Promise.all(
-        tabGroup.tabs.map(async (tab) => {
-          // if the tab to be opened is already open, dispatch the openCurrentTab functionality instead
-          if (tab.hash && state.currentTabs.tabHashes.includes(tab.hash)) {
-            await thunkAPI.dispatch(openCurrentTab(tab.hash) as any)
-          } else {
-            await browser.tabs.create({
-              url: tab.url,
-              windowId: currentTab.windowId,
-            })
-          }
-        })
-      )
-
-      // close the new tab page if we open a group
-      if (currentTab.url && currentTab.id) {
-        try {
-          if (['moz-extension', 'chrome'].includes(currentTab.url.split(':')[0])) {
-            await browser.tabs.remove(currentTab.id)
-          }
-        } catch (e) {}
-      }
 
       // if focus mode is enabled, close all of the tabs belonging to other groups
       // but only if they are not also a member of the selected group
@@ -281,6 +257,30 @@ export const openTabGroup = createAsyncThunk<
 
         await thunkAPI.dispatch(closeTabsWithHashes(tabHashesFromOtherGroups) as any)
       }
+
+      await Promise.all(
+        tabGroup.tabs.map(async (tab) => {
+          // if the tab to be opened is already open, dispatch the openCurrentTab functionality instead
+          if (tab.hash && state.currentTabs.tabHashes.includes(tab.hash)) {
+            await thunkAPI.dispatch(openCurrentTab(tab.hash) as any)
+          } else {
+            await browser.tabs.create({
+              url: tab.url,
+            })
+          }
+        })
+      )
+
+      // close the new tab page if we open a group
+      if (_sender?.tab?.url && _sender.tab.id) {
+        try {
+          if (['moz-extension', 'chrome'].includes(_sender.tab.url.split(':')[0])) {
+            await browser.tabs.remove(_sender.tab.id)
+          }
+        } catch (e) {}
+      }
     }
   }
 )
+
+export const openTabGroupAlias = createAction<string>('tabGroups/openTabGroupAlias')
