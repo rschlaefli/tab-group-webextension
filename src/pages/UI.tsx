@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { DragDropContext, DropResult, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
-import { Button, Input, Typography } from '@material-ui/core'
+import { Button, Switch, Typography, FormControlLabel } from '@material-ui/core'
 import { Add, Settings } from '@material-ui/icons'
 
 import optionsStorage from '@src/optionsStorage'
@@ -21,6 +21,8 @@ import {
   closeTabGroup,
 } from '@src/state/tabGroups'
 import { collapseCurrentTabs, closeCurrentTab, openCurrentTab } from '@src/state/currentTabs'
+import { RootState } from '@src/state/configureStore'
+import { toggleFocusMode } from '@src/state/settings'
 
 const extractDragEventProperties = (dragEvent: DropResult): any => ({
   sourceGroupId: dragEvent.source.droppableId,
@@ -32,9 +34,10 @@ const extractDragEventProperties = (dragEvent: DropResult): any => ({
 function UI(): React.ReactElement {
   const dispatch = useDispatch()
 
-  const currentTabs = useSelector((state: any) => state.currentTabs)
-  const tabGroups = useSelector((state: any) => state.tabGroups)
-  const suggestions = useSelector((state: any) => state.suggestions)
+  const currentTabs = useSelector((state: RootState) => state.currentTabs)
+  const tabGroups = useSelector((state: RootState) => state.tabGroups)
+  const suggestions = useSelector((state: RootState) => state.suggestions)
+  const focusModeEnabled = useSelector((state: RootState) => state.settings.focusModeEnabled)
 
   const [heuristicsEnabled, setHeuristicsEnabled] = useState(false)
 
@@ -44,7 +47,7 @@ function UI(): React.ReactElement {
       setHeuristicsEnabled(result.enableHeuristics)
     }
     init()
-  }, [dispatch])
+  }, [])
 
   const handleDragEnd = async (dragEvent: DropResult): Promise<any> => {
     const properties = extractDragEventProperties(dragEvent)
@@ -117,6 +120,10 @@ function UI(): React.ReactElement {
     dispatch(closeTabGroup(sourceGroupId))
   }
 
+  const handleToggleFocusMode = async (): Promise<void> => {
+    dispatch(toggleFocusMode())
+  }
+
   if (!tabGroups) {
     return <div>Loading</div>
   }
@@ -125,13 +132,17 @@ function UI(): React.ReactElement {
     <Layout>
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="w-full h-auto p-2 min-h-64 min-w-64">
-          <div className="flex flex-row pb-2 dark:text-gray-100">
-            <Input
-              fullWidth
-              disabled
-              placeholder="Search..."
-              value=""
-              onChange={(): void => undefined}
+          <div className="flex flex-row justify-between pb-2 dark:text-gray-100">
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={focusModeEnabled}
+                  onChange={handleToggleFocusMode}
+                  name="focusModeEnabled"
+                  inputProps={{ 'aria-label': 'secondary checkbox' }}
+                />
+              }
+              label="Focus Mode"
             />
             <button
               className="text-lg text-gray-600 dark:text-gray-100"
@@ -157,8 +168,6 @@ function UI(): React.ReactElement {
 
             {tabGroups.map((tabGroup: ITabGroup) => (
               <TabGroup
-                // TODO: pass down current tabs and mark tabs that are open
-                // TODO: disable window display for tabs that are not open
                 key={tabGroup.id}
                 id={tabGroup.id}
                 name={tabGroup.name}
