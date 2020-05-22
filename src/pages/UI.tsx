@@ -15,10 +15,10 @@ import {
   reorderTab,
   removeGroup,
   updateGroup,
-  openTabGroup,
   moveCurrentTab,
   collapseGroup,
   closeTabGroup,
+  openTabGroupAlias,
 } from '@src/state/tabGroups'
 import { collapseCurrentTabs, closeCurrentTab, openCurrentTab } from '@src/state/currentTabs'
 import { RootState } from '@src/state/configureStore'
@@ -93,7 +93,7 @@ function UI(): React.ReactElement {
   }
 
   const handleOpenTabGroup = (sourceGroupId: string) => async (): Promise<void> => {
-    dispatch(openTabGroup(sourceGroupId))
+    dispatch(openTabGroupAlias(sourceGroupId))
   }
 
   const handleRenameTabGroup = (sourceGroupId: string) => (name: string): void => {
