@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { DragDropContext, DropResult, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
-import { Button, Switch, Typography, FormControlLabel } from '@material-ui/core'
-import { Add, Settings } from '@material-ui/icons'
+import { Button, Switch, Typography, FormControlLabel, Tooltip } from '@material-ui/core'
+import { Add, Settings, InfoRounded } from '@material-ui/icons'
 
 import optionsStorage from '@src/optionsStorage'
 import TabGroup from '@src/components/tabs/TabGroup'
@@ -133,23 +133,31 @@ function UI(): React.ReactElement {
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="w-full h-auto p-2 min-h-64 min-w-64">
           <div className="flex flex-row justify-between pb-2 dark:text-gray-100">
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={focusModeEnabled}
-                  onChange={handleToggleFocusMode}
-                  name="focusModeEnabled"
-                  inputProps={{ 'aria-label': 'secondary checkbox' }}
-                />
-              }
-              label="Focus Mode"
-            />
+            <span>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={focusModeEnabled}
+                    onChange={handleToggleFocusMode}
+                    name="focusModeEnabled"
+                    inputProps={{ 'aria-label': 'secondary checkbox' }}
+                  />
+                }
+                label="Focus Mode"
+              />
+              <Tooltip
+                title="Focus Mode: On opening of a tab group, close all tabs belonging to other groups"
+                aria-label="Focus Mode: On opening of a tab group, close all tabs belonging to other groups"
+              >
+                <InfoRounded className="text-blue-400" fontSize="inherit" />
+              </Tooltip>
+            </span>
             <button
               className="text-lg text-gray-600 dark:text-gray-100"
               onClick={handleOpenOptions}
               title="open settings"
             >
-              <Settings fontSize="inherit" />
+              <Settings fontSize="small" />
             </button>
           </div>
 
