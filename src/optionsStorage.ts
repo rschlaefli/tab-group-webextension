@@ -3,9 +3,8 @@ import OptionsSync from 'webext-options-sync'
 export default new OptionsSync({
   // specify default settings
   defaults: {
-    debugLogging: true,
-    enableHeuristics: false,
-    openSidebarByDefault: false,
+    debugLogging: true as boolean,
+    enableHeuristics: false as boolean,
     tutorialProgress: 0,
   },
 
