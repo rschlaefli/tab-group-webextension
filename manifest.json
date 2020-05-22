@@ -32,7 +32,7 @@
     "gecko": {
       "id": "automated-tab-organization@rschlaefli",
       "strict_min_version": "70.0",
-      "update_url": "https://gist.githubusercontent.com/rschlaefli/c9e0324bd4ff5e02bd25b342dae1de2b/raw/c22a316b265d628e6c044f9745ba015e0e2aba72/firefox-updates.json"
+      "update_url": "https://tabs.fra1.digitaloceanspaces.com/webextension/firefox-updates.json"
     }
   },
   "web_accessible_resources": ["ui.html", "tutorial.html"],
