@@ -11,7 +11,7 @@ interface IProps {
   id: string
   name: string
   tabs: ITab[]
-  currentTabs?: string[]
+  currentTabs?: (string | null)[]
   isReadOnly?: boolean
   isCollapsed?: boolean
   isSuggested?: boolean
