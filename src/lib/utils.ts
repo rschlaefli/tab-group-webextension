@@ -2,10 +2,6 @@ import md5 from 'blueimp-md5'
 import { Browser, Runtime } from 'webextension-polyfill-ts'
 import { TAB_ACTION, ITab } from '@src/types/Extension'
 
-export const debug = (options: any) => (...content: any[]): void => {
-  if (!options || options.debugLogging) console.log(...content)
-}
-
 /**
  * Check whether a string is a valid URL
  * @param input an arbitrary string

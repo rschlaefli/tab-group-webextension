@@ -21,7 +21,7 @@ import {
   removeTabAndNotify,
 } from './state/currentTabs'
 import { updateSuggestedGroups } from './state/suggestions'
-import { postNativeMessage, debug } from './lib/utils'
+import { postNativeMessage } from './lib/utils'
 
 const RELEVANT_TAB_PROPS = ['pinned', 'title', 'status', 'favIconUrl']
 
@@ -38,20 +38,19 @@ wrapStore(store, { portName: 'tabGrouping' })
 store.dispatch(initializeCurrentTabs() as any)
 
 // connect to the native port
-let options: any
 let nativePort: Runtime.Port
 optionsStorage.getAll().then((opt) => {
-  options = opt
-  const log = debug(opt)
+  console.log('[background] Fetched user options', opt)
+
   if (opt.enableHeuristics) {
-    log('> Attempting to open native port')
+    console.log('[background] Attempting to open native port')
     nativePort = browser.runtime.connectNative('tabs')
-    log('> Opened native port: ', nativePort)
+    console.log('[background] Opened native port:', nativePort)
 
     // setup a listener for native communcation
     if (nativePort) {
       nativePort.onMessage.addListener(async (messageFromHeuristics: IHeuristicsAction) => {
-        log(`> Received message over native port:`, messageFromHeuristics)
+        console.log('[background] Received message over native port:', messageFromHeuristics)
 
         try {
           switch (messageFromHeuristics.action) {
@@ -75,7 +74,7 @@ optionsStorage.getAll().then((opt) => {
 
             case HEURISTICS_ACTION.QUERY_TABS:
               const currentTabs = store.getState().currentTabs?.tabs as ITab[]
-              log(`> Initializing current tabs in heuristics:`, currentTabs)
+              console.log('[background] Initializing current tabs in heuristics:', currentTabs)
               postNativeMessage(nativePort, {
                 action: TAB_ACTION.INIT_TABS,
                 payload: { currentTabs },
@@ -86,9 +85,10 @@ optionsStorage.getAll().then((opt) => {
           console.error(e)
         }
       })
-      log('> Prepared a listener for native communication events')
+      console.log('[background] Prepared a listener for native communication events')
     }
   }
+
   if (opt.tutorialProgress < 3) {
     browser.tabs.create({ url: 'tutorial.html' })
   }
@@ -96,7 +96,7 @@ optionsStorage.getAll().then((opt) => {
 
 // setup a listener for communication from the popup
 browser.runtime.onMessage.addListener(async (message: any) => {
-  debug(options)('received message in background', message)
+  console.log('[background] received message in background', message)
 
   // if (message.type === 'SIDEBAR') {
   //   const currentTab = (
