@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
-import { Tabs } from 'webextension-polyfill-ts'
+import { Tabs, Runtime } from 'webextension-polyfill-ts'
 import { append, findIndex, remove, update, find, keys, any } from 'ramda'
 import { getBrowserSafe, augmentTabExtras, postNativeMessage } from '@src/lib/utils'
 import { ITab, TAB_ACTION } from '@src/types/Extension'
@@ -188,7 +188,12 @@ export const openCurrentTab = createAsyncThunk<
 
 export const updateTabAndNotify = createAsyncThunk<
   void,
-  any,
+  {
+    id: number
+    changeData: any
+    newTab?: Tabs.Tab
+    nativePort?: Runtime.Port
+  },
   { dispatch: AppDispatch; state: RootState }
 >(
   'currentTabs/updateTabAndNotify',
@@ -207,14 +212,14 @@ export const updateTabAndNotify = createAsyncThunk<
     ) {
       // update the internal representation of the tab
       await thunkAPI.dispatch(updateTab({ tabId: id, tabData: changeData }))
+    }
 
-      // notify the heuristics engine about the new tab if the tab change has completed
-      if (nativePort && newTab && status === 'completed') {
-        await postNativeMessage(nativePort, {
-          action: TAB_ACTION.UPDATE,
-          payload: { ...newTab, ...augmentTabExtras(changeData) },
-        })
-      }
+    // notify the heuristics engine about the new tab if the tab change has completed
+    if (nativePort && newTab && status === 'complete') {
+      await postNativeMessage(nativePort, {
+        action: TAB_ACTION.UPDATE,
+        payload: { ...newTab, ...augmentTabExtras(changeData) },
+      })
     }
   }
 )

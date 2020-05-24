@@ -124,6 +124,7 @@ export async function postNativeMessage(
   }
 
   try {
+    console.info('[postNativeMessage] Sending message to Heuristics Engine', message)
     nativePort.postMessage(message)
     return Promise.resolve()
   } catch (e) {

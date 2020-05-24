@@ -26,7 +26,7 @@
     "deploy:firefox": "npm-run-all build:style build:firefox package:firefox",
     "deploy:opera": "npm-run-all build:style build:opera package:opera",
     "dev": "npm-run-all --parallel dev:style dev:app",
-    "dev:app": "cross-env NODE_ENV=development nodemon --delay 2500ms -e json,html -w public -w package.json -w package-lock.json -w webpack.config.js --exec 'webpack -w'",
+    "dev:app": "cross-env NODE_ENV=development nodemon --delay 2500ms -e json,html -w public -w package.json -w package-lock.json -w webpack.config.js --exec 'webpack --watch --progress'",
     "dev:style": "postcss src/styles/index.css -o src/styles/tailwind.css --watch",
     "dev:serve": "cross-env NODE_ENV=development nodemon --delay 2500ms -e json,html -w public -w package.json -w package-lock.json -w webpack.config.js --exec 'webpack-dev-server'",
     "format": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\" && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",

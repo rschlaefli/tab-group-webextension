@@ -57,6 +57,7 @@ module.exports = function (webpackEnv, _) {
   const PACKAGE = require('./package.json')
 
   return {
+    context: __dirname,
     mode: isEnvProduction ? 'production' : 'development',
     bail: isEnvProduction,
     devtool: isEnvProduction ? 'source-map' : 'inline-source-map',
@@ -188,20 +189,20 @@ module.exports = function (webpackEnv, _) {
     plugins: [
       isEnvProduction && new MiniCssExtractPlugin(),
       // fork a ts typechecker
-      new ForkTsCheckerWebpackPlugin(),
+      // isEnvDevelopment && new ForkTsCheckerWebpackPlugin({ eslint: true }),
       // automatically reload if a missing module is newly installed
       isEnvDevelopment && new WatchMissingNodeModulesPlugin('node_modules'),
       // bundle analysis
       isEnvProduction && webpackEnv.analyze && new BundleAnalyzerPlugin({ analyzerMode: 'static' }),
       // get additional information for errors regarding "module not found"
       new ModuleNotFoundPlugin(PATHS.cwd),
-      // new webpack.DefinePlugin(env.stringified),
+      // ensure that the build directories are cleaned up
       new CleanWebpackPlugin({
         // prevent clean plugin from deleting manifest and html pages
         cleanStaleWebpackAssets: false,
       }),
+      // setup the webextension plugin
       new WebextensionPlugin({
-        autoreload: true,
         vendor: (webpackEnv && webpackEnv.browser) || 'firefox',
         manifestDefaults: {
           name: PACKAGE.name,
@@ -209,6 +210,7 @@ module.exports = function (webpackEnv, _) {
           description: PACKAGE.description,
         },
       }),
+      // inject the css for the sidebar
       new CopyWebpackPlugin({
         patterns: [{ from: PATHS.sidebarCss }],
       }),
@@ -231,7 +233,7 @@ module.exports = function (webpackEnv, _) {
         chunks: ['tutorial'],
       }),
       // ensure that webpack always writes files (for dev-server)
-      new WriteFilePlugin(),
+      // new WriteFilePlugin(),
     ].filter(Boolean),
   }
 }
