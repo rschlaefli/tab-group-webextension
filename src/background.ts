@@ -2,7 +2,7 @@
 // import cache from 'webext-storage-cache'
 import { wrapStore } from 'webext-redux'
 import { browser, Tabs, Runtime } from 'webextension-polyfill-ts'
-import { any, keys } from 'ramda'
+import OptionsSync from 'webext-options-sync'
 
 import {
   TAB_ACTION,
@@ -12,7 +12,6 @@ import {
   // TAB_GROUP_ACTION
 } from './types/Extension'
 import configureStore from './state/configureStore'
-import optionsStorage from './optionsStorage'
 import {
   createTab,
   initializeCurrentTabs,
@@ -30,6 +29,24 @@ const { store, persistor } = configureStore({})
 export { persistor }
 
 export type AppDispatch = typeof store.dispatch
+
+window.optionsSync = new OptionsSync({
+  // specify default settings
+  defaults: {
+    debugLogging: true as boolean,
+    enableHeuristics: false as boolean,
+    tutorialProgress: 0,
+  },
+
+  // List of functions that are called when the extension is updated
+  migrations: [
+    // Integrated utility that drops any properties that don't appear in the defaults
+    OptionsSync.migrations.removeUnused,
+  ],
+
+  // enable logging for sync storage
+  logging: true,
+})
 
 // wrap the redux store for webext communication
 wrapStore(store, { portName: 'tabGrouping' })
@@ -150,7 +167,7 @@ function setupListeners(nativePort?: Runtime.Port): void {
 // }
 
 // connect to the native port
-optionsStorage
+window.optionsSync
   .getAll()
   .then((opt) => {
     console.log('[background] Fetched user options', opt)

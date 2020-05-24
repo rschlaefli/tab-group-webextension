@@ -10,7 +10,6 @@ import {
 } from '@material-ui/core'
 
 import { performBrowserActionSafe } from '../lib/utils'
-import optionsStorage from '../optionsStorage'
 import Layout from '../lib/Layout'
 
 function Options(): React.ReactElement {
@@ -20,29 +19,39 @@ function Options(): React.ReactElement {
 
   useEffect(() => {
     const getAll = async (): Promise<void> => {
-      const options = await optionsStorage.getAll()
-      setEnableHeuristics(options.enableHeuristics)
-      setEnableLogging(options.debugLogging)
-      setTutorialProgress(options.tutorialProgress)
+      await performBrowserActionSafe(async (browser) => {
+        const backgroundWindow = await browser.runtime.getBackgroundPage()
+        const options = await backgroundWindow.optionsSync.getAll()
+        setEnableHeuristics(options.enableHeuristics)
+        setEnableLogging(options.debugLogging)
+        setTutorialProgress(options.tutorialProgress)
+      })
     }
     getAll()
   }, [])
 
   const resetTutorialProgress = async (): Promise<void> => {
-    await optionsStorage.set({ tutorialProgress: 0 })
-    setTutorialProgress(0)
+    await performBrowserActionSafe(async (browser) => {
+      const backgroundWindow = await browser.runtime.getBackgroundPage()
+      await backgroundWindow.optionsSync.set({ tutorialProgress: 0 })
+      setTutorialProgress(0)
+    })
   }
 
   const handleToggleCheckbox = (name: string, setter: Function, extra?: Function) => async (
     e: React.ChangeEvent<HTMLInputElement>
   ): Promise<void> => {
     const checkValue = e.target.checked
-    await optionsStorage.set({ [name]: checkValue })
-    if (extra) extra()
-    setter(checkValue)
+    await performBrowserActionSafe(async (browser) => {
+      const backgroundWindow = await browser.runtime.getBackgroundPage()
+      await backgroundWindow.optionsSync.set({ [name]: checkValue })
+      setter(checkValue)
+      if (extra) extra()
+    })
   }
 
-  const reloadExtension = performBrowserActionSafe((browser) => browser.runtime.reload())
+  const reloadExtension = async (): Promise<void> =>
+    performBrowserActionSafe((browser) => browser.runtime.reload())
 
   return (
     <Layout>

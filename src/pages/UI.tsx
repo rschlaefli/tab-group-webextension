@@ -4,10 +4,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Button, Switch, Typography, FormControlLabel, Tooltip } from '@material-ui/core'
 import { Add, Settings, InfoRounded } from '@material-ui/icons'
 
-import optionsStorage from '@src/optionsStorage'
 import TabGroup from '@src/components/tabs/TabGroup'
 import { ITabGroup } from '@src/types/Extension'
-import { getBrowserSafe } from '@src/lib/utils'
 import Layout from '@src/lib/Layout'
 import {
   removeTab,
@@ -27,6 +25,7 @@ import {
 } from '@src/state/currentTabs'
 import { RootState } from '@src/state/configureStore'
 import { toggleFocusMode, openOptionsPageAlias } from '@src/state/settings'
+import { performBrowserActionSafe } from '@src/lib/utils'
 
 const extractDragEventProperties = (dragEvent: DropResult): any => ({
   sourceGroupId: dragEvent.source.droppableId,
@@ -47,8 +46,11 @@ function UI(): React.ReactElement {
 
   useEffect(() => {
     const init = async (): Promise<void> => {
-      const result = await optionsStorage.getAll()
-      setHeuristicsEnabled(result.enableHeuristics)
+      await performBrowserActionSafe(async (browser) => {
+        const backgroundWindow = await browser.runtime.getBackgroundPage()
+        const options = await backgroundWindow.optionsSync.getAll()
+        setHeuristicsEnabled(options.enableHeuristics)
+      })
     }
     init()
   }, [])

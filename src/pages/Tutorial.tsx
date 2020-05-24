@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Button, Stepper, Step, StepLabel, Typography, Container } from '@material-ui/core'
 
 // import { theme } from '../../tailwind.config.js'
-import optionsStorage from '@src/optionsStorage'
 import Layout from '@src/lib/Layout'
+import { performBrowserActionSafe } from '@src/lib/utils'
 
 const STEPS = ['Extension Setup', 'Heuristics Setup', 'Data Collection']
 
@@ -12,25 +12,37 @@ function Tutorial(): React.ReactElement {
 
   useEffect(() => {
     const getAll = async (): Promise<void> => {
-      const options = await optionsStorage.getAll()
-      setActiveStep(options.tutorialProgress)
+      await performBrowserActionSafe(async (browser) => {
+        const backgroundWindow = await browser.runtime.getBackgroundPage()
+        const options = await backgroundWindow.optionsSync.getAll()
+        setActiveStep(options.tutorialProgress)
+      })
     }
     getAll()
   }, [])
 
   const finalizeExtensionSettings = async (): Promise<void> => {
-    await optionsStorage.set({ tutorialProgress: 1 })
-    setActiveStep(1)
+    await performBrowserActionSafe(async (browser) => {
+      const backgroundWindow = await browser.runtime.getBackgroundPage()
+      await backgroundWindow.optionsSync.set({ tutorialProgress: 1 })
+      setActiveStep(1)
+    })
   }
 
   const finalizeHeuristicsSetup = async (): Promise<void> => {
-    await optionsStorage.set({ tutorialProgress: 2 })
-    setActiveStep(2)
+    await performBrowserActionSafe(async (browser) => {
+      const backgroundWindow = await browser.runtime.getBackgroundPage()
+      await backgroundWindow.optionsSync.set({ tutorialProgress: 2 })
+      setActiveStep(2)
+    })
   }
 
   const finalizeDataCollection = async (): Promise<void> => {
-    await optionsStorage.set({ tutorialProgress: 3 })
-    setActiveStep(3)
+    await performBrowserActionSafe(async (browser) => {
+      const backgroundWindow = await browser.runtime.getBackgroundPage()
+      await backgroundWindow.optionsSync.set({ tutorialProgress: 3 })
+      setActiveStep(3)
+    })
   }
 
   return (

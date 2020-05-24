@@ -32,11 +32,11 @@ export async function getBrowserSafe(): Promise<Browser> {
   return Promise.reject('MISSING_EXTENSION_CONTEXT')
 }
 
-export function performBrowserActionSafe(func: (browser: Browser) => void): Function {
-  return async (): Promise<void> => {
-    try {
-      func(await getBrowserSafe())
-    } catch (e) {}
+export async function performBrowserActionSafe(func: (browser: Browser) => void): Promise<void> {
+  try {
+    await func(await getBrowserSafe())
+  } catch (e) {
+    console.error(e)
   }
 }
 
