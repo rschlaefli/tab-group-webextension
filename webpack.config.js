@@ -82,12 +82,12 @@ module.exports = function (webpackEnv, _) {
       path: PATHS[webpackEnv && webpackEnv.browser ? `output_${webpackEnv.browser}` : 'output'],
       filename: '[name].bundle.js',
     },
-    cache: {
-      type: 'filesystem',
-      buildDependencies: {
-        config: [__filename],
-      },
-    },
+    // cache: {
+    //   type: 'filesystem',
+    //   buildDependencies: {
+    //     config: [__filename],
+    //   },
+    // },
     module: {
       rules: [
         {
@@ -107,11 +107,11 @@ module.exports = function (webpackEnv, _) {
               use: [
                 {
                   loader: require.resolve('babel-loader'),
-                  options: {
-                    cacheDirectory: true,
-                    cacheCompression: false,
-                    compact: isEnvProduction,
-                  },
+                  // options: {
+                  //   // cacheDirectory: true,
+                  //   // cacheCompression: false,
+                  //   // compact: isEnvProduction,
+                  // },
                 },
               ],
             },
