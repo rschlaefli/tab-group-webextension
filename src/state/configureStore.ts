@@ -33,7 +33,11 @@ if (process.env.NODE_ENV === 'development') {
   middleware.push(logger)
 }
 
-export default ({ persistence = true }: any): { store: Store; persistor?: Persistor } => {
+export default ({
+  persistence = true,
+}: {
+  persistence: boolean
+}): { store: Store<RootState>; persistor?: Persistor } => {
   const store = configureStore({
     reducer: rootReducer,
     middleware,
