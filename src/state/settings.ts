@@ -53,6 +53,15 @@ export const openOptionsPage = createAsyncThunk(
   }
 )
 
+export const reloadExtension = createAsyncThunk(
+  'settings/reloadExtension',
+  async (): Promise<void> => {
+    await performBrowserActionSafe(async (browser) => {
+      await browser.runtime.reload()
+    })
+  }
+)
+
 export const toggleDebugLogging = createAsyncThunk<
   void,
   void,
@@ -85,8 +94,10 @@ export const toggleHeuristicsBackend = createAsyncThunk<
 export const openOptionsPageAlias = createAction('settings/openOptionsPageAlias')
 export const toggleDebugLoggingAlias = createAction('settings/toggleDebugLoggingAlias')
 export const toggleHeuristicsBackendAlias = createAction('settings/toggleHeuristicsBackendAlias')
+export const reloadExtensionAlias = createAction('settings/reloadExtensionAlias')
 export const settingsAliases = {
   [openOptionsPageAlias.type]: openOptionsPage,
   [toggleDebugLoggingAlias.type]: toggleDebugLogging,
   [toggleHeuristicsBackendAlias.type]: toggleHeuristicsBackend,
+  [reloadExtensionAlias.type]: reloadExtension,
 }

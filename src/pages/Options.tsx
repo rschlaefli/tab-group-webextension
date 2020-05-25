@@ -16,6 +16,7 @@ import {
   resetTutorialProgress,
   toggleDebugLoggingAlias,
   toggleHeuristicsBackendAlias,
+  reloadExtensionAlias,
 } from '@src/state/settings'
 
 function Options(): React.ReactElement {
@@ -46,6 +47,7 @@ function Options(): React.ReactElement {
             >
               Reset tutorial progress
             </Button>
+            <Button onClick={() => dispatch(reloadExtensionAlias())}>Reload extension</Button>
           </FormGroup>
         </FormControl>
         <FormControl component="fieldset">
