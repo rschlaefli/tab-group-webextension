@@ -243,7 +243,7 @@ export const openTabGroup = createAsyncThunk<
 
       // if focus mode is enabled, close all of the tabs belonging to other groups
       // but only if they are not also a member of the selected group
-      if (state.settings.focusModeEnabled) {
+      if (state.settings.isFocusModeEnabled) {
         const currentGroupHashes = tabGroup.tabs.map((tab) => tab.hash).filter((hash) => !!hash)
 
         const tabHashesFromOtherGroups = state.tabGroups

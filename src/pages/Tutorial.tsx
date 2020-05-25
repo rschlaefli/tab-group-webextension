@@ -1,49 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Button, Stepper, Step, StepLabel, Typography, Container } from '@material-ui/core'
+import { useDispatch, useSelector } from 'react-redux'
 
-// import { theme } from '../../tailwind.config.js'
-import Layout from '@src/lib/Layout'
-import { performBrowserActionSafe } from '@src/lib/utils'
+import Layout from '@src/components/common/Layout'
+import { RootState } from '@src/state/configureStore'
+import { updateTutorialProgress } from '@src/state/settings'
 
 const STEPS = ['Extension Setup', 'Heuristics Setup', 'Data Collection']
 
 function Tutorial(): React.ReactElement {
-  const [activeStep, setActiveStep] = useState(-1)
+  const dispatch = useDispatch()
 
-  useEffect(() => {
-    const getAll = async (): Promise<void> => {
-      await performBrowserActionSafe(async (browser) => {
-        const backgroundWindow = await browser.runtime.getBackgroundPage()
-        const options = await backgroundWindow.optionsSync.getAll()
-        setActiveStep(options.tutorialProgress)
-      })
-    }
-    getAll()
-  }, [])
-
-  const finalizeExtensionSettings = async (): Promise<void> => {
-    await performBrowserActionSafe(async (browser) => {
-      const backgroundWindow = await browser.runtime.getBackgroundPage()
-      await backgroundWindow.optionsSync.set({ tutorialProgress: 1 })
-      setActiveStep(1)
-    })
-  }
-
-  const finalizeHeuristicsSetup = async (): Promise<void> => {
-    await performBrowserActionSafe(async (browser) => {
-      const backgroundWindow = await browser.runtime.getBackgroundPage()
-      await backgroundWindow.optionsSync.set({ tutorialProgress: 2 })
-      setActiveStep(2)
-    })
-  }
-
-  const finalizeDataCollection = async (): Promise<void> => {
-    await performBrowserActionSafe(async (browser) => {
-      const backgroundWindow = await browser.runtime.getBackgroundPage()
-      await backgroundWindow.optionsSync.set({ tutorialProgress: 3 })
-      setActiveStep(3)
-    })
-  }
+  const activeStep = useSelector((state: RootState) => state.settings.tutorialProgress)
+  console.log(activeStep)
 
   return (
     <Layout>
@@ -57,7 +26,7 @@ function Tutorial(): React.ReactElement {
               <ul>
                 <li>asdasd</li>
               </ul>
-              <Button onClick={finalizeExtensionSettings}>Next Step</Button>
+              <Button onClick={() => dispatch(updateTutorialProgress(1))}>Next Step</Button>
             </div>
           )}
 
@@ -71,8 +40,10 @@ function Tutorial(): React.ReactElement {
                 <li>restart the browser</li>
                 <li>if everything works, the extension will show it HERE and THERE...</li>
               </ul>
-              <Button onClick={(): void => setActiveStep(0)}>Previous Step</Button>
-              <Button onClick={finalizeHeuristicsSetup}>Next Step</Button>
+              <Button onClick={() => () => dispatch(updateTutorialProgress(0))}>
+                Previous Step
+              </Button>
+              <Button onClick={() => dispatch(updateTutorialProgress(2))}>Next Step</Button>
             </div>
           )}
 
@@ -84,8 +55,8 @@ function Tutorial(): React.ReactElement {
                 <li>experimental procedures...</li>
                 <li>you can modify your groups at will...</li>
               </ul>
-              <Button onClick={(): void => setActiveStep(1)}>Previous Step</Button>
-              <Button onClick={finalizeDataCollection}>Finish Tutorial</Button>
+              <Button onClick={() => dispatch(updateTutorialProgress(1))}>Previous Step</Button>
+              <Button onClick={() => dispatch(updateTutorialProgress(3))}>Finish Tutorial</Button>
             </div>
           )}
 

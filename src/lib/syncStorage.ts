@@ -4,7 +4,7 @@ import { browser } from 'webextension-polyfill-ts'
 import { Storage } from 'redux-persist'
 
 import StorageAPI from './storageAPI'
-import { persistor } from '@src/background'
+import { persistor, bootstrap } from '@src/background'
 
 // shim requestIdleCallback in case of it not being available
 // ref: https://developer.mozilla.org/en-US/docs/Web/API/Background_Tasks_API
@@ -42,6 +42,8 @@ export default function syncStorage(): Storage {
 
       console.log('[syncStorage] resuming redux persistor')
       persistor?.persist()
+
+      bootstrap()
 
       // setup a listener to watch for sync storage changes
       // browser.storage.onChanged.addListener(async (changes, areaName) => {
