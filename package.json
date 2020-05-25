@@ -137,7 +137,7 @@
     "webext-options-sync": "1.2.3",
     "webext-redux": "2.1.6",
     "webext-storage-cache": "3.0.0",
-    "webextension-polyfill-ts": "0.15.0",
+    "webextension-polyfill-ts": "0.16.0",
     "webpack": "5.0.0-beta.16",
     "webpack-bundle-analyzer": "3.8.0",
     "webpack-cli": "3.3.11",
