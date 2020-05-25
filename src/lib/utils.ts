@@ -26,13 +26,15 @@ export function hasExtensionContext(): boolean {
 export async function getBrowserSafe(): Promise<Browser> {
   if (hasExtensionContext()) {
     const { browser } = await require('webextension-polyfill-ts')
-    return Promise.resolve(browser)
+    return browser
   }
 
   return Promise.reject('MISSING_EXTENSION_CONTEXT')
 }
 
-export async function performBrowserActionSafe(func: (browser: Browser) => void): Promise<void> {
+export async function performBrowserActionSafe(
+  func: (browser: Browser) => Promise<void>
+): Promise<void> {
   try {
     await func(await getBrowserSafe())
   } catch (e) {

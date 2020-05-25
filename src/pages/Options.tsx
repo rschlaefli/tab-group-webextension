@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import {
   Container,
   FormGroup,
@@ -8,52 +8,22 @@ import {
   FormLabel,
   Button,
 } from '@material-ui/core'
+import { useSelector, useDispatch } from 'react-redux'
 
-import { performBrowserActionSafe } from '../lib/utils'
-import Layout from '../lib/Layout'
+import Layout from '../components/common/Layout'
+import { RootState } from '@src/state/configureStore'
+import {
+  resetTutorialProgress,
+  toggleDebugLoggingAlias,
+  toggleHeuristicsBackendAlias,
+} from '@src/state/settings'
 
 function Options(): React.ReactElement {
-  const [enableHeuristics, setEnableHeuristics] = useState(false)
-  const [enableLogging, setEnableLogging] = useState(false)
-  const [tutorialProgress, setTutorialProgress] = useState(-1)
+  const dispatch = useDispatch()
 
-  useEffect(() => {
-    const getAll = async (): Promise<void> => {
-      await performBrowserActionSafe(async (browser) => {
-        const backgroundWindow = await browser.runtime.getBackgroundPage()
-        const options = await backgroundWindow.optionsSync.getAll()
-        setEnableHeuristics(options.enableHeuristics)
-        setEnableLogging(options.debugLogging)
-        setTutorialProgress(options.tutorialProgress)
-      })
-    }
-    getAll()
-  }, [])
-
-  const resetTutorialProgress = async (): Promise<void> => {
-    await performBrowserActionSafe(async (browser) => {
-      const backgroundWindow = await browser.runtime.getBackgroundPage()
-      await backgroundWindow.optionsSync.set({ tutorialProgress: 0 })
-      setTutorialProgress(0)
-    })
-  }
-
-  const handleToggleCheckbox = (
-    name: string,
-    setter: (newValue: any) => void,
-    extra?: () => void
-  ) => async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-    const checkValue = e.target.checked
-    await performBrowserActionSafe(async (browser) => {
-      const backgroundWindow = await browser.runtime.getBackgroundPage()
-      await backgroundWindow.optionsSync.set({ [name]: checkValue })
-      setter(checkValue)
-      if (extra) extra()
-    })
-  }
-
-  const reloadExtension = async (): Promise<void> =>
-    performBrowserActionSafe((browser) => browser.runtime.reload())
+  const { tutorialProgress, isDebugLoggingEnabled, isHeuristicsBackendEnabled } = useSelector(
+    (state: RootState) => state.settings
+  )
 
   return (
     <Layout>
@@ -64,15 +34,15 @@ function Options(): React.ReactElement {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={enableLogging}
-                  onChange={handleToggleCheckbox('debugLogging', setEnableLogging, reloadExtension)}
+                  checked={isDebugLoggingEnabled}
+                  onChange={() => dispatch(toggleDebugLoggingAlias())}
                 />
               }
               label="Enable debug logging"
             />
             <Button
               disabled={tutorialProgress === 0}
-              onClick={(): Promise<void> => resetTutorialProgress()}
+              onClick={() => dispatch(resetTutorialProgress())}
             >
               Reset tutorial progress
             </Button>
@@ -84,12 +54,8 @@ function Options(): React.ReactElement {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={enableHeuristics}
-                  onChange={handleToggleCheckbox(
-                    'enableHeuristics',
-                    setEnableHeuristics,
-                    reloadExtension
-                  )}
+                  checked={isHeuristicsBackendEnabled}
+                  onChange={() => dispatch(toggleHeuristicsBackendAlias())}
                 />
               }
               label="Enable grouping heuristics"

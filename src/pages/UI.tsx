@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { DragDropContext, DropResult, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
 import { Button, Switch, Typography, FormControlLabel, Tooltip } from '@material-ui/core'
@@ -6,7 +6,7 @@ import { Add, Settings, InfoRounded } from '@material-ui/icons'
 
 import TabGroup from '@src/components/tabs/TabGroup'
 import { ITabGroup } from '@src/types/Extension'
-import Layout from '@src/lib/Layout'
+import Layout from '@src/components/common/Layout'
 import {
   removeTab,
   moveTab,
@@ -25,7 +25,6 @@ import {
 } from '@src/state/currentTabs'
 import { RootState } from '@src/state/configureStore'
 import { toggleFocusMode, openOptionsPageAlias } from '@src/state/settings'
-import { performBrowserActionSafe } from '@src/lib/utils'
 
 const extractDragEventProperties = (dragEvent: DropResult): any => ({
   sourceGroupId: dragEvent.source.droppableId,
@@ -40,20 +39,10 @@ function UI(): React.ReactElement {
   const currentTabs = useSelector((state: RootState) => state.currentTabs)
   const tabGroups = useSelector((state: RootState) => state.tabGroups)
   const suggestions = useSelector((state: RootState) => state.suggestions)
-  const focusModeEnabled = useSelector((state: RootState) => state.settings.focusModeEnabled)
-
-  const [heuristicsEnabled, setHeuristicsEnabled] = useState(false)
-
-  useEffect(() => {
-    const init = async (): Promise<void> => {
-      await performBrowserActionSafe(async (browser) => {
-        const backgroundWindow = await browser.runtime.getBackgroundPage()
-        const options = await backgroundWindow.optionsSync.getAll()
-        setHeuristicsEnabled(options.enableHeuristics)
-      })
-    }
-    init()
-  }, [])
+  const focusModeEnabled = useSelector((state: RootState) => state.settings.isFocusModeEnabled)
+  const heuristicsEnabled = useSelector(
+    (state: RootState) => state.settings.isHeuristicsBackendEnabled
+  )
 
   const handleDragEnd = async (dragEvent: DropResult): Promise<any> => {
     const properties = extractDragEventProperties(dragEvent)
