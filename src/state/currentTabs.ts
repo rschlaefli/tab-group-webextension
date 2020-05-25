@@ -220,7 +220,8 @@ export const updateTabAndNotify = createAsyncThunk<
     if (nativePort && newTab && status === 'complete') {
       await postNativeMessage(nativePort, {
         action: TAB_ACTION.UPDATE,
-        payload: { ...newTab, ...augmentTabExtras(changeData) },
+        // TODO: get rid of this double hash calculation
+        payload: augmentTabExtras(newTab as Partial<ITab>),
       })
     }
   }
