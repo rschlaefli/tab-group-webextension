@@ -22,13 +22,12 @@ import { getBrowserSafe } from '@src/lib/utils'
 import { closeTabsWithHashes, openCurrentTab } from './currentTabs'
 import { AppDispatch } from '@src/background'
 import { RootState } from './configureStore'
-import { RootStateOrAny } from 'react-redux'
 
-function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): Function {
+function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): any {
   return pipe(path([sourceGroupIndex, 'tabs', sourceTabIndex]), assoc('uuid', uuidv4()))
 }
 
-function removeTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): Function {
+function removeTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): any {
   return (state: ITabGroup[]): ITabGroup[] =>
     pipe(
       pathOr([], [sourceGroupIndex, 'tabs']),
@@ -277,7 +276,9 @@ export const openTabGroup = createAsyncThunk<
           if (['moz-extension', 'chrome'].includes(_sender.tab.url.split(':')[0])) {
             await browser.tabs.remove(_sender.tab.id)
           }
-        } catch (e) {}
+        } catch (e) {
+          console.error(e)
+        }
       }
     }
   }

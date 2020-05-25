@@ -121,7 +121,7 @@ export const closeCurrentTab = createAsyncThunk<
   { dispatch: AppDispatch; state: RootState }
 >(
   'currentTabs/closeCurrentTab',
-  async ({ payload: tabId }, _): Promise<void> => {
+  async ({ payload: tabId }): Promise<void> => {
     const browser = await getBrowserSafe()
     await browser.tabs.remove(tabId)
   }
@@ -180,7 +180,9 @@ export const openCurrentTab = createAsyncThunk<
           if (['moz-extension', 'chrome'].includes(_sender.tab.url.split(':')[0])) {
             await browser.tabs.remove(_sender.tab.id)
           }
-        } catch (e) {}
+        } catch (e) {
+          console.error(e)
+        }
       }
     }
   }

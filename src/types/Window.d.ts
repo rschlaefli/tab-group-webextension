@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/interface-name-prefix */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /// <reference types="chrome" />
 
 declare interface Window {
   browser: any
-  requestIdleCallback: Function
+  requestIdleCallback: any
   optionsSync: any
 }
 

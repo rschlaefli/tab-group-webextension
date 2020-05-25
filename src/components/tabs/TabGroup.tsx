@@ -26,7 +26,7 @@ interface IProps {
   onCloseTabGroup?: () => void
 }
 
-const getListStyle = (isDraggingOver: boolean): {} => ({
+const getListStyle = (isDraggingOver: boolean): any => ({
   backgroundColor: isDraggingOver && '#CFDAFC',
 })
 

@@ -35,7 +35,7 @@ interface IMousePosition {
 const getItemStyle = (
   isDragging: boolean,
   draggableStyle?: DraggingStyle | NotDraggingStyle
-): {} => ({
+): any => ({
   userSelect: 'none',
   border: isDragging && '1px solid lightgrey',
   ...draggableStyle,

@@ -38,9 +38,11 @@ function Options(): React.ReactElement {
     })
   }
 
-  const handleToggleCheckbox = (name: string, setter: Function, extra?: Function) => async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ): Promise<void> => {
+  const handleToggleCheckbox = (
+    name: string,
+    setter: (newValue: any) => void,
+    extra?: () => void
+  ) => async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const checkValue = e.target.checked
     await performBrowserActionSafe(async (browser) => {
       const backgroundWindow = await browser.runtime.getBackgroundPage()

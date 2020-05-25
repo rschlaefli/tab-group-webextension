@@ -108,7 +108,7 @@ const onNativeMessage = (nativePort) => (messageFromHeuristics: IHeuristicsActio
       })
       break
 
-    case HEURISTICS_ACTION.QUERY_TABS:
+    case HEURISTICS_ACTION.QUERY_TABS: {
       const currentTabs = store.getState().currentTabs?.tabs as ITab[]
       console.log('[background] Initializing current tabs in heuristics:', currentTabs)
       postNativeMessage(nativePort, {
@@ -116,6 +116,7 @@ const onNativeMessage = (nativePort) => (messageFromHeuristics: IHeuristicsActio
         payload: { currentTabs },
       })
       break
+    }
   }
 }
 

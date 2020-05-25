@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles'
 interface IProps {
   fullWidth?: boolean
   value: string
-  onChange?: Function
+  onChange?: (newValue: any) => void
 }
 
 const useStyles = makeStyles({

@@ -1,4 +1,4 @@
-import { Tabs } from 'webextension-polyfill-ts'
+// import { Tabs } from 'webextension-polyfill-ts'
 
 export enum TAB_ACTION {
   'CREATE' = 'CREATE',

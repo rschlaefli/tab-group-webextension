@@ -1,10 +1,11 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
   extends: [
+    'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:react/recommended',
+    'plugin:prettier/recommended',
     'prettier/@typescript-eslint',
-    // 'plugin:prettier/recommended',
   ],
   plugins: ['react-hooks'],
   parserOptions: {
@@ -17,18 +18,18 @@ module.exports = {
   rules: {
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
-    '@typescript-eslint/interface-name-prefix': ['error', 'always'],
     '@typescript-eslint/triple-slash-reference': 'off',
+    // '@typescript-eslint/naming-convention':
   },
   settings: {
     react: {
       version: 'detect',
     },
   },
-  // env: {
-  //     browser: true,
-  //     es6: true,
-  //     webextensions: true,
-  //     jest: true
-  //   },
+  env: {
+    browser: true,
+    es6: true,
+    webextensions: true,
+    jest: true,
+  },
 }
