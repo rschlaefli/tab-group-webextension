@@ -22,6 +22,8 @@ export default async function withProxyStore(Component: React.FC): Promise<React
     const storeWithMiddleware = applyMiddleware(proxyStore, ...middleware)
 
     return proxyStore.ready().then(() => {
+      console.log('[withProxyStore] Proxy store is ready')
+
       return (
         <Provider store={storeWithMiddleware}>
           <Component />
