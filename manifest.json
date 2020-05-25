@@ -26,7 +26,7 @@
   "options_ui": {
     "chrome_style": true,
     "page": "options.html",
-    "open_in_tab": false
+    "open_in_tab": true
   },
   "__firefox__browser_specific_settings": {
     "gecko": {
