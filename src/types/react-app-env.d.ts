@@ -68,3 +68,8 @@ declare module '*.module.sass' {
 }
 
 declare module 'blueimp-md5'
+
+declare module '*.md' {
+  const content: any
+  export default content
+}

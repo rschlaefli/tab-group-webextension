@@ -1,18 +1,35 @@
 import React from 'react'
-import { Button, Stepper, Step, StepLabel, Typography, Container } from '@material-ui/core'
+import {
+  Button,
+  Stepper,
+  Step,
+  Typography,
+  Container,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  StepLabel,
+} from '@material-ui/core'
 import { useDispatch, useSelector } from 'react-redux'
 
 import Layout from '@src/components/common/Layout'
+import Markdown from '@src/components/common/Markdown'
 import { RootState } from '@src/state/configureStore'
 import { updateTutorialProgress } from '@src/state/settings'
+import { useBrowserAndOS } from '@src/lib/utils'
+import TUTORIAL_CONTENTS from '@src/docs/tutorial'
 
 const STEPS = ['Extension Setup', 'Heuristics Setup', 'Data Collection']
 
 function Tutorial(): React.ReactElement {
   const dispatch = useDispatch()
 
-  const activeStep = useSelector((state: RootState) => state.settings.tutorialProgress)
-  console.log(activeStep)
+  // const activeStep = useSelector((state: RootState) => state.settings.tutorialProgress)
+
+  const activeStep = 1
+
+  const { browser, os, setBrowser, setOS } = useBrowserAndOS()
 
   return (
     <Layout>
@@ -32,17 +49,12 @@ function Tutorial(): React.ReactElement {
 
           {activeStep === 1 && (
             <div>
-              <p>Setup the heuristics engine on your local machine.</p>
-              <ul>
-                <li>setup steps...</li>
-                <li>download the installer for your OS from xyz...</li>
-                <li>run the installer</li>
-                <li>restart the browser</li>
-                <li>if everything works, the extension will show it HERE and THERE...</li>
-              </ul>
+              <Markdown content={TUTORIAL_CONTENTS[`${browser}_${os}`]} />
+
               <Button onClick={() => () => dispatch(updateTutorialProgress(0))}>
                 Previous Step
               </Button>
+
               <Button onClick={() => dispatch(updateTutorialProgress(2))}>Next Step</Button>
             </div>
           )}
@@ -59,7 +71,6 @@ function Tutorial(): React.ReactElement {
               <Button onClick={() => dispatch(updateTutorialProgress(3))}>Finish Tutorial</Button>
             </div>
           )}
-
           {activeStep === 3 && (
             <div>
               <p>You have finished the tutorial...</p>
@@ -67,6 +78,7 @@ function Tutorial(): React.ReactElement {
             </div>
           )}
         </div>
+
         <Stepper activeStep={activeStep}>
           {STEPS.map((label) => (
             <Step key={label}>
@@ -74,6 +86,27 @@ function Tutorial(): React.ReactElement {
             </Step>
           ))}
         </Stepper>
+
+        <div>
+          <FormControl>
+            <InputLabel>Browser</InputLabel>
+            <Select value={browser} onChange={(e: any) => setBrowser(e.target.value)}>
+              <MenuItem value="Chrome">Google Chrome</MenuItem>
+              <MenuItem value="Firefox">Mozilla Firefox</MenuItem>
+              <MenuItem value="Other">Other</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl>
+            <InputLabel>OS</InputLabel>
+            <Select value={os} onChange={(e: any) => setOS(e.target.value)}>
+              <MenuItem value="Windows">Windows</MenuItem>
+              <MenuItem value="Mac OS">Mac OS</MenuItem>
+              <MenuItem value="Linux">Linux</MenuItem>
+              <MenuItem value="Other">Other</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
       </Container>
     </Layout>
   )
