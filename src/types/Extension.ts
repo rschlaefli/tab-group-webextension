@@ -8,6 +8,7 @@ export enum TAB_ACTION {
   'ATTACH' = 'ATTACH',
   'REMOVE' = 'REMOVE',
   'INIT_TABS' = 'INIT_TABS',
+  'INIT_GROUPS' = 'INIT_GROUPS',
 }
 
 export enum HEURISTICS_ACTION {
@@ -15,6 +16,7 @@ export enum HEURISTICS_ACTION {
   'NOTIFY' = 'NOTIFY',
   'QUERY_TABS' = 'QUERY_TABS',
   'UPDATE_GROUPS' = 'UPDATE_GROUPS',
+  'QUERY_GROUPS' = 'QUERY_GROUPS',
 }
 
 export interface ITabGroup {

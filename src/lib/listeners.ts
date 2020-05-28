@@ -5,7 +5,13 @@ import {
   activateTabAndNotify,
   removeTabAndNotify,
 } from '@src/state/currentTabs'
-import { IHeuristicsAction, HEURISTICS_ACTION, ITab, TAB_ACTION } from '@src/types/Extension'
+import {
+  IHeuristicsAction,
+  HEURISTICS_ACTION,
+  ITab,
+  TAB_ACTION,
+  ITabGroup,
+} from '@src/types/Extension'
 import { updateSuggestedGroups } from '@src/state/suggestions'
 import { postNativeMessage } from './utils'
 import { Store } from 'redux'
@@ -79,6 +85,16 @@ const onNativeMessage = ({ dispatch, getState }, nativePort) => (
       postNativeMessage(nativePort, {
         action: TAB_ACTION.INIT_TABS,
         payload: { currentTabs },
+      })
+      break
+    }
+
+    case HEURISTICS_ACTION.QUERY_GROUPS: {
+      const tabGroups = getState().tabGroups as ITabGroup[]
+      console.log('[background] Initializing tab groups in heuristics:', tabGroups)
+      postNativeMessage(nativePort, {
+        action: TAB_ACTION.INIT_GROUPS,
+        payload: { tabGroups },
       })
       break
     }
