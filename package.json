@@ -44,7 +44,7 @@
     "type-check:watch": "npm run type-check -- --watch"
   },
   "dependencies": {
-    "@babel/core": "7.10.0",
+    "@babel/core": "7.10.1",
     "@babel/plugin-proposal-optional-chaining": "7.10.0",
     "@babel/plugin-proposal-pipeline-operator": "7.8.3",
     "@babel/preset-env": "7.10.0",
