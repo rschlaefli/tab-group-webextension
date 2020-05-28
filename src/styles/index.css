@@ -23,3 +23,43 @@ html {
 body > * {
   margin: initial !important;
 }
+
+.markdown p,
+.markdown h1,
+.markdown h2,
+.markdown pre {
+  @apply mb-1;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  @apply font-bold;
+}
+
+.markdown h1 {
+  @apply text-xl;
+}
+
+.markdown h2 {
+  @apply text-lg;
+}
+
+.markdown h3 {
+  @apply text-base;
+}
+
+.markdown p,
+.markdown li {
+  @apply text-sm;
+}
+
+.markdown pre,
+.markdown code {
+  @apply text-xs;
+}
+
+.markdown ul {
+  @apply list-disc;
+  @apply list-inside;
+}

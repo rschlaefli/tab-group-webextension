@@ -7,7 +7,7 @@ interface IProps {
 }
 
 function Markdown({ content }: IProps): React.ReactElement {
-  return <div dangerouslySetInnerHTML={{ __html: content }} />
+  return <div className="markdown" dangerouslySetInnerHTML={{ __html: content }} />
 }
 
 export default Markdown
