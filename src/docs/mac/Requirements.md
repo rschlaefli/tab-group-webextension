@@ -1,5 +1,3 @@
-## System Requirements
-
 Before the _Heuristics Engine_ can be installed, certain system requirements need to be satisfied.
 
 ### Homebrew

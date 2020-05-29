@@ -35,6 +35,5 @@
       "update_url": "https://tabs.fra1.digitaloceanspaces.com/webextension/firefox-updates.json"
     }
   },
-  "web_accessible_resources": ["ui.html", "tutorial.html"],
   "__opera__externally_connectable": {}
 }

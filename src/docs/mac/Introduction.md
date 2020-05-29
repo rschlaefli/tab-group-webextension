@@ -1,5 +1,11 @@
-# Heuristics Setup on Chrome for Mac OS
+# Heuristics Setup on Mac OS
 
-Open a Terminal application from `Applications/Utilities`.
+Open a new `Terminal` application from `Applications/Utilities`.
 
-You will need this terminal session during the entire installation, so it is best to keep it open.
+Any command formatted as below:
+
+```bash
+pwd
+```
+
+will need to be executed in the `Terminal`. You will need acces to the `Terminal` during the entire installation.

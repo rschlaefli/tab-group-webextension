@@ -1,40 +1,41 @@
+import Introduction from './Introduction.md'
+import DataCollection from './DataCollection.md'
+import Conclusion from './Conclusion.md'
+
 import MacIntro from './mac/Introduction.md'
 import MacRequirements from './mac/Requirements.md'
-import MacChromeSetup from './mac/SetupChrome.md'
-import MacFirefoxSetup from './mac/SetupFirefox.md'
+import MacSetup from './mac/Setup.md'
 
 import LinuxIntro from './linux/Introduction.md'
 import LinuxRequirements from './linux/Requirements.md'
-import LinuxChromeSetup from './linux/SetupChrome.md'
-import LinuxFirefoxSetup from './linux/SetupFirefox.md'
+import LinuxSetup from './linux/Setup.md'
 
 import WindowsIntro from './windows/Introduction.md'
 import WindowsRequirements from './windows/Requirements.md'
-import WindowsChromeSetup from './windows/SetupChrome.md'
-import WindowsFirefoxSetup from './windows/SetupFirefox.md'
+import WindowsSetup from './windows/Setup.md'
 
 const MacOS = {
-  introduction: MacIntro,
-  requirements: MacRequirements,
-  Chrome: MacChromeSetup,
-  Firefox: MacFirefoxSetup,
+  Introduction: MacIntro,
+  Requirements: MacRequirements,
+  Setup: MacSetup,
 }
 
 const Windows = {
-  introduction: WindowsIntro,
-  requirements: WindowsRequirements,
-  Chrome: WindowsChromeSetup,
-  Firefox: WindowsFirefoxSetup,
+  Introduction: WindowsIntro,
+  Requirements: WindowsRequirements,
+  Setup: WindowsSetup,
 }
 
 const Linux = {
-  introduction: LinuxIntro,
-  requirements: LinuxRequirements,
-  Chrome: LinuxChromeSetup,
-  Firefox: LinuxFirefoxSetup,
+  Introduction: LinuxIntro,
+  Requirements: LinuxRequirements,
+  Setup: LinuxSetup,
 }
 
 export default {
+  Introduction,
+  DataCollection,
+  Conclusion,
   'Mac OS': MacOS,
   Windows,
   Linux,

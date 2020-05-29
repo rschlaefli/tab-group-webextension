@@ -30,6 +30,7 @@ const resolveCwd = pipe(process.cwd, fs.realpathSync)
 const PATHS = {
   background: path.resolve(__dirname, 'src/background.ts'),
   backgroundTemplate: path.resolve(__dirname, 'public/background.html'),
+  changelog: path.resolve(__dirname, 'public/changelog.html'),
   cwd: path.resolve(resolveCwd(), '.'),
   docs: path.resolve(__dirname, 'src/docs'),
   manifest: path.resolve(__dirname, 'manifest.json'),
@@ -44,6 +45,7 @@ const PATHS = {
   sidebar: path.resolve(__dirname, 'src/sidebar.ts'),
   sidebarCss: path.resolve(__dirname, 'public/sidebar.css'),
   styles: path.resolve(__dirname, 'src/styles'),
+  troubleshooting: path.resolve(__dirname, 'public/troubleshooting.html'),
   tutorial: path.resolve(__dirname, 'src/tutorial.tsx'),
   tutorialTemplate: path.resolve(__dirname, 'public/tutorial.html'),
   src: path.resolve(__dirname, 'src'),
@@ -235,7 +237,11 @@ module.exports = function (webpackEnv, _) {
       }),
       // inject the css for the sidebar
       new CopyWebpackPlugin({
-        patterns: [{ from: PATHS.sidebarCss }],
+        patterns: [
+          { from: PATHS.sidebarCss },
+          { from: PATHS.troubleshooting },
+          { from: PATHS.changelog },
+        ],
       }),
       // dynamically generate the main extension ui page
       new HtmlWebpackPlugin({

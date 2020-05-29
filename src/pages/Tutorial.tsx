@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Button,
   Stepper,
@@ -22,12 +22,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import Layout from '@src/components/common/Layout'
 import Markdown from '@src/components/common/Markdown'
 import { RootState } from '@src/state/configureStore'
-import { updateTutorialProgress } from '@src/state/settings'
+import {
+  updateProgress,
+  updateHeuristicsInstallationStep,
+  establishHeuristicsConnectionAlias,
+} from '@src/state/tutorial'
 import { useBrowserAndOS } from '@src/lib/utils'
-
 import TUTORIAL_CONTENTS from '@src/docs/tutorial'
 
-const STEPS = ['Extension Setup', 'Heuristics Setup', 'Data Collection']
+const STEPS = ['Introduction', 'Heuristics Setup', 'Data Collection']
 
 const ExpansionPanel = withStyles({
   root: {
@@ -51,10 +54,10 @@ const ExpansionPanelSummary = withStyles({
     backgroundColor: 'rgba(0, 0, 0, .03)',
     borderBottom: '1px solid rgba(0, 0, 0, .125)',
     marginBottom: -1,
-    minHeight: 56,
-    '&$expanded': {
-      minHeight: 56,
-    },
+    // minHeight: 56,
+    // '&$expanded': {
+    //   minHeight: 56,
+    // },
   },
   content: {
     '&$expanded': {
@@ -73,30 +76,34 @@ const ExpansionPanelDetails = withStyles((theme) => ({
 function Tutorial(): React.ReactElement {
   const dispatch = useDispatch()
 
-  // const activeStep = useSelector((state: RootState) => state.settings.tutorialProgress)
-
-  const activeStep = 1
+  const {
+    progress,
+    heuristicsRequirementsSatisfied,
+    heuristicsSetupCompleted,
+    heuristicsConnectionEstablished,
+    heuristicsConnectionError,
+  } = useSelector((state: RootState) => state.tutorial)
 
   const { browser, os, setBrowser, setOS } = useBrowserAndOS()
 
-  const { introduction, requirements, ...setupSteps } = TUTORIAL_CONTENTS[os]
+  const { Introduction, DataCollection, Conclusion } = TUTORIAL_CONTENTS
+  const { Introduction: OSIntroduction, Requirements, Setup } = TUTORIAL_CONTENTS[os]
 
   return (
     <Layout>
-      <Container>
-        <div className="p-4 border border-gray-100 border-solid min-h-64 dark:border-none">
-          {activeStep === 0 && (
+      <Container className="p-4">
+        <div className="p-4 bg-gray-100 border border-gray-300 border-solid min-h-64 dark:border-none">
+          {progress === 0 && (
             <div>
-              <p>Tune the extension to your liking</p>
-              <ul>
-                <li>asdasd</li>
-              </ul>
-              <Button onClick={() => dispatch(updateTutorialProgress(1))}>Next Step</Button>
+              <Markdown content={Introduction} />
+              <Button color="primary" onClick={() => dispatch(updateProgress(1))}>
+                Next Step
+              </Button>
             </div>
           )}
 
-          {activeStep === 1 && (
-            <div className="p-4 bg-gray-100 border border-gray-300">
+          {progress === 1 && (
+            <div>
               <div className="flex flex-row justify-end -mb-12">
                 <FormControl>
                   <InputLabel>Browser</InputLabel>
@@ -119,8 +126,11 @@ function Tutorial(): React.ReactElement {
 
               {(os !== 'Other' && browser !== 'Other' && (
                 <>
-                  <Markdown content={introduction} />
-                  <ExpansionPanel>
+                  <div className="pb-4">
+                    <Markdown content={OSIntroduction} />
+                  </div>
+
+                  <ExpansionPanel expanded={!heuristicsRequirementsSatisfied}>
                     <ExpansionPanelSummary
                       expandIcon={<ExpandMore />}
                       aria-label="Expand"
@@ -131,16 +141,38 @@ function Tutorial(): React.ReactElement {
                         aria-label="requirements"
                         onClick={(event) => event.stopPropagation()}
                         onFocus={(event) => event.stopPropagation()}
-                        control={<Checkbox />}
+                        control={
+                          <Checkbox
+                            checked={heuristicsRequirementsSatisfied}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                dispatch(
+                                  updateHeuristicsInstallationStep({
+                                    heuristicsRequirementsSatisfied: true,
+                                  })
+                                )
+                              } else {
+                                dispatch(
+                                  updateHeuristicsInstallationStep({
+                                    heuristicsRequirementsSatisfied: false,
+                                  })
+                                )
+                              }
+                            }}
+                          />
+                        }
                         label="System Requirements"
                       />
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                      <Markdown content={requirements} />
+                      <Markdown content={Requirements} />
                     </ExpansionPanelDetails>
                   </ExpansionPanel>
 
-                  <ExpansionPanel>
+                  <ExpansionPanel
+                    disabled={!heuristicsRequirementsSatisfied}
+                    expanded={heuristicsRequirementsSatisfied && !heuristicsSetupCompleted}
+                  >
                     <ExpansionPanelSummary
                       expandIcon={<ExpandMore />}
                       aria-label="Expand"
@@ -151,16 +183,39 @@ function Tutorial(): React.ReactElement {
                         aria-label="setup"
                         onClick={(event) => event.stopPropagation()}
                         onFocus={(event) => event.stopPropagation()}
-                        control={<Checkbox />}
+                        control={
+                          <Checkbox
+                            disabled={!heuristicsRequirementsSatisfied}
+                            checked={heuristicsSetupCompleted}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                dispatch(
+                                  updateHeuristicsInstallationStep({
+                                    heuristicsSetupCompleted: true,
+                                  })
+                                )
+                              } else {
+                                dispatch(
+                                  updateHeuristicsInstallationStep({
+                                    heuristicsSetupCompleted: false,
+                                  })
+                                )
+                              }
+                            }}
+                          />
+                        }
                         label="Heuristics Setup"
                       />
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                      <Markdown content={setupSteps[browser]} />
+                      <Markdown content={Setup} />
                     </ExpansionPanelDetails>
                   </ExpansionPanel>
 
-                  <ExpansionPanel>
+                  <ExpansionPanel
+                    disabled={!heuristicsRequirementsSatisfied || !heuristicsSetupCompleted}
+                    expanded={heuristicsRequirementsSatisfied && heuristicsSetupCompleted}
+                  >
                     <ExpansionPanelSummary
                       expandIcon={<ExpandMore />}
                       aria-label="Expand"
@@ -171,11 +226,36 @@ function Tutorial(): React.ReactElement {
                         aria-label="connection"
                         onClick={(event) => event.stopPropagation()}
                         onFocus={(event) => event.stopPropagation()}
-                        control={<Checkbox />}
+                        control={
+                          <Checkbox
+                            disabled={!heuristicsConnectionEstablished}
+                            checked={heuristicsConnectionEstablished}
+                          />
+                        }
                         label="Heuristics Connection"
                       />
                     </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>Testing...</ExpansionPanelDetails>
+                    <ExpansionPanelDetails>
+                      {heuristicsConnectionEstablished &&
+                        'Connection established. Please continue with the final step.'}
+
+                      {heuristicsConnectionError &&
+                        `Encountered an issue while trying to connect: ${heuristicsConnectionError}`}
+
+                      {!heuristicsConnectionEstablished && (
+                        <div>
+                          <p>
+                            Connection not ready. If you have only just installed the heuristics
+                            engine, please restart your browser.
+                          </p>
+
+                          <Button onClick={() => dispatch(establishHeuristicsConnectionAlias())}>
+                            Try again
+                          </Button>
+                          <a href="troubleshooting.html">Troubleshooting</a>
+                        </div>
+                      )}
+                    </ExpansionPanelDetails>
                   </ExpansionPanel>
                 </>
               )) || (
@@ -186,35 +266,41 @@ function Tutorial(): React.ReactElement {
               )}
 
               <div className="flex justify-between">
-                <Button onClick={() => () => dispatch(updateTutorialProgress(0))}>
-                  Previous Step
+                <Button onClick={() => dispatch(updateProgress(0))}>Previous Step</Button>
+                <Button
+                  color="primary"
+                  disabled={
+                    !heuristicsRequirementsSatisfied ||
+                    !heuristicsSetupCompleted ||
+                    !heuristicsConnectionEstablished
+                  }
+                  onClick={() => dispatch(updateProgress(2))}
+                >
+                  Next Step
                 </Button>
-                <Button onClick={() => dispatch(updateTutorialProgress(2))}>Next Step</Button>
               </div>
             </div>
           )}
 
-          {activeStep === 2 && (
+          {progress === 2 && (
             <div>
-              <p>Start browsing and we will collect data in the background!</p>
-              <ul>
-                <li>data can be viewed and censored here: xyz ...</li>
-                <li>experimental procedures...</li>
-                <li>you can modify your groups at will...</li>
-              </ul>
-              <Button onClick={() => dispatch(updateTutorialProgress(1))}>Previous Step</Button>
-              <Button onClick={() => dispatch(updateTutorialProgress(3))}>Finish Tutorial</Button>
+              <Markdown content={DataCollection} />
+
+              <Button onClick={() => dispatch(updateProgress(1))}>Previous Step</Button>
+              <Button color="primary" onClick={() => dispatch(updateProgress(3))}>
+                Finish Tutorial
+              </Button>
             </div>
           )}
-          {activeStep === 3 && (
+
+          {progress === 3 && (
             <div>
-              <p>You have finished the tutorial...</p>
-              <p>Please send feedback to bla or fill the following form xyz...</p>
+              <Markdown content={Conclusion} />
             </div>
           )}
         </div>
 
-        <Stepper activeStep={activeStep}>
+        <Stepper activeStep={progress}>
           {STEPS.map((label) => (
             <Step key={label}>
               <StepLabel>{label}</StepLabel>
