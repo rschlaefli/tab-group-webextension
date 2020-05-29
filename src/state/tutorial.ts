@@ -65,14 +65,13 @@ export const establishHeuristicsConnection = createAsyncThunk<
     if (!state.settings.isHeuristicsBackendEnabled) {
       thunkAPI.dispatch(toggleHeuristicsBackend() as any)
     }
-    console.log('trying to establish heuristics connection')
     try {
       const browser = await getBrowserSafe()
       await browser.runtime.sendNativeMessage('tabs', { action: 'PING' })
       thunkAPI.dispatch(updateHeuristicsConnectionEstablished({ success: true }))
     } catch (e) {
       console.error(e)
-      thunkAPI.dispatch(updateHeuristicsConnectionEstablished({ error: e }))
+      thunkAPI.dispatch(updateHeuristicsConnectionEstablished({ error: e.message }))
     }
   }
 )

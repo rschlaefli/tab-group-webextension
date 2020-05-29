@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Button,
   Stepper,
@@ -194,6 +194,7 @@ function Tutorial(): React.ReactElement {
                                     heuristicsSetupCompleted: true,
                                   })
                                 )
+                                dispatch(establishHeuristicsConnectionAlias())
                               } else {
                                 dispatch(
                                   updateHeuristicsInstallationStep({
@@ -236,22 +237,27 @@ function Tutorial(): React.ReactElement {
                       />
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                      {heuristicsConnectionEstablished &&
-                        'Connection established. Please continue with the final step.'}
+                      {heuristicsConnectionEstablished && (
+                        <div>Connection established. Please continue with the final step.</div>
+                      )}
 
-                      {heuristicsConnectionError &&
-                        `Encountered an issue while trying to connect: ${heuristicsConnectionError}`}
+                      {heuristicsConnectionError && (
+                        <div>
+                          Encountered an issue while trying to connect: {heuristicsConnectionError}
+                        </div>
+                      )}
 
                       {!heuristicsConnectionEstablished && (
                         <div>
                           <p>
                             Connection not ready. If you have only just installed the heuristics
-                            engine, please restart your browser.
+                            engine, please try to restart your browser.
                           </p>
 
                           <Button onClick={() => dispatch(establishHeuristicsConnectionAlias())}>
                             Try again
                           </Button>
+
                           <a href="troubleshooting.html">Troubleshooting</a>
                         </div>
                       )}
@@ -267,15 +273,7 @@ function Tutorial(): React.ReactElement {
 
               <div className="flex justify-between">
                 <Button onClick={() => dispatch(updateProgress(0))}>Previous Step</Button>
-                <Button
-                  color="primary"
-                  disabled={
-                    !heuristicsRequirementsSatisfied ||
-                    !heuristicsSetupCompleted ||
-                    !heuristicsConnectionEstablished
-                  }
-                  onClick={() => dispatch(updateProgress(2))}
-                >
+                <Button color="primary" onClick={() => dispatch(updateProgress(2))}>
                   Next Step
                 </Button>
               </div>
