@@ -1,8 +1,7 @@
 import { createSlice, createAction, createAsyncThunk } from '@reduxjs/toolkit'
-import { browser } from 'webextension-polyfill-ts'
 
-import { performBrowserActionSafe, getBrowserSafe } from '@src/lib/utils'
-import { AppDispatch, bootstrap } from '@src/background'
+import { performBrowserActionSafe } from '@src/lib/utils'
+import { AppDispatch } from '@src/background'
 import { RootState } from './configureStore'
 import { processSettings } from '@src/lib/listeners'
 
@@ -12,7 +11,6 @@ const settingsSlice = createSlice({
     isDebugLoggingEnabled: true,
     isHeuristicsBackendEnabled: false,
     isFocusModeEnabled: false,
-    tutorialProgress: 0,
   },
   reducers: {
     updateIsDebugLoggingEnabled(state, action): void {
@@ -24,22 +22,14 @@ const settingsSlice = createSlice({
     toggleFocusMode(state): void {
       state.isFocusModeEnabled = !state.isFocusModeEnabled
     },
-    resetTutorialProgress(state): void {
-      state.tutorialProgress = 0
-    },
-    updateTutorialProgress(state, action): void {
-      state.tutorialProgress = action.payload
-    },
   },
 })
 
 const { actions, reducer } = settingsSlice
 export const {
   toggleFocusMode,
-  resetTutorialProgress,
   updateIsDebugLoggingEnabled,
   updateIsHeuristicsBackendEnabled,
-  updateTutorialProgress,
 } = actions
 export default reducer
 

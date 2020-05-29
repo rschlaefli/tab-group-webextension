@@ -7,6 +7,7 @@ import currentTabs from './currentTabs'
 import tabGroups from './tabGroups'
 import suggestions from './suggestions'
 import settings from './settings'
+import tutorial from './tutorial'
 
 const compressor = createCompressor({ whitelist: ['tabGroups'] } as any)
 
@@ -22,5 +23,6 @@ export default persistReducer(
     suggestions,
     tabGroups,
     settings,
+    tutorial,
   })
 )

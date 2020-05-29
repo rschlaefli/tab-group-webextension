@@ -1,6 +1,6 @@
 {
   "name": "automated-tab-organization",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "author": "Roland Schlaefli <rolandschlaefli@gmail.com>",
   "description": "A WebExtension for automated tab organization",
   "repository": {
@@ -95,12 +95,15 @@
     "eslint-plugin-react-hooks": "4.0.4",
     "file-loader": "6.0.0",
     "fork-ts-checker-webpack-plugin": "4.1.6",
+    "highlight.js": "10.0.3",
+    "html-loader": "1.1.0",
     "html-webpack-plugin": "4.3.0",
     "husky": "4.2.5",
     "jest": "26.0.1",
     "json-stringify-safe": "5.0.1",
     "lint-staged": "10.2.6",
     "lz-string": "1.4.4",
+    "markdown-loader": "5.1.0",
     "mini-css-extract-plugin": "0.9.0",
     "mousetrap": "1.6.5",
     "nodemon": "2.0.4",

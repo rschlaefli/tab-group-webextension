@@ -15,6 +15,7 @@ import {
 import { updateSuggestedGroups } from '@src/state/suggestions'
 import { postNativeMessage } from './utils'
 import { Store } from 'redux'
+import { RootState } from '@src/state/configureStore'
 
 const RELEVANT_TAB_PROPS = ['pinned', 'title', 'status', 'favIconUrl', 'url']
 
@@ -156,7 +157,8 @@ function removeListeners({ dispatch, getState }, nativePort?: Runtime.Port): voi
 
 let nativePort: Runtime.Port
 export const processSettings = ({ dispatch, getState }) => (settings?: unknown) => {
-  const options = settings || getState().settings
+  const currentState: RootState = getState()
+  const options: any = settings || currentState.settings
 
   console.log('[background] Processing options', options)
 
@@ -180,7 +182,8 @@ export const processSettings = ({ dispatch, getState }) => (settings?: unknown) 
     }
   }
 
-  if (typeof options.tutorialProgress !== 'undefined' && options.tutorialProgress < 3) {
+  const tutorial = currentState.tutorial
+  if (tutorial?.progress < 3) {
     browser.tabs.create({ url: 'tutorial.html' })
   }
 }

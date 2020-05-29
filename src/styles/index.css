@@ -3,11 +3,70 @@
 @import 'tailwindcss/components';
 /* purgecss end ignore */
 
-/* own component declarations start */
-
-/* own component declarations end */
-
 @import 'tailwindcss/utilities';
+
+.markdown p,
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown pre {
+  @apply mb-1;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  @apply font-bold;
+}
+
+.markdown h1 {
+  @apply text-xl;
+  @apply leading-tight;
+}
+
+.markdown h2 {
+  @apply text-lg;
+  @apply leading-tight;
+}
+
+.markdown h3 {
+  @apply text-base;
+  @apply leading-tight;
+}
+
+.markdown h4 {
+  @apply text-base;
+  @apply leading-tight;
+}
+
+.markdown p,
+.markdown li {
+  @apply text-sm;
+}
+
+.markdown pre,
+.markdown code {
+  @apply text-xs;
+}
+
+.markdown ul {
+  @apply list-disc;
+  @apply list-inside;
+}
+
+.markdown li {
+  @apply mb-1;
+}
+
+.markdown ul li ul li {
+  @apply ml-5;
+  @apply list-none;
+}
+
+.markdown a {
+  @apply text-blue-400;
+}
 
 html {
   font-size: 17px;

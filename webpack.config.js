@@ -21,15 +21,18 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+const HighlightJS = require('highlight.js')
 
 const { pipe, __ } = require('ramda')
 
 const resolveCwd = pipe(process.cwd, fs.realpathSync)
 
 const PATHS = {
-  cwd: path.resolve(resolveCwd(), '.'),
   background: path.resolve(__dirname, 'src/background.ts'),
   backgroundTemplate: path.resolve(__dirname, 'public/background.html'),
+  changelog: path.resolve(__dirname, 'public/changelog.html'),
+  cwd: path.resolve(resolveCwd(), '.'),
+  docs: path.resolve(__dirname, 'src/docs'),
   manifest: path.resolve(__dirname, 'manifest.json'),
   options: path.resolve(__dirname, 'src/options.tsx'),
   optionsTemplate: path.resolve(__dirname, 'public/options.html'),
@@ -42,6 +45,7 @@ const PATHS = {
   sidebar: path.resolve(__dirname, 'src/sidebar.ts'),
   sidebarCss: path.resolve(__dirname, 'public/sidebar.css'),
   styles: path.resolve(__dirname, 'src/styles'),
+  troubleshooting: path.resolve(__dirname, 'public/troubleshooting.html'),
   tutorial: path.resolve(__dirname, 'src/tutorial.tsx'),
   tutorialTemplate: path.resolve(__dirname, 'public/tutorial.html'),
   src: path.resolve(__dirname, 'src'),
@@ -133,6 +137,27 @@ module.exports = function (webpackEnv, _) {
               ],
             },
             {
+              // process markdown files with syntax highlighting
+              // ref: https://intoli.com/blog/webpack-markdown-setup/
+              test: /\.md$/,
+              include: [PATHS.docs],
+              use: [
+                require.resolve('html-loader'),
+                {
+                  loader: require.resolve('markdown-loader'),
+                  options: {
+                    highlight: (code, lang) => {
+                      if (!lang || ['text', 'literal', 'nohighlight'].includes(lang)) {
+                        return `<pre class="hljs">${code}</pre>`
+                      }
+                      const html = HighlightJS.highlight(lang, code).value
+                      return `<span class="hljs">${html}</span>`
+                    },
+                  },
+                },
+              ],
+            },
+            {
               // process all files that are not covered by previous loaders
               loader: require.resolve('file-loader'),
               exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
@@ -145,7 +170,7 @@ module.exports = function (webpackEnv, _) {
       ],
     },
     resolve: {
-      extensions: ['.mjs', '.js', '.ts', '.tsx', '.json'],
+      extensions: ['.mjs', '.js', '.ts', '.tsx', '.json', '.md'],
       alias: {
         '@src': PATHS.src,
       },
@@ -212,7 +237,11 @@ module.exports = function (webpackEnv, _) {
       }),
       // inject the css for the sidebar
       new CopyWebpackPlugin({
-        patterns: [{ from: PATHS.sidebarCss }],
+        patterns: [
+          { from: PATHS.sidebarCss },
+          { from: PATHS.troubleshooting },
+          { from: PATHS.changelog },
+        ],
       }),
       // dynamically generate the main extension ui page
       new HtmlWebpackPlugin({

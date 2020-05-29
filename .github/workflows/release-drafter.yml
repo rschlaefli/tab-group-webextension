@@ -6,7 +6,7 @@ name: CI
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [master, dev]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -17,10 +17,9 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Release Drafter
-      uses: release-drafter/release-drafter@v5.8.0
-      env:
+      - name: Release Drafter
+        uses: release-drafter/release-drafter@v5.8.0
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

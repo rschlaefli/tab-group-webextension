@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import md5 from 'blueimp-md5'
 import { Browser, Runtime } from 'webextension-polyfill-ts'
 import { TAB_ACTION, ITab } from '@src/types/Extension'
@@ -133,4 +134,39 @@ export async function postNativeMessage(
     console.error(e)
     return Promise.reject(e)
   }
+}
+
+type SUPPORTED_BROWSER = 'Chrome' | 'Firefox' | 'Other'
+type SUPPORTED_OS = 'Windows' | 'Mac OS' | 'Linux' | 'Other'
+
+export function useBrowserAndOS(): {
+  browser: SUPPORTED_BROWSER
+  os: SUPPORTED_OS
+  setBrowser: (newBrowser: SUPPORTED_BROWSER) => void
+  setOS: (newOS: SUPPORTED_OS) => void
+} {
+  const [browser, setBrowser] = useState<SUPPORTED_BROWSER>('Chrome')
+  const [os, setOS] = useState<SUPPORTED_OS>('Windows')
+
+  useEffect(() => {
+    if (navigator.userAgent.indexOf('Chrome') != -1) {
+      setBrowser('Chrome')
+    } else if (navigator.userAgent.indexOf('Firefox') != -1) {
+      setBrowser('Firefox')
+    } else {
+      setBrowser('Other')
+    }
+
+    if (navigator.appVersion.indexOf('Win') != -1) {
+      setOS('Windows')
+    } else if (navigator.appVersion.indexOf('Mac') != -1) {
+      setOS('Mac OS')
+    } else if (navigator.appVersion.indexOf('Linux') != -1) {
+      setOS('Linux')
+    } else {
+      setOS('Other')
+    }
+  }, [])
+
+  return { browser, os, setBrowser, setOS }
 }

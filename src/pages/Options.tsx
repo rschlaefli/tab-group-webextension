@@ -13,18 +13,19 @@ import { useSelector, useDispatch } from 'react-redux'
 import Layout from '../components/common/Layout'
 import { RootState } from '@src/state/configureStore'
 import {
-  resetTutorialProgress,
   toggleDebugLoggingAlias,
   toggleHeuristicsBackendAlias,
   reloadExtensionAlias,
 } from '@src/state/settings'
+import { resetProgress } from '@src/state/tutorial'
 
 function Options(): React.ReactElement {
   const dispatch = useDispatch()
 
-  const { tutorialProgress, isDebugLoggingEnabled, isHeuristicsBackendEnabled } = useSelector(
+  const { isDebugLoggingEnabled, isHeuristicsBackendEnabled } = useSelector(
     (state: RootState) => state.settings
   )
+  const { progress } = useSelector((state: RootState) => state.tutorial)
 
   return (
     <Layout>
@@ -41,13 +42,10 @@ function Options(): React.ReactElement {
               }
               label="Enable debug logging"
             />
-            <Button
-              disabled={tutorialProgress === 0}
-              onClick={() => dispatch(resetTutorialProgress())}
-            >
-              Reset tutorial progress
+            <Button disabled={progress === 0} onClick={() => dispatch(resetProgress())}>
+              Reset Tutorial
             </Button>
-            <Button onClick={() => dispatch(reloadExtensionAlias())}>Reload extension</Button>
+            <Button onClick={() => dispatch(reloadExtensionAlias())}>Reload Extension</Button>
           </FormGroup>
         </FormControl>
         <FormControl component="fieldset">
