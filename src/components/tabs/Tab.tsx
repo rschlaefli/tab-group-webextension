@@ -9,6 +9,8 @@ import {
 import { Delete, Close } from '@material-ui/icons'
 import { Menu, MenuItem, Typography } from '@material-ui/core'
 import clsx from 'clsx'
+import { makeStyles } from '@material-ui/core/styles'
+import useContextMenu from '@src/lib/useContextMenu'
 
 interface IProps {
   uniqueId: string
@@ -27,11 +29,6 @@ interface IProps {
   // onCloseContextMenu: () => void
 }
 
-interface IMousePosition {
-  mouseX: null | number
-  mouseY: null | number
-}
-
 const getItemStyle = (
   isDragging: boolean,
   draggableStyle?: DraggingStyle | NotDraggingStyle
@@ -41,10 +38,9 @@ const getItemStyle = (
   ...draggableStyle,
 })
 
-const initialMousePosition = {
-  mouseX: null,
-  mouseY: null,
-}
+const useStyles = makeStyles({
+  contextMenu: {},
+})
 
 function Tab({
   uniqueId,
@@ -59,18 +55,21 @@ function Tab({
   onCloseTab,
   onOpenCurrentTab,
 }: IProps): React.ReactElement {
-  const [mousePosition, setMousePosition] = useState<IMousePosition>(initialMousePosition)
+  const styles = useStyles()
 
-  const handleOpenContextMenu = (event: React.MouseEvent<HTMLDivElement>): void => {
-    event.preventDefault()
-    setMousePosition({
-      mouseX: event.clientX - 2,
-      mouseY: event.clientY - 4,
-    })
-  }
+  const {
+    isContextMenuOpen,
+    contextAnchorPosition,
+    handleOpenContextMenu,
+    handleCloseContextMenu,
+  } = useContextMenu()
 
-  const handleCloseContextMenu = (): void => {
-    setMousePosition(initialMousePosition)
+  const handleOpenTab = (url) => () => {
+    if (window.location !== window.parent.location) {
+      window.parent.location.replace(url)
+    } else {
+      window.location.replace(url)
+    }
   }
 
   return (
@@ -103,16 +102,7 @@ function Tab({
                 )}
                 {!isOpen &&
                   ((!isReadOnly || isSuggested) && url ? (
-                    <a
-                      role="button"
-                      onClick={(): void => {
-                        if (window.location !== window.parent.location) {
-                          window.parent.location.replace(url)
-                        } else {
-                          window.location.replace(url)
-                        }
-                      }}
-                    >
+                    <a role="button" onClick={handleOpenTab(url)}>
                       {title}
                     </a>
                   ) : (
@@ -143,18 +133,35 @@ function Tab({
           </div>
         )}
       </Draggable>
+
       <Menu
         keepMounted
-        open={mousePosition.mouseY !== null}
+        className={styles.contextMenu}
+        open={isContextMenuOpen}
         onClose={handleCloseContextMenu}
         anchorReference="anchorPosition"
-        anchorPosition={
-          mousePosition.mouseY !== null && mousePosition.mouseX !== null
-            ? { top: mousePosition.mouseY, left: mousePosition.mouseX }
-            : undefined
-        }
+        anchorPosition={contextAnchorPosition}
       >
-        <MenuItem onClick={handleCloseContextMenu}>Do something</MenuItem>
+        {onRemoveTab && (
+          <MenuItem dense onClick={onRemoveTab}>
+            Remove &quot;{title}&quot; From Group
+          </MenuItem>
+        )}
+        {onCloseTab && (
+          <MenuItem dense onClick={onCloseTab}>
+            Close &quot;{title}&quot;
+          </MenuItem>
+        )}
+        {isOpen && onOpenCurrentTab && (
+          <MenuItem dense onClick={onOpenCurrentTab}>
+            Switch To &quot;{title}&quot;
+          </MenuItem>
+        )}
+        {!isOpen && (!isReadOnly || isSuggested) && url && (
+          <MenuItem dense onClick={handleOpenTab(url)}>
+            Open &quot;{title}&quot;
+          </MenuItem>
+        )}
       </Menu>
     </>
   )
