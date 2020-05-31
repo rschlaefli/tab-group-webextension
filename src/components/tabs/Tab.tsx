@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Draggable,
   DraggableProvided,
@@ -10,6 +10,7 @@ import { Delete, Close } from '@material-ui/icons'
 import { Menu, MenuItem, Typography } from '@material-ui/core'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
+
 import useContextMenu from '@src/lib/useContextMenu'
 
 interface IProps {
