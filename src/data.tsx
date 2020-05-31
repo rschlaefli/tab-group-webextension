@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import withProxyStore from './lib/withProxyStore'
 import Data from './pages/Data'
 
 //load tailwind styling and reset css
