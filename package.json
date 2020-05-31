@@ -1,6 +1,6 @@
 {
   "name": "automated-tab-organization",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "author": "Roland Schlaefli <rolandschlaefli@gmail.com>",
   "description": "A WebExtension for automated tab organization",
   "repository": {
@@ -124,7 +124,9 @@
     "react-docgen-typescript-loader": "3.7.2",
     "react-docgen-typescript-webpack-plugin": "1.1.0",
     "react-dom": "16.13.1",
+    "react-dropzone": "11.0.1",
     "react-redux": "7.2.0",
+    "react-table": "7.1.0",
     "redux": "4.0.5",
     "redux-logger": "3.0.6",
     "redux-persist": "6.0.0",
