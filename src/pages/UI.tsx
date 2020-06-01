@@ -3,6 +3,7 @@ import { DragDropContext, DropResult, Droppable, DroppableProvided } from 'react
 import { useSelector, useDispatch } from 'react-redux'
 import { Button, Switch, Typography, FormControlLabel, Tooltip } from '@material-ui/core'
 import { Add, Settings, InfoRounded } from '@material-ui/icons'
+import { makeStyles } from '@material-ui/core/styles'
 
 import TabGroup from '@src/components/tabs/TabGroup'
 import { ITabGroup } from '@src/types/Extension'
@@ -17,14 +18,17 @@ import {
   collapseGroup,
   openTabGroupAlias,
   closeTabGroupAlias,
+  closeTabsOutsideGroupAlias,
 } from '@src/state/tabGroups'
 import {
   collapseCurrentTabs,
   closeCurrentTabAlias,
   openCurrentTabAlias,
+  collapseRecentTabs,
 } from '@src/state/currentTabs'
 import { RootState } from '@src/state/configureStore'
 import { toggleFocusMode, openOptionsPageAlias } from '@src/state/settings'
+import clsx from 'clsx'
 
 const extractDragEventProperties = (dragEvent: DropResult): any => ({
   sourceGroupId: dragEvent.source.droppableId,
@@ -33,7 +37,19 @@ const extractDragEventProperties = (dragEvent: DropResult): any => ({
   targetTabIndex: dragEvent?.destination?.index,
 })
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    background: theme.palette.type === 'dark' ? 'rgba(0, 0, 0, 0.02)' : 'rgba(0, 0, 0, 0.02)',
+    marginBottom: '0.5rem',
+    '&:hover': {
+      background: theme.palette.type === 'dark' ? 'rgba(0, 0, 0, 0.01)' : 'rgba(0, 0, 0, 0.01)',
+    },
+  },
+}))
+
 function UI(): React.ReactElement {
+  const styles = useStyles()
+
   const dispatch = useDispatch()
 
   const currentTabs = useSelector((state: RootState) => state.currentTabs)
@@ -102,8 +118,12 @@ function UI(): React.ReactElement {
     dispatch(collapseCurrentTabs())
   }
 
-  const handleCloseCurrentTab = (tabId: number) => (): void => {
-    dispatch(closeCurrentTabAlias(tabId))
+  const handleCollapseRecentTabs = (): void => {
+    dispatch(collapseRecentTabs())
+  }
+
+  const handleCloseCurrentTab = (tabHash: string) => (): void => {
+    dispatch(closeCurrentTabAlias(tabHash))
   }
 
   const handleOpenCurrentTab = (tabHash: string) => (): void => {
@@ -112,6 +132,10 @@ function UI(): React.ReactElement {
 
   const handleCloseTabGroup = (sourceGroupId: string) => (): void => {
     dispatch(closeTabGroupAlias(sourceGroupId))
+  }
+
+  const handleCloseTabsOutsideGroup = (sourceGroupId: string) => (): void => {
+    dispatch(closeTabsOutsideGroupAlias(sourceGroupId))
   }
 
   const handleToggleFocusMode = async (): Promise<void> => {
@@ -158,6 +182,20 @@ function UI(): React.ReactElement {
           <div className="flex flex-col md:flex-wrap md:flex-row">
             <TabGroup
               isReadOnly
+              isDragDisabled
+              isDropDisabled
+              id="recent"
+              name="Recent Tabs"
+              tabs={currentTabs.recentTabs}
+              currentTabs={currentTabs.tabHashes}
+              isCollapsed={currentTabs.recentTabsCollapsed}
+              onCollapseGroup={handleCollapseRecentTabs}
+              onOpenCurrentTab={handleOpenCurrentTab}
+            />
+
+            <TabGroup
+              isReadOnly
+              isDropDisabled
               id="current"
               name="Current Tabs"
               tabs={currentTabs.tabs}
@@ -183,7 +221,9 @@ function UI(): React.ReactElement {
                 onOpenTabGroup={handleOpenTabGroup(tabGroup.id)}
                 onChangeGroupName={handleRenameTabGroup(tabGroup.id)}
                 onOpenCurrentTab={handleOpenCurrentTab}
+                onCloseTab={handleCloseCurrentTab}
                 onCloseTabGroup={handleCloseTabGroup(tabGroup.id)}
+                onCloseTabsOutsideGroup={handleCloseTabsOutsideGroup(tabGroup.id)}
               />
             ))}
 
@@ -192,8 +232,7 @@ function UI(): React.ReactElement {
                 <Button
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  fullWidth
-                  className="min-h-8 md:min-w-xxs md:max-w-xxs"
+                  className={clsx(styles.root, 'w-full min-h-8 md:w-56')}
                   onClick={handleAddTabGroup}
                   title="add group"
                 >
@@ -215,6 +254,8 @@ function UI(): React.ReactElement {
                     // TODO: pass down current tabs and mark tabs that are open
                     // TODO: disable window display for tabs that are not open
                     isSuggested
+                    isDropDisabled
+                    isDragDisabled
                     isReadOnly
                     key={tabGroup.id}
                     id={tabGroup.id}

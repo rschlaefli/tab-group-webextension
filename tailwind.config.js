@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 module.exports = {
   prefix: '',
   important: false,
@@ -310,10 +311,11 @@ module.exports = {
       ...theme('spacing'),
       ...negative(theme('spacing')),
     }),
-    maxHeight: {
+    maxHeight: (theme) => ({
+      ...theme('spacing'),
       full: '100%',
       screen: '100vh',
-    },
+    }),
     maxWidth: (theme, { breakpoints }) => ({
       none: 'none',
       xxs: '16rem',
