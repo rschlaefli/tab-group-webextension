@@ -65,6 +65,8 @@ describe('currentTabsReducer', () => {
     tabs: ITab[]
     tabHashes: (string | null)[]
     collapsed: boolean
+    recentTabs: ITab[]
+    recentTabsCollapsed: boolean
   }
 
   beforeAll(() => {
@@ -75,6 +77,8 @@ describe('currentTabsReducer', () => {
       tabs: [],
       tabHashes: [],
       collapsed: false,
+      recentTabs: [],
+      recentTabsCollapsed: true,
     }
   })
 
@@ -83,6 +87,7 @@ describe('currentTabsReducer', () => {
 
     expect(currentState.tabs).toHaveLength(0)
     expect(currentState.tabHashes).toHaveLength(0)
+    expect(currentState.recentTabs).toHaveLength(0)
   })
 
   it('creates a new tab', () => {
@@ -90,6 +95,7 @@ describe('currentTabsReducer', () => {
 
     expect(currentState.tabs).toHaveLength(1)
     expect(currentState.tabs[0].title).toEqual('test tab 2')
+    expect(currentState.recentTabs).toHaveLength(0)
 
     expect(currentState.tabHashes).toMatchInlineSnapshot(`
       Array [
@@ -102,6 +108,7 @@ describe('currentTabsReducer', () => {
     currentState = currentTabsReducer(currentState, activateTab({ tabId: 1 }))
 
     expect(currentState.activeTab).toEqual(1)
+    expect(currentState.recentTabs).toHaveLength(0)
   })
 
   it('updates the new tab to another url', () => {
@@ -109,6 +116,7 @@ describe('currentTabsReducer', () => {
 
     expect(currentState.tabs).toHaveLength(1)
     expect(currentState.tabs[0].title).toEqual('test tab 3')
+    expect(currentState.recentTabs).toHaveLength(0)
 
     expect(currentState.tabHashes).toMatchInlineSnapshot(`
       Array [
@@ -123,6 +131,7 @@ describe('currentTabsReducer', () => {
     expect(currentState.tabs).toHaveLength(2)
     expect(currentState.tabHashes).toHaveLength(2)
     expect(currentState.tabs[1].title).toEqual('test tab 1')
+    expect(currentState.recentTabs).toHaveLength(0)
 
     expect(currentState.tabHashes).toMatchInlineSnapshot(`
       Array [
@@ -143,6 +152,7 @@ describe('currentTabsReducer', () => {
         "abcd",
       ]
     `)
+    expect(currentState.recentTabs).toHaveLength(1)
   })
 
   it('can be collapsed', () => {
