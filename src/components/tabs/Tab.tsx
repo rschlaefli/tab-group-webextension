@@ -22,6 +22,7 @@ interface IProps {
   isOpen?: boolean
   isReadOnly?: boolean
   isSuggested?: boolean
+  isDragDisabled?: boolean
   faviconUrl?: string
   onRemoveTab?: (() => void) | false
   onCloseTab?: (() => void) | false
@@ -51,6 +52,7 @@ function Tab({
   isOpen,
   isReadOnly,
   isSuggested,
+  isDragDisabled,
   faviconUrl,
   onRemoveTab,
   onCloseTab,
@@ -79,11 +81,16 @@ function Tab({
 
   return (
     <>
-      <Draggable key={uniqueId} draggableId={`draggable-${uniqueId}`} index={index}>
+      <Draggable
+        key={uniqueId}
+        draggableId={`draggable-${uniqueId}`}
+        index={index}
+        isDragDisabled={isDragDisabled}
+      >
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot): React.ReactElement => (
           <div
             className={clsx(
-              'flex flex-row items-center justify-start px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0',
+              'flex flex-row w-56 h-6 items-center justify-start px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0',
               !isReadOnly && isOpen && 'bg-orange-200 dark:bg-gray-700'
             )}
             ref={provided.innerRef}
@@ -93,12 +100,12 @@ function Tab({
             onContextMenu={handleOpenContextMenu}
           >
             {!isSuggested && (
-              <div className="flex-initial w-4 h-4 mr-2">
+              <div className="flex-none w-3 h-3 mr-2">
                 <img src={faviconUrl} />
               </div>
             )}
 
-            <div className="flex-1 leading-tight max-w-5/6">
+            <div className="flex-auto w-40 leading-tight">
               <Typography noWrap display="block" variant="inherit" title={title}>
                 {isOpen && onOpenCurrentTab && (
                   <a role="button" onClick={onOpenCurrentTab as any}>

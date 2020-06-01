@@ -163,6 +163,8 @@ function UI(): React.ReactElement {
           <div className="flex flex-col md:flex-wrap md:flex-row">
             <TabGroup
               isReadOnly
+              isDragDisabled
+              isDropDisabled
               id="recent"
               name="Recent Tabs"
               tabs={currentTabs.recentTabs}
@@ -174,6 +176,7 @@ function UI(): React.ReactElement {
 
             <TabGroup
               isReadOnly
+              isDropDisabled
               id="current"
               name="Current Tabs"
               tabs={currentTabs.tabs}
@@ -232,6 +235,8 @@ function UI(): React.ReactElement {
                     // TODO: pass down current tabs and mark tabs that are open
                     // TODO: disable window display for tabs that are not open
                     isSuggested
+                    isDropDisabled
+                    isDragDisabled
                     isReadOnly
                     key={tabGroup.id}
                     id={tabGroup.id}

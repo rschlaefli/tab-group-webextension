@@ -17,6 +17,8 @@ interface IProps {
   isReadOnly?: boolean
   isCollapsed?: boolean
   isSuggested?: boolean
+  isDropDisabled?: boolean
+  isDragDisabled?: boolean
   onCollapseGroup?: () => void
   onRemoveTab?: (tabIndex: number) => () => void
   onRemoveTabGroup?: () => void
@@ -40,6 +42,8 @@ function TabGroup({
   isReadOnly,
   isCollapsed,
   isSuggested,
+  isDropDisabled,
+  isDragDisabled,
   onCollapseGroup,
   onChangeGroupName,
   onOpenTabGroup,
@@ -59,11 +63,15 @@ function TabGroup({
 
   return (
     <>
-      <Droppable ignoreContainerClipping droppableId={id} isDropDisabled={isSuggested}>
+      <Droppable
+        ignoreContainerClipping
+        droppableId={id}
+        isDropDisabled={isSuggested || isDropDisabled}
+      >
         {(provided: DroppableProvided, snapshot: DroppableStateSnapshot): React.ReactElement => (
           <div
             className={clsx(
-              'flex-1 mb-2 border border-solid md:mr-2 md:last:mr-0 md:max-w-xxs md:min-w-xxs md:max-h-64 dark:border-gray-500',
+              'flex-initial mb-2 border border-solid md:mr-2 md:last:mr-0 md:w-56 dark:border-gray-500',
               isSuggested && ''
             )}
             ref={provided.innerRef}
@@ -71,7 +79,7 @@ function TabGroup({
             style={getListStyle(snapshot.isDraggingOver)}
           >
             <div
-              className="flex flex-row items-center justify-between px-2 py-1 bg-gray-100 dark:text-gray-900 dark:bg-gray-700"
+              className="flex flex-row items-center justify-between h-6 px-2 py-1 bg-gray-100 dark:text-gray-900 dark:bg-gray-700"
               onContextMenu={handleOpenContextMenu}
             >
               <button
@@ -152,11 +160,7 @@ function TabGroup({
             </div>
 
             <div
-              className={clsx(
-                'min-h-8 overflow-y-auto',
-                tabs.length > 0 && isCollapsed && 'hidden',
-                'md:block'
-              )}
+              className={clsx('min-h-8', tabs.length > 0 && isCollapsed && 'hidden', 'md:block')}
             >
               {tabs
                 .filter((tab) => typeof tab.id !== 'undefined')
@@ -171,6 +175,7 @@ function TabGroup({
                       url={tab.url}
                       faviconUrl={tab.favIconUrl}
                       windowId={tab.windowId}
+                      isDragDisabled={isDragDisabled}
                       isReadOnly={isReadOnly}
                       isOpen={!!tab.hash && currentTabs && currentTabs.includes(tab.hash)}
                       isSuggested={isSuggested}
