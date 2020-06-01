@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
 import { Tabs, Runtime } from 'webextension-polyfill-ts'
-import { append, findIndex, remove, update, find, keys, any } from 'ramda'
+import { take, prepend, append, findIndex, remove, update, find, keys, any } from 'ramda'
 import { getBrowserSafe, augmentTabExtras, postNativeMessage } from '@src/lib/utils'
 import { ITab, TAB_ACTION } from '@src/types/Extension'
 import { AppDispatch } from '@src/background'
@@ -15,10 +15,15 @@ const currentTabsSlice = createSlice({
     tabs: [] as ITab[],
     tabHashes: [] as (string | null)[],
     collapsed: false,
+    recentTabs: [] as ITab[],
+    recentTabsCollapsed: true,
   },
   reducers: {
     collapseCurrentTabs(state): void {
       state.collapsed = !state.collapsed
+    },
+    collapseRecentTabs(state): void {
+      state.recentTabsCollapsed = !state.recentTabsCollapsed
     },
     updateTabs(state, action): void {
       // initialize derived properties for all existing tabs
@@ -71,10 +76,15 @@ const currentTabsSlice = createSlice({
       const tabIndex = findIndex((tab) => tab.id === action.payload.tabId, state.tabs)
 
       if (tabIndex > -1) {
+        const tabData = state.tabs[tabIndex]
+        console.log('[currentTabs] REMOVE', tabData, state.recentTabs)
+
+        if (tabData.title !== 'New Tab') {
+          state.recentTabs = take(5, prepend(tabData, state.recentTabs))
+        }
+
         state.tabs = remove(tabIndex, 1, state.tabs)
         state.tabHashes = remove(tabIndex, 1, state.tabHashes)
-
-        console.log('[currentTabs] REMOVE', state.tabs[tabIndex])
       }
     },
   },
@@ -82,6 +92,7 @@ const currentTabsSlice = createSlice({
 
 const { actions, reducer } = currentTabsSlice
 export const {
+  collapseRecentTabs,
   collapseCurrentTabs,
   createTab,
   updateTab,
@@ -138,7 +149,6 @@ export const closeCurrentTab = createAsyncThunk<
 >(
   'currentTabs/closeCurrentTab',
   async ({ payload: tabHash }, thunkAPI): Promise<void> => {
-    console.log('closing current tab', tabHash)
     await thunkAPI.dispatch(closeTabsWithHashes([tabHash]) as any)
   }
 )

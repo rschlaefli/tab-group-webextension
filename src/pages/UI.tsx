@@ -22,6 +22,7 @@ import {
   collapseCurrentTabs,
   closeCurrentTabAlias,
   openCurrentTabAlias,
+  collapseRecentTabs,
 } from '@src/state/currentTabs'
 import { RootState } from '@src/state/configureStore'
 import { toggleFocusMode, openOptionsPageAlias } from '@src/state/settings'
@@ -102,6 +103,10 @@ function UI(): React.ReactElement {
     dispatch(collapseCurrentTabs())
   }
 
+  const handleCollapseRecentTabs = (): void => {
+    dispatch(collapseRecentTabs())
+  }
+
   const handleCloseCurrentTab = (tabHash: string) => (): void => {
     dispatch(closeCurrentTabAlias(tabHash))
   }
@@ -156,6 +161,17 @@ function UI(): React.ReactElement {
           </div>
 
           <div className="flex flex-col md:flex-wrap md:flex-row">
+            <TabGroup
+              isReadOnly
+              id="recent"
+              name="Recent Tabs"
+              tabs={currentTabs.recentTabs}
+              currentTabs={currentTabs.tabHashes}
+              isCollapsed={currentTabs.recentTabsCollapsed}
+              onCollapseGroup={handleCollapseRecentTabs}
+              onOpenCurrentTab={handleOpenCurrentTab}
+            />
+
             <TabGroup
               isReadOnly
               id="current"

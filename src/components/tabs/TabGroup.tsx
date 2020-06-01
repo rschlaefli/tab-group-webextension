@@ -63,7 +63,7 @@ function TabGroup({
         {(provided: DroppableProvided, snapshot: DroppableStateSnapshot): React.ReactElement => (
           <div
             className={clsx(
-              'flex-1 mb-2 border border-solid md:mr-2 md:last:mr-0 md:max-w-xxs md:min-w-xxs dark:border-gray-500',
+              'flex-1 mb-2 border border-solid md:mr-2 md:last:mr-0 md:max-w-xxs md:min-w-xxs md:max-h-64 dark:border-gray-500',
               isSuggested && ''
             )}
             ref={provided.innerRef}
@@ -89,9 +89,11 @@ function TabGroup({
                   <ArrowDropUp fontSize="inherit" />
                 )}
               </button>
+
               <h1 className="w-full mr-2 text-xs font-bold text-gray-600 dark:text-gray-400">
                 {isReadOnly ? name : <Input fullWidth value={name} onChange={onChangeGroupName} />}
               </h1>
+
               <div className="flex flex-row">
                 {(!isReadOnly || isSuggested) && (
                   <button
@@ -146,7 +148,11 @@ function TabGroup({
             </div>
 
             <div
-              className={clsx('min-h-8', tabs.length > 0 && isCollapsed && 'hidden', 'md:block')}
+              className={clsx(
+                'min-h-8 overflow-y-auto',
+                tabs.length > 0 && isCollapsed && 'hidden',
+                'md:block'
+              )}
             >
               {tabs
                 .filter((tab) => typeof tab.id !== 'undefined')

@@ -106,7 +106,7 @@ function Tab({
                   </a>
                 )}
                 {!isOpen &&
-                  ((!isReadOnly || isSuggested) && url ? (
+                  (url ? (
                     <a role="button" onClick={handleOpenTab(url)}>
                       {title}
                     </a>

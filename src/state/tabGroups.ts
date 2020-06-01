@@ -241,6 +241,17 @@ export const openTabGroup = createAsyncThunk<
     if (tabGroupIndex > -1) {
       const tabGroup = state.tabGroups[tabGroupIndex]
 
+      await Promise.all(
+        tabGroup.tabs.map(async (tab) => {
+          // if the tab to be opened is already open, dispatch the openCurrentTab functionality instead
+          if (tab.hash && state.currentTabs.tabHashes.includes(tab.hash)) {
+            await thunkAPI.dispatch(openCurrentTab({ payload: tab.hash }) as any)
+          } else {
+            await browser.tabs.create({ url: tab.url })
+          }
+        })
+      )
+
       // if focus mode is enabled, close all of the tabs belonging to other groups
       // but only if they are not also a member of the selected group
       if (state.settings.isFocusModeEnabled) {
@@ -256,19 +267,6 @@ export const openTabGroup = createAsyncThunk<
 
         await thunkAPI.dispatch(closeTabsWithHashes(tabHashesFromOtherGroups) as any)
       }
-
-      await Promise.all(
-        tabGroup.tabs.map(async (tab) => {
-          // if the tab to be opened is already open, dispatch the openCurrentTab functionality instead
-          if (tab.hash && state.currentTabs.tabHashes.includes(tab.hash)) {
-            await thunkAPI.dispatch(openCurrentTab({ payload: tab.hash }) as any)
-          } else {
-            await browser.tabs.create({
-              url: tab.url,
-            })
-          }
-        })
-      )
 
       // close the new tab page if we open a group
       if (_sender?.tab?.url && _sender.tab.id) {
