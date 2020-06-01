@@ -90,7 +90,7 @@ function Tab({
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot): React.ReactElement => (
           <div
             className={clsx(
-              'flex flex-row w-56 h-6 items-center justify-start px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0',
+              'flex flex-row h-6 items-center justify-start px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0',
               !isReadOnly && isOpen && 'bg-orange-200 dark:bg-gray-700'
             )}
             ref={provided.innerRef}
