@@ -115,18 +115,6 @@ export const initializeCurrentTabs = createAsyncThunk<
   }
 )
 
-export const closeCurrentTab = createAsyncThunk<
-  void,
-  { _sender?: any; payload: number },
-  { dispatch: AppDispatch; state: RootState }
->(
-  'currentTabs/closeCurrentTab',
-  async ({ payload: tabId }): Promise<void> => {
-    const browser = await getBrowserSafe()
-    await browser.tabs.remove(tabId)
-  }
-)
-
 export const closeTabsWithHashes = createAsyncThunk<
   void,
   (string | null)[],
@@ -140,6 +128,18 @@ export const closeTabsWithHashes = createAsyncThunk<
     const matchingTabs = state.currentTabs.tabs.filter((tab) => tabHashes.includes(tab.hash))
 
     await Promise.all(matchingTabs.map((tab) => browser.tabs.remove(tab.id)))
+  }
+)
+
+export const closeCurrentTab = createAsyncThunk<
+  void,
+  { _sender?: any; payload: string },
+  { dispatch: AppDispatch; state: RootState }
+>(
+  'currentTabs/closeCurrentTab',
+  async ({ payload: tabHash }, thunkAPI): Promise<void> => {
+    console.log('closing current tab', tabHash)
+    await thunkAPI.dispatch(closeTabsWithHashes([tabHash]) as any)
   }
 )
 
@@ -264,7 +264,7 @@ export const removeTabAndNotify = createAsyncThunk<void, any, { dispatch: AppDis
 
 // ALIASES
 export const openCurrentTabAlias = createAction<string>('currentTabs/openCurrentTabAlias')
-export const closeCurrentTabAlias = createAction<number>('currentTabs/closeCurrentTabAlias')
+export const closeCurrentTabAlias = createAction<string>('currentTabs/closeCurrentTabAlias')
 export const currentTabsAliases = {
   [openCurrentTabAlias.type]: openCurrentTab,
   [closeCurrentTabAlias.type]: closeCurrentTab,

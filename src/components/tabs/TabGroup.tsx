@@ -22,7 +22,7 @@ interface IProps {
   onRemoveTabGroup?: () => void
   onChangeGroupName?: (newName: string) => void
   onOpenTabGroup?: () => void
-  onCloseTab?: (tabId: number) => () => void
+  onCloseTab?: (tabHash: string) => () => void
   onSaveSuggestion?: () => void
   onOpenCurrentTab?: (tabHash: string) => () => void
   onCloseTabGroup?: () => void
@@ -113,14 +113,14 @@ function TabGroup({
                   >
                     <Close fontSize="inherit" />
                   </button>,
-                  <button
-                    key="remove"
-                    className="ml-2 text-sm text-gray-600 dark:text-gray-400"
-                    onClick={onRemoveTabGroup}
-                    title="remove group"
-                  >
-                    <Delete fontSize="inherit" />
-                  </button>,
+                  // <button
+                  //   key="remove"
+                  //   className="ml-2 text-sm text-gray-600 dark:text-gray-400"
+                  //   onClick={onRemoveTabGroup}
+                  //   title="remove group"
+                  // >
+                  //   <Delete fontSize="inherit" />
+                  // </button>,
                 ]}
 
                 {isSuggested && [
@@ -165,7 +165,7 @@ function TabGroup({
                       isOpen={!!tab.hash && currentTabs && currentTabs.includes(tab.hash)}
                       isSuggested={isSuggested}
                       onRemoveTab={onRemoveTab && onRemoveTab(index)}
-                      onCloseTab={onCloseTab && onCloseTab(tab.id as number)}
+                      onCloseTab={!!tab.hash && onCloseTab && onCloseTab(tab.hash)}
                       onOpenCurrentTab={
                         !!tab.hash && onOpenCurrentTab && onOpenCurrentTab(tab.hash)
                       }
@@ -187,13 +187,15 @@ function TabGroup({
         anchorPosition={contextAnchorPosition}
       >
         {(!isReadOnly || isSuggested) && (
-          <MenuItem onClick={onOpenTabGroup}>Open Tab Group</MenuItem>
+          <MenuItem dense onClick={onOpenTabGroup}>
+            Open Tab Group
+          </MenuItem>
         )}
         {!isReadOnly && [
-          <MenuItem key="close" onClick={onCloseTabGroup}>
+          <MenuItem dense key="close" onClick={onCloseTabGroup}>
             Close Tab Group
           </MenuItem>,
-          <MenuItem key="remove" onClick={onRemoveTabGroup}>
+          <MenuItem dense key="remove" onClick={onRemoveTabGroup}>
             Remove Tab Group
           </MenuItem>,
         ]}

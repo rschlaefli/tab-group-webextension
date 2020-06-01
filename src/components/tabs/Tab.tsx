@@ -6,7 +6,7 @@ import {
   DraggingStyle,
   NotDraggingStyle,
 } from 'react-beautiful-dnd'
-import { Delete, Close } from '@material-ui/icons'
+import { Close } from '@material-ui/icons'
 import { Menu, MenuItem, Typography } from '@material-ui/core'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
@@ -26,8 +26,6 @@ interface IProps {
   onRemoveTab?: (() => void) | false
   onCloseTab?: (() => void) | false
   onOpenCurrentTab?: (() => void) | false
-  // onOpenContextMenu: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
-  // onCloseContextMenu: () => void
 }
 
 const getItemStyle = (
@@ -112,19 +110,13 @@ function Tab({
               </Typography>
             </div>
 
-            {onRemoveTab && !isReadOnly && (
-              <button
-                className="flex-auto ml-2 text-sm text-right text-gray-600 dark:text-gray-400"
-                onClick={onRemoveTab}
-                title="remove tab"
-              >
-                <Delete fontSize="inherit" />
-              </button>
-            )}
-
             {onCloseTab && (
               <button
-                className="flex-auto ml-2 text-sm text-right text-gray-600 dark:text-gray-400"
+                disabled={!isOpen}
+                className={clsx(
+                  'flex-auto ml-2 text-sm text-right ',
+                  isOpen ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400 dark:text-gray-600'
+                )}
                 onClick={onCloseTab}
                 title="close tab"
               >
@@ -143,24 +135,26 @@ function Tab({
         anchorReference="anchorPosition"
         anchorPosition={contextAnchorPosition}
       >
-        {onRemoveTab && (
-          <MenuItem dense onClick={onRemoveTab}>
-            Remove &quot;{title}&quot; From Group
-          </MenuItem>
-        )}
-        {onCloseTab && (
-          <MenuItem dense onClick={onCloseTab}>
-            Close &quot;{title}&quot;
-          </MenuItem>
-        )}
         {isOpen && onOpenCurrentTab && (
           <MenuItem dense onClick={onOpenCurrentTab}>
             Switch To &quot;{title}&quot;
           </MenuItem>
         )}
+
         {!isOpen && (!isReadOnly || isSuggested) && url && (
           <MenuItem dense onClick={handleOpenTab(url)}>
             Open &quot;{title}&quot;
+          </MenuItem>
+        )}
+        {isOpen && onCloseTab && (
+          <MenuItem dense onClick={onCloseTab}>
+            Close &quot;{title}&quot;
+          </MenuItem>
+        )}
+
+        {!isReadOnly && onRemoveTab && (
+          <MenuItem dense onClick={onRemoveTab}>
+            Remove &quot;{title}&quot; From Group
           </MenuItem>
         )}
       </Menu>

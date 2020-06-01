@@ -102,8 +102,8 @@ function UI(): React.ReactElement {
     dispatch(collapseCurrentTabs())
   }
 
-  const handleCloseCurrentTab = (tabId: number) => (): void => {
-    dispatch(closeCurrentTabAlias(tabId))
+  const handleCloseCurrentTab = (tabHash: string) => (): void => {
+    dispatch(closeCurrentTabAlias(tabHash))
   }
 
   const handleOpenCurrentTab = (tabHash: string) => (): void => {
@@ -183,6 +183,7 @@ function UI(): React.ReactElement {
                 onOpenTabGroup={handleOpenTabGroup(tabGroup.id)}
                 onChangeGroupName={handleRenameTabGroup(tabGroup.id)}
                 onOpenCurrentTab={handleOpenCurrentTab}
+                onCloseTab={handleCloseCurrentTab}
                 onCloseTabGroup={handleCloseTabGroup(tabGroup.id)}
               />
             ))}
