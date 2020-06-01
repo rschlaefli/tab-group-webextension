@@ -38,7 +38,9 @@ const getItemStyle = (
 })
 
 const useStyles = makeStyles({
-  contextMenu: {},
+  contextMenu: {
+    maxWidth: 400,
+  },
 })
 
 function Tab({
@@ -137,24 +139,40 @@ function Tab({
       >
         {isOpen && onOpenCurrentTab && (
           <MenuItem dense onClick={onOpenCurrentTab}>
-            Switch To &quot;{title}&quot;
+            Switch To &quot;
+            <Typography noWrap variant="inherit">
+              {title}
+            </Typography>
+            &quot;
           </MenuItem>
         )}
 
         {!isOpen && (!isReadOnly || isSuggested) && url && (
           <MenuItem dense onClick={handleOpenTab(url)}>
-            Open &quot;{title}&quot;
+            Open &quot;
+            <Typography noWrap variant="inherit">
+              {title}
+            </Typography>
+            &quot;
           </MenuItem>
         )}
         {isOpen && onCloseTab && (
           <MenuItem dense onClick={onCloseTab}>
-            Close &quot;{title}&quot;
+            Close &quot;
+            <Typography noWrap variant="inherit">
+              {title}
+            </Typography>
+            &quot;
           </MenuItem>
         )}
 
         {!isReadOnly && onRemoveTab && (
           <MenuItem dense onClick={onRemoveTab}>
-            Remove &quot;{title}&quot; From Group
+            Remove &quot;
+            <Typography noWrap variant="inherit">
+              {title}
+            </Typography>
+            &quot; From Group
           </MenuItem>
         )}
       </Menu>
