@@ -91,7 +91,11 @@ function TabGroup({
               </button>
 
               <h1 className="w-full mr-2 text-xs font-bold text-gray-600 dark:text-gray-400">
-                {isReadOnly ? name : <Input fullWidth value={name} onChange={onChangeGroupName} />}
+                {isReadOnly ? (
+                  `${name} (${tabs.length})`
+                ) : (
+                  <Input fullWidth value={name} onChange={onChangeGroupName} />
+                )}
               </h1>
 
               <div className="flex flex-row">
