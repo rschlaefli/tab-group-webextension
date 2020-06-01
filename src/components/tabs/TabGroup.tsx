@@ -180,7 +180,7 @@ function TabGroup({
       </Droppable>
 
       <Menu
-        keepMounted
+        onClickCapture={handleCloseContextMenu}
         open={isContextMenuOpen}
         onClose={handleCloseContextMenu}
         anchorReference="anchorPosition"

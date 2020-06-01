@@ -65,11 +65,15 @@ function Tab({
     handleCloseContextMenu,
   } = useContextMenu()
 
-  const handleOpenTab = (url) => () => {
-    if (window.location !== window.parent.location) {
-      window.parent.location.replace(url)
+  const handleOpenTab = (url, newTab = false) => () => {
+    if (newTab) {
+      window.open(url, '_blank')
     } else {
-      window.location.replace(url)
+      if (window.location !== window.parent.location) {
+        window.parent.location.replace(url)
+      } else {
+        window.location.replace(url)
+      }
     }
   }
 
@@ -130,7 +134,7 @@ function Tab({
       </Draggable>
 
       <Menu
-        keepMounted
+        onClickCapture={handleCloseContextMenu}
         className={styles.contextMenu}
         open={isContextMenuOpen}
         onClose={handleCloseContextMenu}
@@ -147,15 +151,24 @@ function Tab({
           </MenuItem>
         )}
 
-        {!isOpen && (!isReadOnly || isSuggested) && url && (
-          <MenuItem dense onClick={handleOpenTab(url)}>
-            Open &quot;
-            <Typography noWrap variant="inherit">
-              {title}
-            </Typography>
-            &quot;
-          </MenuItem>
-        )}
+        {!isOpen &&
+          (!isReadOnly || isSuggested) &&
+          url && [
+            <MenuItem dense key="open" onClick={handleOpenTab(url)}>
+              Open &quot;
+              <Typography noWrap variant="inherit">
+                {title}
+              </Typography>
+              &quot;
+            </MenuItem>,
+            <MenuItem dense key="openBlank" onClick={handleOpenTab(url, true)}>
+              Open &quot;
+              <Typography noWrap variant="inherit">
+                {title}
+              </Typography>
+              &quot; in New Tab
+            </MenuItem>,
+          ]}
         {isOpen && onCloseTab && (
           <MenuItem dense onClick={onCloseTab}>
             Close &quot;
