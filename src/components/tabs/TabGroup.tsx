@@ -28,6 +28,7 @@ interface IProps {
   onSaveSuggestion?: () => void
   onOpenCurrentTab?: (tabHash: string) => () => void
   onCloseTabGroup?: () => void
+  onCloseTabsOutsideGroup?: () => void
 }
 
 const getListStyle = (isDraggingOver: boolean): any => ({
@@ -53,6 +54,7 @@ function TabGroup({
   onSaveSuggestion,
   onOpenCurrentTab,
   onCloseTabGroup,
+  onCloseTabsOutsideGroup,
 }: IProps): React.ReactElement {
   const {
     isContextMenuOpen,
@@ -206,9 +208,13 @@ function TabGroup({
             Open Tab Group
           </MenuItem>
         )}
+
         {!isReadOnly && [
           <MenuItem dense key="close" onClick={onCloseTabGroup}>
             Close Tab Group
+          </MenuItem>,
+          <MenuItem dense key="closeOutside" onClick={onCloseTabsOutsideGroup}>
+            Close All Except Group
           </MenuItem>,
           <MenuItem dense key="remove" onClick={onRemoveTabGroup}>
             Remove Tab Group

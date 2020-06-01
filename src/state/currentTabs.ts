@@ -128,15 +128,20 @@ export const initializeCurrentTabs = createAsyncThunk<
 
 export const closeTabsWithHashes = createAsyncThunk<
   void,
-  (string | null)[],
+  { keepHashes?: (string | null)[]; closeHashes?: (string | null)[] },
   { dispatch: AppDispatch; state: RootState }
 >(
   'currentTabs/closeTabsWithHashes',
-  async (tabHashes, thunkAPI): Promise<void> => {
+  async ({ keepHashes, closeHashes }, thunkAPI): Promise<void> => {
     const browser = await getBrowserSafe()
     const state = thunkAPI.getState()
 
-    const matchingTabs = state.currentTabs.tabs.filter((tab) => tabHashes.includes(tab.hash))
+    let matchingTabs = [] as ITab[]
+    if (keepHashes) {
+      matchingTabs = state.currentTabs.tabs.filter((tab) => !keepHashes.includes(tab.hash))
+    } else if (closeHashes) {
+      matchingTabs = state.currentTabs.tabs.filter((tab) => closeHashes.includes(tab.hash))
+    }
 
     await Promise.all(matchingTabs.map((tab) => browser.tabs.remove(tab.id)))
   }
@@ -149,7 +154,7 @@ export const closeCurrentTab = createAsyncThunk<
 >(
   'currentTabs/closeCurrentTab',
   async ({ payload: tabHash }, thunkAPI): Promise<void> => {
-    await thunkAPI.dispatch(closeTabsWithHashes([tabHash]) as any)
+    await thunkAPI.dispatch(closeTabsWithHashes({ closeHashes: [tabHash] }) as any)
   }
 )
 

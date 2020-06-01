@@ -18,6 +18,7 @@ import {
   collapseGroup,
   openTabGroupAlias,
   closeTabGroupAlias,
+  closeTabsOutsideGroupAlias,
 } from '@src/state/tabGroups'
 import {
   collapseCurrentTabs,
@@ -133,6 +134,10 @@ function UI(): React.ReactElement {
     dispatch(closeTabGroupAlias(sourceGroupId))
   }
 
+  const handleCloseTabsOutsideGroup = (sourceGroupId: string) => (): void => {
+    dispatch(closeTabsOutsideGroupAlias(sourceGroupId))
+  }
+
   const handleToggleFocusMode = async (): Promise<void> => {
     dispatch(toggleFocusMode())
   }
@@ -218,6 +223,7 @@ function UI(): React.ReactElement {
                 onOpenCurrentTab={handleOpenCurrentTab}
                 onCloseTab={handleCloseCurrentTab}
                 onCloseTabGroup={handleCloseTabGroup(tabGroup.id)}
+                onCloseTabsOutsideGroup={handleCloseTabsOutsideGroup(tabGroup.id)}
               />
             ))}
 
