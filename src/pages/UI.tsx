@@ -3,6 +3,7 @@ import { DragDropContext, DropResult, Droppable, DroppableProvided } from 'react
 import { useSelector, useDispatch } from 'react-redux'
 import { Button, Switch, Typography, FormControlLabel, Tooltip } from '@material-ui/core'
 import { Add, Settings, InfoRounded } from '@material-ui/icons'
+import { makeStyles } from '@material-ui/core/styles'
 
 import TabGroup from '@src/components/tabs/TabGroup'
 import { ITabGroup } from '@src/types/Extension'
@@ -26,6 +27,7 @@ import {
 } from '@src/state/currentTabs'
 import { RootState } from '@src/state/configureStore'
 import { toggleFocusMode, openOptionsPageAlias } from '@src/state/settings'
+import clsx from 'clsx'
 
 const extractDragEventProperties = (dragEvent: DropResult): any => ({
   sourceGroupId: dragEvent.source.droppableId,
@@ -34,7 +36,19 @@ const extractDragEventProperties = (dragEvent: DropResult): any => ({
   targetTabIndex: dragEvent?.destination?.index,
 })
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    background: theme.palette.type === 'dark' ? 'rgba(0, 0, 0, 0.02)' : 'rgba(0, 0, 0, 0.02)',
+    marginBottom: '0.5rem',
+    '&:hover': {
+      background: theme.palette.type === 'dark' ? 'rgba(0, 0, 0, 0.01)' : 'rgba(0, 0, 0, 0.01)',
+    },
+  },
+}))
+
 function UI(): React.ReactElement {
+  const styles = useStyles()
+
   const dispatch = useDispatch()
 
   const currentTabs = useSelector((state: RootState) => state.currentTabs)
@@ -212,8 +226,7 @@ function UI(): React.ReactElement {
                 <Button
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  fullWidth
-                  className="min-h-8 md:min-w-xxs md:max-w-xxs"
+                  className={clsx(styles.root, 'w-full min-h-8 md:w-56')}
                   onClick={handleAddTabGroup}
                   title="add group"
                 >
