@@ -32,13 +32,12 @@ function Data(): React.ReactElement {
   const [csvData, setCsvData] = useState<any[]>([])
 
   const onDrop = useCallback((acceptedFiles) => {
-    acceptedFiles.forEach((file) => {
+    acceptedFiles.forEach((file: File) => {
       Papa.parse(file, {
         delimiter: ';',
         worker: true,
         header: true,
         complete(result) {
-          console.log(result)
           setCsvData(result.data)
         },
       })
