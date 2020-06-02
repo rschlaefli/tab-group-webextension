@@ -13,9 +13,10 @@ import {
   ITabGroup,
 } from '@src/types/Extension'
 import { updateSuggestedGroups } from '@src/state/suggestions'
-import { postNativeMessage } from './utils'
+import { postNativeMessage, pickRelevantProperties } from './utils'
 import { Store } from 'redux'
 import { RootState } from '@src/state/configureStore'
+import { groupBy } from 'ramda'
 
 const RELEVANT_TAB_PROPS = ['pinned', 'title', 'status', 'favIconUrl', 'url']
 
@@ -85,7 +86,7 @@ const onNativeMessage = ({ dispatch, getState }, nativePort) => (
       console.log('[background] Initializing current tabs in heuristics:', currentTabs)
       postNativeMessage(nativePort, {
         action: TAB_ACTION.INIT_TABS,
-        payload: { currentTabs },
+        payload: { currentTabs: currentTabs.map(pickRelevantProperties) },
       })
       break
     }
@@ -95,7 +96,12 @@ const onNativeMessage = ({ dispatch, getState }, nativePort) => (
       console.log('[background] Initializing tab groups in heuristics:', tabGroups)
       postNativeMessage(nativePort, {
         action: TAB_ACTION.INIT_GROUPS,
-        payload: { tabGroups },
+        payload: {
+          tabGroups: tabGroups.map((group) => ({
+            ...group,
+            tabs: group.tabs.map(pickRelevantProperties),
+          })),
+        },
       })
       break
     }

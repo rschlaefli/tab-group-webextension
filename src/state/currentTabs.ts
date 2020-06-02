@@ -1,7 +1,12 @@
 import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
 import { Tabs, Runtime } from 'webextension-polyfill-ts'
 import { take, prepend, append, findIndex, remove, update, find, keys, any } from 'ramda'
-import { getBrowserSafe, augmentTabExtras, postNativeMessage } from '@src/lib/utils'
+import {
+  getBrowserSafe,
+  augmentTabExtras,
+  postNativeMessage,
+  pickRelevantProperties,
+} from '@src/lib/utils'
 import { ITab, TAB_ACTION } from '@src/types/Extension'
 import { AppDispatch } from '@src/background'
 import { RootState } from './configureStore'
@@ -236,7 +241,7 @@ export const updateTabAndNotify = createAsyncThunk<
       await postNativeMessage(nativePort, {
         action: TAB_ACTION.UPDATE,
         // TODO: get rid of this double hash calculation
-        payload: augmentTabExtras(newTab as Partial<ITab>),
+        payload: pickRelevantProperties(augmentTabExtras(newTab as Partial<ITab>)),
       })
     }
   }
@@ -260,7 +265,7 @@ export const activateTabAndNotify = createAsyncThunk<
 
     await postNativeMessage(nativePort, {
       action: TAB_ACTION.ACTIVATE,
-      payload: { id: activeInfo.tabId, ...activeInfo },
+      payload: pickRelevantProperties({ id: activeInfo.tabId, ...activeInfo }),
     })
   }
 )
@@ -272,7 +277,7 @@ export const removeTabAndNotify = createAsyncThunk<void, any, { dispatch: AppDis
 
     await postNativeMessage(nativePort, {
       action: TAB_ACTION.REMOVE,
-      payload: { id: tabId, ...removeInfo },
+      payload: pickRelevantProperties({ id: tabId, ...removeInfo }),
     })
   }
 )
