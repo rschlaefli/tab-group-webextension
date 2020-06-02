@@ -112,8 +112,11 @@ function Data(): React.ReactElement {
           <>
             <ul>
               <li>Some intro...</li>
+              <li>You can find the data HERE for your OS (e.g., ~/bin/tabs/bin/*.csv)</li>
               <li>Choose level of data submission (BASIC/COMPLETE)?</li>
-              <li>Basic: only show next step for aggregate stats upload?</li>
+              <li>
+                Basic: only show next step for aggregate stats upload? hash-hash for tab events?
+              </li>
               <li>Complete: show step for tab events upload with censoring capabilities?</li>
             </ul>
           </>
