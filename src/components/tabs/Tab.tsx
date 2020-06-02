@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Draggable,
   DraggableProvided,
@@ -6,9 +6,12 @@ import {
   DraggingStyle,
   NotDraggingStyle,
 } from 'react-beautiful-dnd'
-import { Delete, Close } from '@material-ui/icons'
+import { Close } from '@material-ui/icons'
 import { Menu, MenuItem, Typography } from '@material-ui/core'
 import clsx from 'clsx'
+import { makeStyles } from '@material-ui/core/styles'
+
+import useContextMenu from '@src/lib/useContextMenu'
 
 interface IProps {
   uniqueId: string
@@ -19,17 +22,11 @@ interface IProps {
   isOpen?: boolean
   isReadOnly?: boolean
   isSuggested?: boolean
+  isDragDisabled?: boolean
   faviconUrl?: string
   onRemoveTab?: (() => void) | false
   onCloseTab?: (() => void) | false
   onOpenCurrentTab?: (() => void) | false
-  // onOpenContextMenu: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
-  // onCloseContextMenu: () => void
-}
-
-interface IMousePosition {
-  mouseX: null | number
-  mouseY: null | number
 }
 
 const getItemStyle = (
@@ -41,10 +38,11 @@ const getItemStyle = (
   ...draggableStyle,
 })
 
-const initialMousePosition = {
-  mouseX: null,
-  mouseY: null,
-}
+const useStyles = makeStyles({
+  contextMenu: {
+    maxWidth: 400,
+  },
+})
 
 function Tab({
   uniqueId,
@@ -54,32 +52,45 @@ function Tab({
   isOpen,
   isReadOnly,
   isSuggested,
+  isDragDisabled,
   faviconUrl,
   onRemoveTab,
   onCloseTab,
   onOpenCurrentTab,
 }: IProps): React.ReactElement {
-  const [mousePosition, setMousePosition] = useState<IMousePosition>(initialMousePosition)
+  const styles = useStyles()
 
-  const handleOpenContextMenu = (event: React.MouseEvent<HTMLDivElement>): void => {
-    event.preventDefault()
-    setMousePosition({
-      mouseX: event.clientX - 2,
-      mouseY: event.clientY - 4,
-    })
-  }
+  const {
+    isContextMenuOpen,
+    contextAnchorPosition,
+    handleOpenContextMenu,
+    handleCloseContextMenu,
+  } = useContextMenu()
 
-  const handleCloseContextMenu = (): void => {
-    setMousePosition(initialMousePosition)
+  const handleOpenTab = (url, newTab = false) => () => {
+    if (newTab) {
+      window.open(url, '_blank')
+    } else {
+      if (window.location !== window.parent.location) {
+        window.parent.location.replace(url)
+      } else {
+        window.location.replace(url)
+      }
+    }
   }
 
   return (
     <>
-      <Draggable key={uniqueId} draggableId={`draggable-${uniqueId}`} index={index}>
+      <Draggable
+        key={uniqueId}
+        draggableId={`draggable-${uniqueId}`}
+        index={index}
+        isDragDisabled={isDragDisabled}
+      >
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot): React.ReactElement => (
           <div
             className={clsx(
-              'flex flex-row items-center justify-start px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0',
+              'flex flex-row h-6 items-center justify-start px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0',
               !isReadOnly && isOpen && 'bg-orange-200 dark:bg-gray-700'
             )}
             ref={provided.innerRef}
@@ -89,12 +100,12 @@ function Tab({
             onContextMenu={handleOpenContextMenu}
           >
             {!isSuggested && (
-              <div className="flex-initial w-4 h-4 mr-2">
+              <div className="flex-none w-3 h-3 mr-2">
                 <img src={faviconUrl} />
               </div>
             )}
 
-            <div className="flex-1 leading-tight max-w-5/6">
+            <div className="flex-auto w-40 leading-tight">
               <Typography noWrap display="block" variant="inherit" title={title}>
                 {isOpen && onOpenCurrentTab && (
                   <a role="button" onClick={onOpenCurrentTab as any}>
@@ -102,17 +113,8 @@ function Tab({
                   </a>
                 )}
                 {!isOpen &&
-                  ((!isReadOnly || isSuggested) && url ? (
-                    <a
-                      role="button"
-                      onClick={(): void => {
-                        if (window.location !== window.parent.location) {
-                          window.parent.location.replace(url)
-                        } else {
-                          window.location.replace(url)
-                        }
-                      }}
-                    >
+                  (url ? (
+                    <a role="button" onClick={handleOpenTab(url)}>
                       {title}
                     </a>
                   ) : (
@@ -121,19 +123,13 @@ function Tab({
               </Typography>
             </div>
 
-            {onRemoveTab && !isReadOnly && (
-              <button
-                className="flex-auto ml-2 text-sm text-right text-gray-600 dark:text-gray-400"
-                onClick={onRemoveTab}
-                title="remove tab"
-              >
-                <Delete fontSize="inherit" />
-              </button>
-            )}
-
             {onCloseTab && (
               <button
-                className="flex-auto ml-2 text-sm text-right text-gray-600 dark:text-gray-400"
+                disabled={!isOpen}
+                className={clsx(
+                  'flex-auto ml-2 text-sm text-right ',
+                  isOpen ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400 dark:text-gray-600'
+                )}
                 onClick={onCloseTab}
                 title="close tab"
               >
@@ -143,18 +139,62 @@ function Tab({
           </div>
         )}
       </Draggable>
+
       <Menu
-        keepMounted
-        open={mousePosition.mouseY !== null}
+        onClickCapture={handleCloseContextMenu}
+        className={styles.contextMenu}
+        open={isContextMenuOpen}
         onClose={handleCloseContextMenu}
         anchorReference="anchorPosition"
-        anchorPosition={
-          mousePosition.mouseY !== null && mousePosition.mouseX !== null
-            ? { top: mousePosition.mouseY, left: mousePosition.mouseX }
-            : undefined
-        }
+        anchorPosition={contextAnchorPosition}
       >
-        <MenuItem onClick={handleCloseContextMenu}>Do something</MenuItem>
+        {isOpen && onOpenCurrentTab && (
+          <MenuItem dense onClick={onOpenCurrentTab}>
+            Switch To &quot;
+            <Typography noWrap variant="inherit">
+              {title}
+            </Typography>
+            &quot;
+          </MenuItem>
+        )}
+
+        {!isOpen &&
+          (!isReadOnly || isSuggested) &&
+          url && [
+            <MenuItem dense key="open" onClick={handleOpenTab(url)}>
+              Open &quot;
+              <Typography noWrap variant="inherit">
+                {title}
+              </Typography>
+              &quot;
+            </MenuItem>,
+            <MenuItem dense key="openBlank" onClick={handleOpenTab(url, true)}>
+              Open &quot;
+              <Typography noWrap variant="inherit">
+                {title}
+              </Typography>
+              &quot; in New Tab
+            </MenuItem>,
+          ]}
+        {isOpen && onCloseTab && (
+          <MenuItem dense onClick={onCloseTab}>
+            Close &quot;
+            <Typography noWrap variant="inherit">
+              {title}
+            </Typography>
+            &quot;
+          </MenuItem>
+        )}
+
+        {!isReadOnly && onRemoveTab && (
+          <MenuItem dense onClick={onRemoveTab}>
+            Remove &quot;
+            <Typography noWrap variant="inherit">
+              {title}
+            </Typography>
+            &quot; From Group
+          </MenuItem>
+        )}
       </Menu>
     </>
   )

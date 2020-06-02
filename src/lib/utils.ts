@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import md5 from 'blueimp-md5'
 import { Browser, Runtime } from 'webextension-polyfill-ts'
+import { pick } from 'ramda'
+
 import { TAB_ACTION, ITab } from '@src/types/Extension'
 
 /**
@@ -111,6 +113,30 @@ export function augmentTabExtras(tabData: Partial<ITab>): ITab {
   }
 
   return augmentedTabData as ITab
+}
+
+/**
+ * Extract only relevant properties from a tab (to not send favicon etc. to the backend)
+ * @param tabData
+ */
+export function pickRelevantProperties(tabData: Partial<ITab>): Partial<ITab> {
+  const relevantProps = [
+    'id',
+    'index',
+    'lastAccessed',
+    'openerTabId',
+    'pinned',
+    'sessionId',
+    'successorTabId',
+    'title',
+    'url',
+    'windowId',
+    'normalizedTitle',
+    'hash',
+    'origin',
+    'baseUrl',
+  ]
+  return pick(relevantProps, tabData)
 }
 
 /**

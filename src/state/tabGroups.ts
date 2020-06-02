@@ -222,7 +222,24 @@ export const closeTabGroup = createAsyncThunk<
     const tabGroup = find((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
     if (tabGroup) {
       const tabHashes = tabGroup.tabs.map((tab) => tab.hash)
-      await thunkAPI.dispatch(closeTabsWithHashes(tabHashes) as any)
+      await thunkAPI.dispatch(closeTabsWithHashes({ closeHashes: tabHashes }) as any)
+    }
+  }
+)
+
+export const closeTabsOutsideGroup = createAsyncThunk<
+  void,
+  { _sender?: any; payload: string },
+  { dispatch: AppDispatch; state: RootState }
+>(
+  'tabGroups/closeTabsOutsideGroup',
+  async ({ payload: tabGroupId }, thunkAPI): Promise<void> => {
+    const state = thunkAPI.getState()
+
+    const tabGroup = find((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
+    if (tabGroup) {
+      const tabHashes = tabGroup.tabs.map((tab) => tab.hash)
+      await thunkAPI.dispatch(closeTabsWithHashes({ keepHashes: tabHashes }) as any)
     }
   }
 )
@@ -241,6 +258,17 @@ export const openTabGroup = createAsyncThunk<
     if (tabGroupIndex > -1) {
       const tabGroup = state.tabGroups[tabGroupIndex]
 
+      await Promise.all(
+        tabGroup.tabs.map(async (tab) => {
+          // if the tab to be opened is already open, dispatch the openCurrentTab functionality instead
+          if (tab.hash && state.currentTabs.tabHashes.includes(tab.hash)) {
+            await thunkAPI.dispatch(openCurrentTab({ payload: tab.hash }) as any)
+          } else {
+            await browser.tabs.create({ url: tab.url })
+          }
+        })
+      )
+
       // if focus mode is enabled, close all of the tabs belonging to other groups
       // but only if they are not also a member of the selected group
       if (state.settings.isFocusModeEnabled) {
@@ -254,21 +282,10 @@ export const openTabGroup = createAsyncThunk<
 
         console.log('[tabGroups] closing other tabs in focus mode', tabHashesFromOtherGroups)
 
-        await thunkAPI.dispatch(closeTabsWithHashes(tabHashesFromOtherGroups) as any)
+        await thunkAPI.dispatch(
+          closeTabsWithHashes({ closeHashes: tabHashesFromOtherGroups }) as any
+        )
       }
-
-      await Promise.all(
-        tabGroup.tabs.map(async (tab) => {
-          // if the tab to be opened is already open, dispatch the openCurrentTab functionality instead
-          if (tab.hash && state.currentTabs.tabHashes.includes(tab.hash)) {
-            await thunkAPI.dispatch(openCurrentTab({ payload: tab.hash }) as any)
-          } else {
-            await browser.tabs.create({
-              url: tab.url,
-            })
-          }
-        })
-      )
 
       // close the new tab page if we open a group
       if (_sender?.tab?.url && _sender.tab.id) {
@@ -286,8 +303,10 @@ export const openTabGroup = createAsyncThunk<
 
 // ALIASES
 export const closeTabGroupAlias = createAction<string>('tabGroups/closeTabGroupAlias')
+export const closeTabsOutsideGroupAlias = createAction<string>('tabGroups/closeTabsOutsideGroup')
 export const openTabGroupAlias = createAction<string>('tabGroups/openTabGroupAlias')
 export const tabGroupsAliases = {
   [closeTabGroupAlias.type]: closeTabGroup,
+  [closeTabsOutsideGroupAlias.type]: closeTabsOutsideGroup,
   [openTabGroupAlias.type]: openTabGroup,
 }
