@@ -53,6 +53,7 @@ function UI(): React.ReactElement {
   const dispatch = useDispatch()
 
   const currentTabs = useSelector((state: RootState) => state.currentTabs)
+  // TODO: use numTabGroups and numSuggestions to only trigger a rerender if the amount changes
   const tabGroups = useSelector((state: RootState) => state.tabGroups)
   const suggestions = useSelector((state: RootState) => state.suggestions)
   const focusModeEnabled = useSelector((state: RootState) => state.settings.isFocusModeEnabled)
