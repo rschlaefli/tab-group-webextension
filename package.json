@@ -1,6 +1,6 @@
 {
   "name": "automated-tab-organization",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "author": "Roland Schlaefli <rolandschlaefli@gmail.com>",
   "description": "A WebExtension for automated tab organization",
   "repository": {
