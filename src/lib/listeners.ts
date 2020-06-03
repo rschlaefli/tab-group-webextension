@@ -14,11 +14,14 @@ import {
 } from '@src/types/Extension'
 import { updateSuggestedGroups } from '@src/state/suggestions'
 import { postNativeMessage, pickRelevantProperties } from './utils'
-import { Store } from 'redux'
 import { RootState } from '@src/state/configureStore'
-import { groupBy } from 'ramda'
+import { openExtensionUI } from '@src/state/settings'
 
 const RELEVANT_TAB_PROPS = ['pinned', 'title', 'status', 'favIconUrl', 'url']
+
+const onBrowserActionClicked = ({ dispatch }) => (tab: Tabs.Tab) => {
+  dispatch(openExtensionUI())
+}
 
 const onTabCreated = ({ dispatch }) => (tabData: Tabs.CreateCreatePropertiesType): void => {
   dispatch(createTab({ tabData }))
@@ -115,6 +118,9 @@ const onNativeDisconnect = (...params): void => {
 function setupListeners({ dispatch, getState }, nativePort?: Runtime.Port): void {
   console.log('[background] Preparing listeners', nativePort)
 
+  // setup a listener for the browser action (opening the ui)
+  browser.browserAction.onClicked.addListener(onBrowserActionClicked({ dispatch }))
+
   // setup the listener for the onCreated event
   browser.tabs.onCreated.addListener(onTabCreated({ dispatch }))
 
@@ -149,6 +155,7 @@ function setupListeners({ dispatch, getState }, nativePort?: Runtime.Port): void
 }
 
 function removeListeners({ dispatch, getState }, nativePort?: Runtime.Port): void {
+  browser.browserAction.onClicked.removeListener(onBrowserActionClicked({ dispatch }))
   browser.tabs.onCreated.removeListener(onTabCreated({ dispatch }))
   browser.tabs.onUpdated.removeListener(onTabUpdated({ dispatch }, nativePort))
   browser.tabs.onMoved.removeListener(onTabMoved({ dispatch }, nativePort))

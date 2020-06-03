@@ -12,8 +12,11 @@
   "background": {
     "scripts": ["background.bundle.js"]
   },
-  "chrome_url_overrides": {
-    "newtab": "ui.html"
+  "browser_action": {
+    "default_icon": {
+      "24": "icon_group_24.png"
+    },
+    "default_title": "Tab Groups"
   },
   "content_scripts": [
     {

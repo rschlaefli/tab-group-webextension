@@ -2,7 +2,7 @@ import React from 'react'
 import { DragDropContext, DropResult, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
 import { Button, Switch, Typography, FormControlLabel, Tooltip } from '@material-ui/core'
-import { Add, Settings, InfoRounded } from '@material-ui/icons'
+import { Add, Settings, InfoRounded, GroupWork } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles'
 
 import TabGroup from '@src/components/tabs/TabGroup'
@@ -27,7 +27,7 @@ import {
   collapseRecentTabs,
 } from '@src/state/currentTabs'
 import { RootState } from '@src/state/configureStore'
-import { toggleFocusMode, openOptionsPageAlias } from '@src/state/settings'
+import { toggleFocusMode, openOptionsPageAlias, openExtensionUIAlias } from '@src/state/settings'
 import clsx from 'clsx'
 
 const extractDragEventProperties = (dragEvent: DropResult): any => ({
@@ -102,6 +102,10 @@ function UI(): React.ReactElement {
     dispatch(openOptionsPageAlias())
   }
 
+  const handleOpenUI = async (): Promise<void> => {
+    dispatch(openExtensionUIAlias())
+  }
+
   const handleOpenTabGroup = (sourceGroupId: string) => async (): Promise<void> => {
     dispatch(openTabGroupAlias(sourceGroupId))
   }
@@ -170,13 +174,24 @@ function UI(): React.ReactElement {
                 <InfoRounded className="text-blue-400" fontSize="inherit" />
               </Tooltip>
             </span>
-            <button
-              className="text-lg text-gray-600 dark:text-gray-100"
-              onClick={handleOpenOptions}
-              title="open settings"
-            >
-              <Settings fontSize="small" />
-            </button>
+            <div>
+              {self != top && (
+                <button
+                  className="text-lg text-gray-600 dark:text-gray-100"
+                  onClick={handleOpenUI}
+                  title="open group ui"
+                >
+                  <GroupWork fontSize="small" />
+                </button>
+              )}
+              <button
+                className="text-lg text-gray-600 dark:text-gray-100"
+                onClick={handleOpenOptions}
+                title="open settings"
+              >
+                <Settings fontSize="small" />
+              </button>
+            </div>
           </div>
 
           <div className="flex flex-col md:flex-wrap md:flex-row">
