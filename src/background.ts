@@ -30,7 +30,12 @@ browser.runtime.onMessage.addListener(async (message: string) => {
     bootstrap()
   }
 
-  if (message === 'PIN_SIDEBAR') {
+  if (message === 'TOGGLE_SIDEBAR') {
+    browser.tabs.executeScript({ file: 'sidebar.bundle.js' })
+    sendMessageToActiveContentScript('TOGGLE_SIDEBAR')
+  }
+
+  if (message === 'TOGGLE_PINNED') {
     sendMessageToActiveContentScript('TOGGLE_PINNED')
   }
 })

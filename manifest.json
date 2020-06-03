@@ -22,7 +22,7 @@
     {
       "matches": ["<all_urls>"],
       "run_at": "document_end",
-      "js": ["sidebar.bundle.js"],
+      "js": ["sidebarToggle.bundle.js"],
       "css": ["sidebar.css"]
     }
   ],
