@@ -35,7 +35,7 @@ browser.runtime.onMessage.addListener(async (message: string) => {
     sendMessageToActiveContentScript('TOGGLE_SIDEBAR')
   }
 
-  if (message === 'TOGGLE_PINNED') {
+  if (message === 'PIN_SIDEBAR') {
     sendMessageToActiveContentScript('TOGGLE_PINNED')
   }
 })
@@ -44,6 +44,7 @@ browser.commands.onCommand.addListener(async (command) => {
   console.log('[background] received command in background', command)
 
   if (command === 'toggle_sidebar') {
+    browser.tabs.executeScript({ file: 'sidebar.bundle.js' })
     sendMessageToActiveContentScript('TOGGLE_SIDEBAR')
   }
 })

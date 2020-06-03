@@ -3,6 +3,8 @@ body.tabGroupsPinned {
 }
 
 #tabs-sidebar-wrapper {
+  background-color: #fff;
+
   position: relative;
 
   z-index: 99999;
