@@ -14,12 +14,12 @@ import { RootState } from './configureStore'
 const currentTabsSlice = createSlice({
   name: 'currentTabs',
   initialState: {
+    collapsed: false,
     previousTabId: -1,
     activeTab: -1,
     activeWindow: 0,
     tabs: [] as ITab[],
     tabHashes: [] as (string | null)[],
-    collapsed: false,
     recentTabs: [] as ITab[],
     recentTabsCollapsed: true,
   },
@@ -82,9 +82,9 @@ const currentTabsSlice = createSlice({
 
       if (tabIndex > -1) {
         const tabData = state.tabs[tabIndex]
-        console.log('[currentTabs] REMOVE', tabData, state.recentTabs)
+        console.log('[currentTabs] REMOVE', tabData)
 
-        if (tabData.title !== 'New Tab') {
+        if (tabData.title !== 'Tab Groups') {
           state.recentTabs = take(5, prepend(tabData, state.recentTabs))
         }
 

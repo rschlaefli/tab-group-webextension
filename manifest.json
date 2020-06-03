@@ -31,6 +31,21 @@
     "page": "options.html",
     "open_in_tab": true
   },
+
+  "web_accessible_resources": ["ui.html"],
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+A"
+      }
+    },
+    "toggle_sidebar": {
+      "description": "Open the Tab Group Sidebar",
+      "suggested_key": {
+        "default": "Ctrl+Shift+X"
+      }
+    }
+  },
   "__firefox__browser_specific_settings": {
     "gecko": {
       "id": "automated-tab-organization@rschlaefli",
@@ -38,6 +53,5 @@
       "update_url": "https://tabs.fra1.digitaloceanspaces.com/webextension/firefox-updates.json"
     }
   },
-  "web_accessible_resources": ["ui.html"],
   "__opera__externally_connectable": {}
 }

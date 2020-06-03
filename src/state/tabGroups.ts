@@ -22,6 +22,7 @@ import { getBrowserSafe } from '@src/lib/utils'
 import { closeTabsWithHashes, openCurrentTab } from './currentTabs'
 import { AppDispatch } from '@src/background'
 import { RootState } from './configureStore'
+import { DropResult } from 'react-beautiful-dnd'
 
 function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): any {
   return pipe(path([sourceGroupIndex, 'tabs', sourceTabIndex]), assoc('uuid', uuidv4()))
@@ -301,12 +302,63 @@ export const openTabGroup = createAsyncThunk<
   }
 )
 
+const extractDragEventProperties = (dragEvent: DropResult) => ({
+  sourceGroupId: dragEvent.source.droppableId,
+  targetGroupId: dragEvent?.destination?.droppableId,
+  sourceTabIndex: dragEvent.source.index,
+  targetTabIndex: dragEvent?.destination?.index,
+})
+
+export const processDragEvent = createAsyncThunk<
+  void,
+  { payload: DropResult },
+  { dispatch: AppDispatch; state: RootState }
+>(
+  'tabGroups/processDragEvent',
+  async ({ payload: dragEvent }, thunkAPI): Promise<void> => {
+    const state = thunkAPI.getState()
+    const properties = extractDragEventProperties(dragEvent)
+
+    // if the destination is empty, return
+    if (!properties.targetGroupId) return
+
+    // if we are reordering within a droppable
+    if (properties.sourceGroupId === properties.targetGroupId) {
+      // do not allow reordering in current tabs
+      if (properties.sourceGroupId === 'current') return
+
+      // if we are reordering to the same position,, return
+      if (properties.sourceTabIndex === properties.targetTabIndex) return
+
+      thunkAPI.dispatch(reorderTab(properties))
+      return
+    }
+
+    if (properties.sourceGroupId === 'current') {
+      const currentTab = state.currentTabs.tabs[properties.sourceTabIndex]
+      thunkAPI.dispatch(moveCurrentTab({ ...properties, currentTab }))
+      return
+    }
+
+    if (properties.sourceGroupId === 'recent') {
+      const recentTab = state.currentTabs.recentTabs[properties.sourceTabIndex]
+      thunkAPI.dispatch(moveCurrentTab({ ...properties, recentTab }))
+      return
+    }
+
+    // if we are moving between groups
+    thunkAPI.dispatch(moveTab(properties))
+  }
+)
+
 // ALIASES
 export const closeTabGroupAlias = createAction<string>('tabGroups/closeTabGroupAlias')
 export const closeTabsOutsideGroupAlias = createAction<string>('tabGroups/closeTabsOutsideGroup')
 export const openTabGroupAlias = createAction<string>('tabGroups/openTabGroupAlias')
+export const processDragEventAlias = createAction<DropResult>('tabGroups/processDragEventAlias')
 export const tabGroupsAliases = {
   [closeTabGroupAlias.type]: closeTabGroup,
   [closeTabsOutsideGroupAlias.type]: closeTabsOutsideGroup,
   [openTabGroupAlias.type]: openTabGroup,
+  [processDragEventAlias.type]: processDragEvent,
 }

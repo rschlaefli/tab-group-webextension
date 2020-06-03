@@ -6,6 +6,7 @@ import { browser } from 'webextension-polyfill-ts'
 import configureStore from './state/configureStore'
 import { initializeCurrentTabs } from './state/currentTabs'
 import { processSettings } from './lib/listeners'
+import { sendMessageToActiveContentScript } from './lib/utils'
 
 // setup a redux store
 const { store, persistor } = configureStore({ persistence: true })
@@ -22,11 +23,23 @@ store.dispatch(initializeCurrentTabs() as any)
 export const bootstrap = processSettings(store)
 
 // setup a listener for communication from the popup
-browser.runtime.onMessage.addListener(async (message: any) => {
+browser.runtime.onMessage.addListener(async (message: string) => {
   console.log('[background] received message in background', message)
 
-  if (message.type === 'RELOAD_SETTINGS') {
+  if (message === 'RELOAD_SETTINGS') {
     bootstrap()
+  }
+
+  if (message === 'PIN_SIDEBAR') {
+    sendMessageToActiveContentScript('TOGGLE_PINNED')
+  }
+})
+
+browser.commands.onCommand.addListener(async (command) => {
+  console.log('[background] received command in background', command)
+
+  if (command === 'toggle_sidebar') {
+    sendMessageToActiveContentScript('TOGGLE_SIDEBAR')
   }
 })
 

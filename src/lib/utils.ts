@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import md5 from 'blueimp-md5'
-import { Browser, Runtime } from 'webextension-polyfill-ts'
+import { browser, Browser, Runtime } from 'webextension-polyfill-ts'
 import { pick } from 'ramda'
 
 import { TAB_ACTION, ITab } from '@src/types/Extension'
@@ -79,11 +79,14 @@ export function computeTabHash(url?: string, title?: string): IHashResult | null
     return {
       origin,
       baseUrl,
-      hash: md5(baseUrl + ' ' + title),
+      hash: md5(`${baseUrl} ${title}`),
     }
   } catch (e) {
-    console.error(e)
-    return null
+    return {
+      origin: 'null',
+      baseUrl: 'null',
+      hash: md5(`null ${title}`),
+    }
   }
 }
 
@@ -195,4 +198,11 @@ export function useBrowserAndOS(): {
   }, [])
 
   return { browser, os, setBrowser, setOS }
+}
+
+export async function sendMessageToActiveContentScript(message: string): Promise<void> {
+  const activeTabs = await browser.tabs.query({ currentWindow: true, active: true })
+  if (activeTabs.length === 1 && activeTabs[0].id) {
+    await browser.tabs.sendMessage(activeTabs[0].id, message)
+  }
 }

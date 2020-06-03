@@ -1,9 +1,10 @@
 import { createSlice, createAction, createAsyncThunk } from '@reduxjs/toolkit'
 
-import { performBrowserActionSafe } from '@src/lib/utils'
+import { performBrowserActionSafe, getBrowserSafe } from '@src/lib/utils'
 import { AppDispatch } from '@src/background'
 import { RootState } from './configureStore'
 import { processSettings } from '@src/lib/listeners'
+import { openCurrentTab } from './currentTabs'
 
 const settingsSlice = createSlice({
   name: 'settings',
@@ -87,11 +88,17 @@ export const openExtensionUI = createAsyncThunk<
 >(
   'settings/openExtensionUI',
   async (_, thunkAPI): Promise<void> => {
+    const browser = await getBrowserSafe()
     const state = thunkAPI.getState()
-    console.log(state.currentTabs.tabs)
-    await performBrowserActionSafe(async (browser) => {
+
+    // if there are any existing tab group pages, get them for recycling
+    // otherwise, open a new tab with the tab group overview
+    const existingTabs = state.currentTabs.tabs.filter((tab) => tab.title === 'Tab Groups')
+    if (existingTabs.length > 0) {
+      thunkAPI.dispatch(openCurrentTab({ payload: existingTabs[0].hash as string }) as any)
+    } else {
       await browser.tabs.create({ url: 'ui.html' })
-    })
+    }
   }
 )
 

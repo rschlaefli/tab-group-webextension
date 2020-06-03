@@ -1,3 +1,7 @@
+body.tabGroupsPinned {
+  padding-left: 300px;
+}
+
 #tabs-sidebar-wrapper {
   position: relative;
 
@@ -19,6 +23,8 @@
 
 #tabs-sidebar {
   height: 100%;
+
+  border: none !important;
 }
 
 #tabs-sidebar-toggle {
