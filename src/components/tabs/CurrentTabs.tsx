@@ -30,6 +30,7 @@ function CurrentTabs(): React.ReactElement {
 
   return (
     <TabGroup
+      isGroupedByWindow
       isReadOnly
       isDropDisabled
       id="current"
