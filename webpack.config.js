@@ -23,7 +23,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const HighlightJS = require('highlight.js')
 
-const { pipe, __ } = require('ramda')
+const { pipe } = require('ramda')
 
 const resolveCwd = pipe(process.cwd, fs.realpathSync)
 

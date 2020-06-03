@@ -38,8 +38,8 @@ function ManualTabGroup({ selector }: IProps): React.ReactElement {
     dispatch(removeGroup({ sourceGroupId }))
   }
 
-  const handleOpenTabGroup = (sourceGroupId: string) => async (): Promise<void> => {
-    dispatch(openTabGroupAlias(sourceGroupId))
+  const handleOpenTabGroup = (sourceGroupId: string) => (newWindow?: boolean) => () => {
+    dispatch(openTabGroupAlias({ tabGroupId: sourceGroupId, newWindow }))
   }
 
   const handleRenameTabGroup = (sourceGroupId: string) => async (name: string): Promise<void> => {

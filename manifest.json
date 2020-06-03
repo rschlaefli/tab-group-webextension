@@ -21,7 +21,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "run_at": "document_idle",
+      "run_at": "document_end",
       "js": ["sidebar.bundle.js"],
       "css": ["sidebar.css"]
     }
