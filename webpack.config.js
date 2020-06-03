@@ -29,13 +29,12 @@ const resolveCwd = pipe(process.cwd, fs.realpathSync)
 
 const PATHS = {
   background: path.resolve(__dirname, 'src/background.ts'),
-  backgroundTemplate: path.resolve(__dirname, 'public/background.html'),
   changelog: path.resolve(__dirname, 'public/changelog.html'),
   cwd: path.resolve(resolveCwd(), '.'),
+  data: path.resolve(__dirname, 'src/data.tsx'),
   docs: path.resolve(__dirname, 'src/docs'),
   manifest: path.resolve(__dirname, 'manifest.json'),
   options: path.resolve(__dirname, 'src/options.tsx'),
-  optionsTemplate: path.resolve(__dirname, 'public/options.html'),
   output: path.resolve(__dirname, 'build/dev'),
   output_chrome: path.resolve(__dirname, 'build/chrome'),
   output_edge: path.resolve(__dirname, 'build/edge'),
@@ -44,13 +43,12 @@ const PATHS = {
   public: path.resolve(__dirname, 'public'),
   sidebar: path.resolve(__dirname, 'src/sidebar.ts'),
   sidebarCss: path.resolve(__dirname, 'public/sidebar.css'),
+  src: path.resolve(__dirname, 'src'),
   styles: path.resolve(__dirname, 'src/styles'),
+  template: path.resolve(__dirname, 'public/template.html'),
   troubleshooting: path.resolve(__dirname, 'public/troubleshooting.html'),
   tutorial: path.resolve(__dirname, 'src/tutorial.tsx'),
-  tutorialTemplate: path.resolve(__dirname, 'public/tutorial.html'),
-  src: path.resolve(__dirname, 'src'),
   ui: path.resolve(__dirname, 'src/ui.tsx'),
-  uiTemplate: path.resolve(__dirname, 'public/ui.html'),
   vendor: path.resolve(__dirname, 'node_modules'),
 }
 
@@ -73,6 +71,8 @@ module.exports = function (webpackEnv, _) {
     entry: {
       // create a build for the background page
       background: PATHS.background,
+      // create a build for the data page
+      data: PATHS.data,
       // create a build for the settings/options page
       options: PATHS.options,
       // content script for sidebar injection
@@ -245,21 +245,31 @@ module.exports = function (webpackEnv, _) {
       }),
       // dynamically generate the main extension ui page
       new HtmlWebpackPlugin({
-        template: PATHS.uiTemplate,
+        title: 'New Tab',
+        template: PATHS.template,
         filename: 'ui.html',
         chunks: ['ui'],
       }),
       // dynamically generate the extension options page
       new HtmlWebpackPlugin({
-        template: PATHS.optionsTemplate,
+        title: 'Options',
+        template: PATHS.template,
         filename: 'options.html',
         chunks: ['options'],
       }),
       // dynamically generate the extension tutorial page
       new HtmlWebpackPlugin({
-        template: PATHS.tutorialTemplate,
+        title: 'Tutorial',
+        template: PATHS.template,
         filename: 'tutorial.html',
         chunks: ['tutorial'],
+      }),
+      // dynamically generate the extension data processing page
+      new HtmlWebpackPlugin({
+        title: 'Data Submission',
+        template: PATHS.template,
+        filename: 'data.html',
+        chunks: ['data'],
       }),
       // ensure that webpack always writes files (for dev-server)
       // new WriteFilePlugin(),
