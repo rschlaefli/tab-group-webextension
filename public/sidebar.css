@@ -19,6 +19,8 @@
 
 #tabs-sidebar {
   height: 100%;
+
+  border: none !important;
 }
 
 #tabs-sidebar-toggle {
