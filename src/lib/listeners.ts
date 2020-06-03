@@ -19,7 +19,7 @@ import { openExtensionUI } from '@src/state/settings'
 
 const RELEVANT_TAB_PROPS = ['pinned', 'title', 'status', 'favIconUrl', 'url']
 
-const onBrowserActionClicked = ({ dispatch }) => (tab: Tabs.Tab) => {
+const onBrowserActionClicked = ({ dispatch }) => () => {
   dispatch(openExtensionUI())
 }
 
@@ -27,18 +27,22 @@ const onTabCreated = ({ dispatch }) => (tabData: Tabs.CreateCreatePropertiesType
   dispatch(createTab({ tabData }))
 }
 
-const onTabUpdated = ({ dispatch }, nativePort) => (tabId, changeInfo, tab): void => {
+const onTabUpdated = ({ dispatch }, nativePort) => (
+  tabId: number,
+  changeInfo: Tabs.OnUpdatedChangeInfoType,
+  tab: Tabs.Tab
+): void => {
   dispatch(
     updateTabAndNotify({ id: tabId, changeData: changeInfo, nativePort, newTab: tab }) as any
   )
 }
 
-const onTabMoved = ({ dispatch }, nativePort) => (
-  tabId: number,
-  moveInfo: Tabs.OnMovedMoveInfoType
-): void => {
-  dispatch(updateTabAndNotify({ id: tabId, changeData: moveInfo, nativePort }) as any)
-}
+// const onTabMoved = ({ dispatch }, nativePort) => (
+//   tabId: number,
+//   moveInfo: Tabs.OnMovedMoveInfoType
+// ): void => {
+//   dispatch(updateTabAndNotify({ id: tabId, changeData: moveInfo, nativePort }) as any)
+// }
 
 const onTabActivated = ({ dispatch }, nativePort) => (
   activeInfo: Tabs.OnActivatedActiveInfoType
@@ -137,7 +141,7 @@ function setupListeners({ dispatch, getState }, nativePort?: Runtime.Port): void
   }
 
   // setup the listener for the onMoved event
-  browser.tabs.onMoved.addListener(onTabMoved({ dispatch }, nativePort))
+  // browser.tabs.onMoved.addListener(onTabMoved({ dispatch }, nativePort))
 
   // setup the listener for the onActivated event
   browser.tabs.onActivated.addListener(onTabActivated({ dispatch }, nativePort))
@@ -158,7 +162,7 @@ function removeListeners({ dispatch, getState }, nativePort?: Runtime.Port): voi
   browser.browserAction.onClicked.removeListener(onBrowserActionClicked({ dispatch }))
   browser.tabs.onCreated.removeListener(onTabCreated({ dispatch }))
   browser.tabs.onUpdated.removeListener(onTabUpdated({ dispatch }, nativePort))
-  browser.tabs.onMoved.removeListener(onTabMoved({ dispatch }, nativePort))
+  // browser.tabs.onMoved.removeListener(onTabMoved({ dispatch }, nativePort))
   browser.tabs.onActivated.removeListener(onTabActivated({ dispatch }, nativePort))
   browser.tabs.onAttached.removeListener(onTabAttached({ dispatch }, nativePort))
   browser.tabs.onRemoved.removeListener(onTabRemoved({ dispatch }, nativePort))

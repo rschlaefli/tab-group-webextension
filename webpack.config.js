@@ -43,6 +43,7 @@ const PATHS = {
   output_opera: path.resolve(__dirname, 'build/opera'),
   public: path.resolve(__dirname, 'public'),
   sidebar: path.resolve(__dirname, 'src/sidebar.ts'),
+  sidebarToggle: path.resolve(__dirname, 'src/sidebarToggle.ts'),
   sidebarCss: path.resolve(__dirname, 'public/sidebar.css'),
   src: path.resolve(__dirname, 'src'),
   styles: path.resolve(__dirname, 'src/styles'),
@@ -78,6 +79,7 @@ module.exports = function (webpackEnv, _) {
       options: PATHS.options,
       // content script for sidebar injection
       sidebar: PATHS.sidebar,
+      sidebarToggle: PATHS.sidebarToggle,
       // tutorial page
       tutorial: PATHS.tutorial,
       // create a build for the extension ui (popup/newtab)

@@ -2,12 +2,14 @@ import React from 'react'
 import clsx from 'clsx'
 import { Droppable, DroppableProvided, DroppableStateSnapshot } from 'react-beautiful-dnd'
 import { Save, Delete, Launch, ArrowDropDown, ArrowDropUp, Close } from '@material-ui/icons'
+import { groupBy } from 'ramda'
 
 import Input from '../common/Input'
 import Tab from './Tab'
 import { ITab } from '@src/types/Extension'
 import useContextMenu from '@src/lib/useContextMenu'
 import { Menu, MenuItem } from '@material-ui/core'
+import WindowSeparator from './WindowSeparator'
 
 interface IProps {
   id: string
@@ -19,6 +21,7 @@ interface IProps {
   isSuggested?: boolean
   isDropDisabled?: boolean
   isDragDisabled?: boolean
+  isGroupedByWindow?: boolean
   onCollapseGroup?: () => void
   onRemoveTab?: (tabIndex: number) => () => void
   onRemoveTabGroup?: () => void
@@ -45,6 +48,7 @@ function TabGroup({
   isSuggested,
   isDropDisabled,
   isDragDisabled,
+  isGroupedByWindow,
   onCollapseGroup,
   onChangeGroupName,
   onOpenTabGroup,
@@ -62,6 +66,31 @@ function TabGroup({
     handleOpenContextMenu,
     handleCloseContextMenu,
   } = useContextMenu()
+
+  const filteredTabs = tabs.filter((tab) => typeof tab.id !== 'undefined')
+
+  const mapTab = (tab: ITab, index: number): React.ReactElement => {
+    const uniqueId = `${tab.id}-${tab.hash}-${id}`
+    return (
+      <Tab
+        uniqueId={uniqueId}
+        key={uniqueId}
+        title={tab.title}
+        index={index}
+        url={tab.url}
+        faviconUrl={tab.favIconUrl}
+        windowId={tab.windowId}
+        isDragDisabled={isDragDisabled}
+        isReadOnly={isReadOnly}
+        // eslint-disable-next-line react/prop-types
+        isOpen={!!tab.hash && currentTabs && currentTabs.includes(tab.hash)}
+        isSuggested={isSuggested}
+        onRemoveTab={onRemoveTab && onRemoveTab(index)}
+        onCloseTab={!!tab.hash && onCloseTab && onCloseTab(tab.hash)}
+        onOpenCurrentTab={!!tab.hash && onOpenCurrentTab && onOpenCurrentTab(tab.hash)}
+      />
+    )
+  }
 
   return (
     <>
@@ -164,31 +193,14 @@ function TabGroup({
             <div
               className={clsx('min-h-8', tabs.length > 0 && isCollapsed && 'hidden', 'md:block')}
             >
-              {tabs
-                .filter((tab) => typeof tab.id !== 'undefined')
-                .map((tab: ITab, index: number) => {
-                  const uniqueId = `${tab.id}-${tab.hash}-${id}`
-                  return (
-                    <Tab
-                      uniqueId={uniqueId}
-                      key={uniqueId}
-                      title={tab.title}
-                      index={index}
-                      url={tab.url}
-                      faviconUrl={tab.favIconUrl}
-                      windowId={tab.windowId}
-                      isDragDisabled={isDragDisabled}
-                      isReadOnly={isReadOnly}
-                      isOpen={!!tab.hash && currentTabs && currentTabs.includes(tab.hash)}
-                      isSuggested={isSuggested}
-                      onRemoveTab={onRemoveTab && onRemoveTab(index)}
-                      onCloseTab={!!tab.hash && onCloseTab && onCloseTab(tab.hash)}
-                      onOpenCurrentTab={
-                        !!tab.hash && onOpenCurrentTab && onOpenCurrentTab(tab.hash)
-                      }
-                    />
-                  )
-                })}
+              {isGroupedByWindow
+                ? Object.entries(
+                    groupBy((tab) => tab.windowId.toString(), filteredTabs)
+                  ).flatMap(([windowId, windowTabs], ix) => [
+                    <WindowSeparator key={windowId} index={ix} />,
+                    ...windowTabs.map(mapTab),
+                  ])
+                : filteredTabs.map(mapTab)}
             </div>
 
             {provided.placeholder}
