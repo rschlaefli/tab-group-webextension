@@ -1,7 +1,6 @@
 // ref: https://github.com/lusakasa/saka/blob/master/src/content_script/toggle_saka.js
 
 import { browser } from 'webextension-polyfill-ts'
-import Mousetrap from 'mousetrap'
 
 const sidebar = document.createElement('iframe')
 sidebar.id = 'tabs-sidebar'
@@ -19,9 +18,12 @@ const toggleSidebar = (): void => {
   }
 }
 
-Mousetrap.bind(['command+shift+x', 'ctrl+shift+x'], function () {
-  toggleSidebar()
-  return false
+browser.runtime.onMessage.addListener((message) => {
+  console.log('[sidebar] received message in content script', message)
+
+  if (message === 'TOGGLE_SIDEBAR') {
+    toggleSidebar()
+  }
 })
 
 const sidebarToggle = document.createElement('button')

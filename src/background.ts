@@ -30,6 +30,17 @@ browser.runtime.onMessage.addListener(async (message: any) => {
   }
 })
 
+browser.commands.onCommand.addListener(async (command) => {
+  console.log('[background] received command in background', command)
+
+  if (command === 'toggle_sidebar') {
+    const activeTabs = await browser.tabs.query({ currentWindow: true, active: true })
+    if (activeTabs.length === 1 && activeTabs[0].id) {
+      await browser.tabs.sendMessage(activeTabs[0].id, 'TOGGLE_SIDEBAR')
+    }
+  }
+})
+
 // setup context menu entries
 // browser.contextMenus.create({ title: 'group this', contexts: ['tab'] }, () => null)
 // browser.contextMenus.removeAll()
