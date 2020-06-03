@@ -58,7 +58,11 @@ const currentTabsSlice = createSlice({
 
       if (tabIndex > -1) {
         // merge the existing tab with the changed properties
-        let mergedTab = { ...state.tabs[tabIndex], ...action.payload.tabData }
+        let mergedTab = {
+          ...state.tabs[tabIndex],
+          ...action.payload.tabData,
+          windowId: action.payload.tabData.newWindowId || state.tabs[tabIndex].windowId,
+        }
 
         // check whether a property relevant for the tab hash has been changed
         const hashInvalidated = keys(action.payload.tabData).some((key) =>
@@ -230,6 +234,7 @@ export const updateTabAndNotify = createAsyncThunk<
         'title',
         'favIconUrl',
         'url',
+        'newWindowId',
       ])
     ) {
       // update the internal representation of the tab
