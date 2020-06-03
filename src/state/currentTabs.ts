@@ -179,7 +179,7 @@ export const openCurrentTab = createAsyncThunk<
       // get the selected tab
       const selectedTab = await browser.tabs.get(tab.id)
 
-      // get the currently active tab
+      // get the currently active window
       const currentWindow = await browser.windows.getCurrent()
 
       // move the tab to the current window (if it is in another one)

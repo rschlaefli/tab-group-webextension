@@ -247,11 +247,11 @@ export const closeTabsOutsideGroup = createAsyncThunk<
 
 export const openTabGroup = createAsyncThunk<
   void,
-  { _sender?: any; payload: string },
+  { _sender?: any; payload: { tabGroupId: string; newWindow?: boolean } },
   { dispatch: AppDispatch; state: RootState }
 >(
   'tabGroups/openTabGroup',
-  async ({ _sender, payload: tabGroupId }, thunkAPI): Promise<void> => {
+  async ({ _sender, payload: { tabGroupId, newWindow } }, thunkAPI): Promise<void> => {
     const browser = await getBrowserSafe()
     const state = thunkAPI.getState()
 
@@ -259,6 +259,13 @@ export const openTabGroup = createAsyncThunk<
     if (tabGroupIndex > -1) {
       const tabGroup = state.tabGroups[tabGroupIndex]
 
+      // if the tab group is to be opened in a new window, create one
+      let createdWindow
+      if (newWindow) {
+        createdWindow = await browser.windows.create()
+      }
+
+      // open all of the tabs within the group in the new window
       await Promise.all(
         tabGroup.tabs.map(async (tab) => {
           // if the tab to be opened is already open, dispatch the openCurrentTab functionality instead
@@ -269,6 +276,12 @@ export const openTabGroup = createAsyncThunk<
           }
         })
       )
+
+      // if the tab group was opened in a new window, remove the unnecessary new tab at the start
+      if (createdWindow) {
+        const uiTabs = await browser.tabs.query({ windowId: createdWindow.id, index: 0 })
+        await browser.tabs.remove(uiTabs.map((tab) => tab.id) as number[])
+      }
 
       // if focus mode is enabled, close all of the tabs belonging to other groups
       // but only if they are not also a member of the selected group
@@ -354,7 +367,9 @@ export const processDragEvent = createAsyncThunk<
 // ALIASES
 export const closeTabGroupAlias = createAction<string>('tabGroups/closeTabGroupAlias')
 export const closeTabsOutsideGroupAlias = createAction<string>('tabGroups/closeTabsOutsideGroup')
-export const openTabGroupAlias = createAction<string>('tabGroups/openTabGroupAlias')
+export const openTabGroupAlias = createAction<{ tabGroupId: string; newWindow?: boolean }>(
+  'tabGroups/openTabGroupAlias'
+)
 export const processDragEventAlias = createAction<DropResult>('tabGroups/processDragEventAlias')
 export const tabGroupsAliases = {
   [closeTabGroupAlias.type]: closeTabGroup,
