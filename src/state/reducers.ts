@@ -17,6 +17,8 @@ export default persistReducer(
     storage: syncStorage(),
     blacklist: ['currentTabs'],
     transforms: [compressor],
+    throttle: 500,
+    version: 1,
   },
   combineReducers({
     currentTabs,
