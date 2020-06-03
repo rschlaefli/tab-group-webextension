@@ -23,7 +23,7 @@ interface IProps {
   onRemoveTab?: (tabIndex: number) => () => void
   onRemoveTabGroup?: () => void
   onChangeGroupName?: (newName: string) => void
-  onOpenTabGroup?: () => void
+  onOpenTabGroup?: (newWindow?: boolean) => () => void
   onCloseTab?: (tabHash: string) => () => void
   onSaveSuggestion?: () => void
   onOpenCurrentTab?: (tabHash: string) => () => void
@@ -113,7 +113,7 @@ function TabGroup({
                   <button
                     key="open"
                     className="text-sm text-gray-600 dark:text-gray-400"
-                    onClick={onOpenTabGroup}
+                    onClick={onOpenTabGroup && onOpenTabGroup()}
                     title="open group"
                   >
                     <Launch fontSize="inherit" />
@@ -203,11 +203,14 @@ function TabGroup({
         anchorReference="anchorPosition"
         anchorPosition={contextAnchorPosition}
       >
-        {(!isReadOnly || isSuggested) && (
-          <MenuItem dense onClick={onOpenTabGroup}>
+        {(!isReadOnly || isSuggested) && [
+          <MenuItem dense key="openGroup" onClick={onOpenTabGroup && onOpenTabGroup()}>
             Open Tab Group
-          </MenuItem>
-        )}
+          </MenuItem>,
+          <MenuItem dense key="openGroupInWindow" onClick={onOpenTabGroup && onOpenTabGroup(true)}>
+            Open Tab Group in New Window
+          </MenuItem>,
+        ]}
 
         {!isReadOnly && [
           <MenuItem dense key="close" onClick={onCloseTabGroup}>
