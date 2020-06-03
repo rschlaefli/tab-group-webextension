@@ -35,7 +35,7 @@ export default function syncStorage(): Storage {
       const currentState = (await StorageAPI.local.getItem('persist:root')) || {}
       const lastUpdate = await StorageAPI.local.getItem('lastUpdate')
 
-      if (!lastUpdate || (data.lastUpdate && lastUpdate < data.lastUpdate)) {
+      if (data.lastUpdate && lastUpdate < data.lastUpdate) {
         await Promise.all([
           StorageAPI.local.setItem('persist:root', { ...currentState, ...data['persist:root'] }),
           StorageAPI.local.setItem('lastUpdate', data.lastUpdate),
@@ -74,14 +74,14 @@ export default function syncStorage(): Storage {
   // mirror local storage to sync on a regular schedule
   async function syncLocalStorage(): Promise<void> {
     const lastUpdateLocal: number = await StorageAPI.local.getItem('lastUpdate')
-    const lastUpdate = await StorageAPI.sync.getItem('lastUpdate')
+    const lastUpdateSync = await StorageAPI.sync.getItem('lastUpdate')
 
     console.log('[syncStorage] triggering local<->sync update')
 
     // if the local version is more current than the one on sync
     // we want to upload our changes
     const localData = await StorageAPI.local.getItem('persist:root')
-    if (lastUpdateLocal > lastUpdate) {
+    if (lastUpdateLocal > lastUpdateSync) {
       await Promise.all([
         StorageAPI.sync.setItem('persist:root', omit(UNSYNCED_PROPERTIES, localData)),
         StorageAPI.sync.setItem('lastUpdate', lastUpdateLocal),
@@ -94,12 +94,12 @@ export default function syncStorage(): Storage {
 
     // if the sync version is more current than the one locally
     // we want to download remote changes
-    if (lastUpdateLocal < lastUpdate) {
+    if (lastUpdateLocal < lastUpdateSync) {
       const syncData = await StorageAPI.sync.getItem('persist:root')
 
       await Promise.all([
         StorageAPI.local.setItem('persist:root', { ...localData, ...syncData }),
-        StorageAPI.local.setItem('lastUpdate', lastUpdate),
+        StorageAPI.local.setItem('lastUpdate', lastUpdateSync),
       ])
 
       console.log('[syncStorage] updated local storage with remote changes')

@@ -3,7 +3,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery'
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles'
 
 interface IProps {
-  children: React.ReactChildren | React.ReactChild
+  children: React.ReactChildren | React.ReactChild | React.ReactChild[]
 }
 
 function Layout({ children }: IProps): React.ReactElement {

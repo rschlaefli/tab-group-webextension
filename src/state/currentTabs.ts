@@ -197,7 +197,7 @@ export const openCurrentTab = createAsyncThunk<
       // close the new tab page if we open a group
       if (_sender?.tab?.url && _sender.tab.id) {
         try {
-          if (['moz-extension', 'chrome'].includes(_sender.tab.url.split(':')[0])) {
+          if (['moz-extension', 'chrome-extension'].includes(_sender.tab.url.split(':')[0])) {
             await browser.tabs.remove(_sender.tab.id)
           }
         } catch (e) {
