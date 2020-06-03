@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { FormControlLabel, Switch, Tooltip, Checkbox } from '@material-ui/core'
+import { FormControlLabel, Switch, Tooltip } from '@material-ui/core'
 import { InfoRounded, GroupWork, Settings } from '@material-ui/icons'
 
 import { RootState } from '@src/state/configureStore'
@@ -62,7 +62,7 @@ function ConfigBar(): React.ReactElement {
         {self == top && (
           <FormControlLabel
             control={
-              <Checkbox
+              <Switch
                 size="small"
                 checked={heuristicsEnabled}
                 onChange={handleToggleHeuristics}
