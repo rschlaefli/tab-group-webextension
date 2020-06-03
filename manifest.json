@@ -33,7 +33,7 @@
   },
 
   "web_accessible_resources": ["ui.html"],
-  "commands": {
+  "__chrome__commands": {
     "_execute_browser_action": {
       "suggested_key": {
         "default": "Ctrl+Shift+A"
@@ -43,6 +43,19 @@
       "description": "Open the Tab Group Sidebar",
       "suggested_key": {
         "default": "Ctrl+Shift+X"
+      }
+    }
+  },
+  "__firefox__commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+A"
+      }
+    },
+    "toggle_sidebar": {
+      "description": "Open the Tab Group Sidebar",
+      "suggested_key": {
+        "default": "Ctrl+Shift+Q"
       }
     }
   },
