@@ -88,7 +88,7 @@ const currentTabsSlice = createSlice({
         const tabData = state.tabs[tabIndex]
         console.log('[currentTabs] REMOVE', tabData)
 
-        if (tabData.title !== 'Tab Groups') {
+        if (tabData.title && !['New Tab', 'Tab Groups'].includes(tabData.title)) {
           state.recentTabs = take(5, prepend(tabData, state.recentTabs))
         }
 

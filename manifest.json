@@ -49,7 +49,7 @@
   "__firefox__commands": {
     "_execute_browser_action": {
       "suggested_key": {
-        "default": "Ctrl+Shift+A"
+        "default": "Ctrl+Shift+S"
       }
     },
     "toggle_sidebar": {
@@ -62,7 +62,7 @@
   "__firefox__browser_specific_settings": {
     "gecko": {
       "id": "automated-tab-organization@rschlaefli",
-      "strict_min_version": "70.0",
+      "strict_min_version": "68.0",
       "update_url": "https://tabs.fra1.digitaloceanspaces.com/webextension/firefox-updates.json"
     }
   },

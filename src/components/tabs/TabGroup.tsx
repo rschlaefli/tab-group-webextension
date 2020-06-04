@@ -111,7 +111,7 @@ function TabGroup({
           >
             <div
               className="flex flex-row items-center justify-between h-6 px-2 py-1 bg-gray-100 dark:text-gray-900 dark:bg-gray-700"
-              onContextMenu={handleOpenContextMenu}
+              onContextMenu={(!isReadOnly || isSuggested) && handleOpenContextMenu}
             >
               <button
                 className={clsx(
