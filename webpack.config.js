@@ -28,7 +28,8 @@ const { pipe } = require('ramda')
 const resolveCwd = pipe(process.cwd, fs.realpathSync)
 
 const PATHS = {
-  appIcon: path.resolve(__dirname, 'public/icon_group_24.png'),
+  appIconBlack: path.resolve(__dirname, 'public/baseline_group_work_black_24dp.png'),
+  appIconWhite: path.resolve(__dirname, 'public/baseline_group_work_white_24dp.png'),
   background: path.resolve(__dirname, 'src/background.ts'),
   changelog: path.resolve(__dirname, 'public/changelog.html'),
   cwd: path.resolve(resolveCwd(), '.'),
@@ -244,7 +245,8 @@ module.exports = function (webpackEnv, _) {
           { from: PATHS.sidebarCss },
           { from: PATHS.troubleshooting },
           { from: PATHS.changelog },
-          { from: PATHS.appIcon },
+          { from: PATHS.appIconBlack },
+          { from: PATHS.appIconWhite },
         ],
       }),
       // dynamically generate the main extension ui page

@@ -10,18 +10,26 @@
     "contextMenus"
   ],
   "background": {
-    "scripts": ["background.bundle.js"]
+    "scripts": ["background.bundle.js"],
+    "persistent": false
   },
   "browser_action": {
     "default_icon": {
-      "24": "icon_group_24.png"
+      "24": "baseline_group_work_black_24dp.png"
     },
-    "default_title": "Tab Groups"
+    "default_title": "Tab Groups",
+    "theme_icons": [
+      {
+        "light": "baseline_group_work_black_24dp.png",
+        "dark": "baseline_group_work_white_24dp.png",
+        "size": 24
+      }
+    ]
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "run_at": "document_end",
+      "run_at": "document_idle",
       "js": ["sidebarToggle.bundle.js"],
       "css": ["sidebar.css"]
     }
