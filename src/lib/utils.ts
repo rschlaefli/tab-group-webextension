@@ -190,7 +190,7 @@ export function useBrowserAndOS(): {
       setOS('Windows')
     } else if (navigator.appVersion.indexOf('Mac') != -1) {
       setOS('Mac OS')
-    } else if (navigator.appVersion.indexOf('Linux') != -1) {
+    } else if (navigator.appVersion.indexOf('X11') != -1 || navigator.appVersion.indexOf('Linux')) {
       setOS('Linux')
     } else {
       setOS('Other')
