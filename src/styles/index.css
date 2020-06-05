@@ -1,5 +1,6 @@
 /* purgecss start ignore */
 @import 'tailwindcss/base';
+@import 'webext-base-css/webext-base.css';
 @import 'tailwindcss/components';
 /* purgecss end ignore */
 
@@ -73,7 +74,7 @@ html {
 }
 
 :root {
-  background: #fff;
+  background-color: #fff;
   margin: initial !important;
   max-width: initial !important;
   min-width: initial !important;
@@ -81,4 +82,10 @@ html {
 
 body > * {
   margin: initial !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    background-color: #292a2d;
+  }
 }
