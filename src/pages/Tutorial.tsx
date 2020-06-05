@@ -92,13 +92,11 @@ function Tutorial(): React.ReactElement {
   return (
     <Layout>
       <Container className="p-4">
-        <div className="p-4 bg-gray-100 border border-gray-300 border-solid min-h-64 dark:border-none">
+        <div className="p-4 bg-gray-100 border border-gray-300 border-solid dark:bg-gray-700 min-h-64 dark:border-none">
           {progress === 0 && (
             <div>
               <Markdown content={Introduction} />
-              <Button color="primary" onClick={() => dispatch(updateProgress(1))}>
-                Next Step
-              </Button>
+              <Button onClick={() => dispatch(updateProgress(1))}>Next Step</Button>
             </div>
           )}
 
@@ -164,8 +162,20 @@ function Tutorial(): React.ReactElement {
                         label="System Requirements"
                       />
                     </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
+                    <ExpansionPanelDetails style={{ display: 'flex', flexDirection: 'column' }}>
                       <Markdown content={Requirements} />
+                      <Button
+                        style={{ marginTop: '1rem' }}
+                        onClick={() => {
+                          dispatch(
+                            updateHeuristicsInstallationStep({
+                              heuristicsRequirementsSatisfied: true,
+                            })
+                          )
+                        }}
+                      >
+                        Continue
+                      </Button>
                     </ExpansionPanelDetails>
                   </ExpansionPanel>
 
@@ -208,8 +218,19 @@ function Tutorial(): React.ReactElement {
                         label="Heuristics Setup"
                       />
                     </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
+                    <ExpansionPanelDetails style={{ display: 'flex', flexDirection: 'column' }}>
                       <Markdown content={Setup} />
+                      <Button
+                        style={{ marginTop: '1rem' }}
+                        onClick={() => {
+                          dispatch(
+                            updateHeuristicsInstallationStep({ heuristicsSetupCompleted: true })
+                          )
+                          dispatch(establishHeuristicsConnectionAlias())
+                        }}
+                      >
+                        Continue
+                      </Button>
                     </ExpansionPanelDetails>
                   </ExpansionPanel>
 
@@ -273,9 +294,7 @@ function Tutorial(): React.ReactElement {
 
               <div className="flex justify-between">
                 <Button onClick={() => dispatch(updateProgress(0))}>Previous Step</Button>
-                <Button color="primary" onClick={() => dispatch(updateProgress(2))}>
-                  Next Step
-                </Button>
+                <Button onClick={() => dispatch(updateProgress(2))}>Next Step</Button>
               </div>
             </div>
           )}
@@ -285,9 +304,7 @@ function Tutorial(): React.ReactElement {
               <Markdown content={DataCollection} />
 
               <Button onClick={() => dispatch(updateProgress(1))}>Previous Step</Button>
-              <Button color="primary" onClick={() => dispatch(updateProgress(3))}>
-                Finish Tutorial
-              </Button>
+              <Button onClick={() => dispatch(updateProgress(3))}>Finish Tutorial</Button>
             </div>
           )}
 
