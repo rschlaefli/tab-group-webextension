@@ -60,20 +60,22 @@ function setupListeners({ dispatch, getState }, nativePort?: Runtime.Port): void
 }
 
 function removeListeners(nativePort?: Runtime.Port): void {
-  console.log(browser.browserAction.onClicked.hasListeners())
-  browser.browserAction.onClicked.removeListener(LISTENERS.onBrowserActionClicked)
-  console.log(browser.browserAction.onClicked.hasListeners())
+  try {
+    browser.browserAction.onClicked.removeListener(LISTENERS.onBrowserActionClicked)
 
-  browser.tabs.onCreated.removeListener(LISTENERS.onTabCreated)
-  browser.tabs.onUpdated.removeListener(LISTENERS.onTabUpdated)
-  browser.tabs.onActivated.removeListener(LISTENERS.onTabActivated)
-  browser.tabs.onAttached.removeListener(LISTENERS.onTabAttached)
-  browser.tabs.onRemoved.removeListener(LISTENERS.onTabRemoved)
+    browser.tabs.onCreated.removeListener(LISTENERS.onTabCreated)
+    browser.tabs.onUpdated.removeListener(LISTENERS.onTabUpdated)
+    browser.tabs.onActivated.removeListener(LISTENERS.onTabActivated)
+    browser.tabs.onAttached.removeListener(LISTENERS.onTabAttached)
+    browser.tabs.onRemoved.removeListener(LISTENERS.onTabRemoved)
 
-  if (nativePort) {
-    console.log('[background] Removing native messaging listeners')
-    nativePort.onMessage.removeListener(LISTENERS.onNativeMessage)
-    nativePort.onDisconnect.removeListener(LISTENERS.onNativeDisconnect)
+    if (nativePort) {
+      console.log('[background] Removing native messaging listeners')
+      nativePort.onMessage.removeListener(LISTENERS.onNativeMessage)
+      nativePort.onDisconnect.removeListener(LISTENERS.onNativeDisconnect)
+    }
+  } catch (e) {
+    console.error(e)
   }
 }
 
@@ -86,6 +88,9 @@ export const processSettings = ({ dispatch, getState }) => (settings?: unknown) 
 
   if (typeof options.isHeuristicsBackendEnabled !== 'undefined') {
     if (options.isHeuristicsBackendEnabled) {
+      // remove any listeners that might already exist
+      removeListeners()
+
       try {
         nativePort = browser.runtime.connectNative('tabs')
         console.log('[background] Opened native port:', nativePort.name)
