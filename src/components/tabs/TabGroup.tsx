@@ -38,6 +38,32 @@ const getListStyle = (isDraggingOver: boolean): any => ({
   backgroundColor: isDraggingOver && '#CFDAFC',
 })
 
+const injectWindowSeparators = (inputTabs: ITab[], mapTab: any) => {
+  // group tabs by their window
+  const windowGroups = groupBy((tab) => tab.windowId.toString(), inputTabs)
+
+  // inject window separators
+  const tabListWithSeparators = Object.entries(
+    windowGroups
+  ).flatMap(([windowId, windowTabs], ix) => [
+    <WindowSeparator key={windowId} index={ix} />,
+    ...windowTabs.map(mapTab),
+  ])
+
+  // reduce the list of tabs to get an index that ignores separators
+  const tabListWithConsistentIndex = tabListWithSeparators.reduce(
+    ({ ix, tabs }, tab) => {
+      if (typeof tab === 'function') {
+        return { ix: ix + 1, tabs: tabs.concat(tab(ix)) }
+      }
+      return { ix, tabs: tabs.concat(tab) }
+    },
+    { ix: 0, tabs: [] as any[] }
+  )
+
+  return tabListWithConsistentIndex.tabs
+}
+
 function TabGroup({
   id,
   name,
@@ -69,7 +95,7 @@ function TabGroup({
 
   const filteredTabs = tabs.filter((tab) => typeof tab.id !== 'undefined')
 
-  const mapTab = (tab: ITab, index: number): React.ReactElement => {
+  const mapTab = (tab: ITab) => (index: number): React.ReactElement => {
     const uniqueId = `${tab.id}-${tab.hash}-${id}`
     return (
       <Tab
@@ -194,13 +220,8 @@ function TabGroup({
               className={clsx('min-h-8', tabs.length > 0 && isCollapsed && 'hidden', 'md:block')}
             >
               {isGroupedByWindow
-                ? Object.entries(
-                    groupBy((tab) => tab.windowId.toString(), filteredTabs)
-                  ).flatMap(([windowId, windowTabs], ix) => [
-                    <WindowSeparator key={windowId} index={ix} />,
-                    ...windowTabs.map(mapTab),
-                  ])
-                : filteredTabs.map(mapTab)}
+                ? injectWindowSeparators(filteredTabs, mapTab)
+                : filteredTabs.map((tab, ix) => mapTab(tab)(ix))}
             </div>
 
             {provided.placeholder}

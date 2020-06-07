@@ -91,6 +91,11 @@ export const openExtensionUI = createAsyncThunk<
     const browser = await getBrowserSafe()
     const state = thunkAPI.getState()
 
+    // get the currently active tab
+    const currentTab = await browser.tabs.query({
+      active: true,
+    })
+
     // if there are any existing tab group pages, get them for recycling
     // otherwise, open a new tab with the tab group overview
     const existingTabs = state.currentTabs.tabs.filter((tab) => tab.title === 'Tab Groups')
@@ -98,6 +103,11 @@ export const openExtensionUI = createAsyncThunk<
       thunkAPI.dispatch(openCurrentTab({ payload: existingTabs[0].hash as string }) as any)
     } else {
       await browser.tabs.create({ url: 'ui.html' })
+    }
+
+    // remove the source tab if it was a "New Tab" page
+    if (currentTab?.length > 0 && currentTab[0]?.title === 'New Tab') {
+      await browser.tabs.remove(currentTab[0].id as number)
     }
   }
 )

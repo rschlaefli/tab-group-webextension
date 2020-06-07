@@ -42,3 +42,9 @@ body.tabGroupsPinned {
   border: 1px solid grey;
   border-radius: 5px;
 }
+
+@media print {
+  #tabs-sidebar-toggle {
+    display: none;
+  }
+}
