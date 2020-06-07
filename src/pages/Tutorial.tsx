@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Button,
   Stepper,
@@ -18,6 +18,7 @@ import {
 import { ExpandMore } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles'
 import { useDispatch, useSelector } from 'react-redux'
+import axios from 'axios'
 
 import Layout from '@src/components/common/Layout'
 import Markdown from '@src/components/common/Markdown'
@@ -76,6 +77,8 @@ const ExpansionPanelDetails = withStyles((theme) => ({
 function Tutorial(): React.ReactElement {
   const dispatch = useDispatch()
 
+  const [heuristicsVersion, setHeuristicsVersion] = useState<string>()
+
   const {
     progress,
     heuristicsRequirementsSatisfied,
@@ -83,6 +86,16 @@ function Tutorial(): React.ReactElement {
     heuristicsConnectionEstablished,
     heuristicsConnectionError,
   } = useSelector((state: RootState) => state.tutorial)
+
+  useEffect(() => {
+    const fetchHeuristicsVersion = async () => {
+      const { data } = await axios.get(
+        'https://tabs.fra1.digitaloceanspaces.com/heuristics/heuristics-version.json'
+      )
+      setHeuristicsVersion(data.latest)
+    }
+    fetchHeuristicsVersion()
+  }, [])
 
   const { browser, os, setBrowser, setOS } = useBrowserAndOS()
 
@@ -219,7 +232,10 @@ function Tutorial(): React.ReactElement {
                       />
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails style={{ display: 'flex', flexDirection: 'column' }}>
-                      <Markdown content={Setup} />
+                      <Markdown
+                        content={Setup}
+                        replace={{ key: '__VERSION__', value: heuristicsVersion || 'X.X.X' }}
+                      />
                       <Button
                         style={{ marginTop: '1rem' }}
                         onClick={() => {
