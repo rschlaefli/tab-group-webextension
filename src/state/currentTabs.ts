@@ -270,7 +270,7 @@ export const activateTabAndNotify = createAsyncThunk<
 
     await postNativeMessage(nativePort, {
       action: TAB_ACTION.ACTIVATE,
-      payload: pickRelevantProperties({ id: activeInfo.tabId, ...activeInfo }),
+      payload: { id: activeInfo.tabId, ...activeInfo },
     })
   }
 )
@@ -282,7 +282,7 @@ export const removeTabAndNotify = createAsyncThunk<void, any, { dispatch: AppDis
 
     await postNativeMessage(nativePort, {
       action: TAB_ACTION.REMOVE,
-      payload: pickRelevantProperties({ id: tabId, ...removeInfo }),
+      payload: { id: tabId, ...removeInfo },
     })
   }
 )
