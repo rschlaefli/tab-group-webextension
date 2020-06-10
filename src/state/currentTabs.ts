@@ -256,11 +256,11 @@ export const updateTabAndNotify = createAsyncThunk<
     ) {
       // update the internal representation of the tab
       await thunkAPI.dispatch(updateTab({ tabId: id, tabData: changeData }))
-    }
 
-    // notify the heuristics engine about the new tab if the tab change has completed
-    if (nativePort && newTab) {
-      debounceUpdateNotification(id)(nativePort, generateUpdateContents(newTab))
+      // notify the heuristics engine about the new tab if the tab change has completed
+      if (nativePort && newTab && newTab.status == 'complete') {
+        debounceUpdateNotification(id)(nativePort, generateUpdateContents(newTab))
+      }
     }
   }
 )
