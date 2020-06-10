@@ -86,29 +86,27 @@ export const processSettings = ({ dispatch, getState }) => (settings?: unknown) 
 
   console.log('[background] Processing options', options)
 
-  if (typeof options.isHeuristicsBackendEnabled !== 'undefined') {
-    if (options.isHeuristicsBackendEnabled && !nativePort) {
-      // remove any listeners that might already exist
-      removeListeners()
+  if (options.isHeuristicsBackendEnabled && !nativePort) {
+    // remove any listeners that might already exist
+    removeListeners()
 
-      try {
-        nativePort = browser.runtime.connectNative('tabs')
-        console.log('[background] Opened native port:', nativePort.name)
-        setupListeners({ dispatch, getState }, nativePort)
-      } catch (e) {
-        console.error('[background] Failed to connect to the native backend', e)
-        // TODO: disable heuristics? send a notification?
-        setupListeners({ dispatch, getState })
-      }
-    } else if (!options.isHeuristicsBackendEnabled) {
-      // if there is a native port, but the heuristics have been disabled, close the port
-      if (nativePort) {
-        removeListeners(nativePort)
-        nativePort.disconnect()
-        nativePort = null
-      }
+    try {
+      nativePort = browser.runtime.connectNative('tabs')
+      console.log('[background] Opened native port:', nativePort.name)
+      setupListeners({ dispatch, getState }, nativePort)
+    } catch (e) {
+      console.error('[background] Failed to connect to the native backend', e)
+      // TODO: disable heuristics? send a notification?
       setupListeners({ dispatch, getState })
     }
+  } else if (!options.isHeuristicsBackendEnabled) {
+    // if there is a native port, but the heuristics have been disabled, close the port
+    if (nativePort) {
+      removeListeners(nativePort)
+      nativePort.disconnect()
+      nativePort = null
+    }
+    setupListeners({ dispatch, getState })
   }
 
   const tutorial = currentState.tutorial
