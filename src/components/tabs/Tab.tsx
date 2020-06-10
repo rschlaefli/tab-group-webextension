@@ -12,6 +12,8 @@ import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 
 import useContextMenu from '@src/lib/useContextMenu'
+import { useDispatch } from 'react-redux'
+import { openInNewTabAlias } from '@src/state/tabGroups'
 
 interface IProps {
   uniqueId: string
@@ -58,6 +60,7 @@ function Tab({
   onCloseTab,
   onOpenCurrentTab,
 }: IProps): React.ReactElement {
+  const dispatch = useDispatch()
   const styles = useStyles()
 
   const {
@@ -69,7 +72,7 @@ function Tab({
 
   const handleOpenTab = (url, newTab = false) => () => {
     if (newTab) {
-      window.open(url, '_blank')
+      dispatch(openInNewTabAlias(url))
     } else {
       if (window.location !== window.parent.location) {
         window.parent.location.replace(url)

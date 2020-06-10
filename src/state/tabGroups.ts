@@ -364,6 +364,18 @@ export const processDragEvent = createAsyncThunk<
   }
 )
 
+export const openInNewTab = createAsyncThunk<
+  void,
+  { payload: string },
+  { dispatch: AppDispatch; state: RootState }
+>(
+  'tabGroups/openInNewTab',
+  async ({ payload: url }, _): Promise<void> => {
+    const browser = await getBrowserSafe()
+    await browser.tabs.create({ url, active: false })
+  }
+)
+
 // ALIASES
 export const closeTabGroupAlias = createAction<string>('tabGroups/closeTabGroupAlias')
 export const closeTabsOutsideGroupAlias = createAction<string>('tabGroups/closeTabsOutsideGroup')
@@ -371,9 +383,11 @@ export const openTabGroupAlias = createAction<{ tabGroupId: string; newWindow?: 
   'tabGroups/openTabGroupAlias'
 )
 export const processDragEventAlias = createAction<DropResult>('tabGroups/processDragEventAlias')
+export const openInNewTabAlias = createAction<string>('tabGroups/openInNewTabAlias')
 export const tabGroupsAliases = {
   [closeTabGroupAlias.type]: closeTabGroup,
   [closeTabsOutsideGroupAlias.type]: closeTabsOutsideGroup,
   [openTabGroupAlias.type]: openTabGroup,
   [processDragEventAlias.type]: processDragEvent,
+  [openInNewTabAlias.type]: openInNewTab,
 }
