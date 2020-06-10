@@ -79,7 +79,7 @@ function removeListeners(nativePort?: Runtime.Port): void {
   }
 }
 
-let nativePort: Runtime.Port
+let nativePort: Runtime.Port | null
 export const processSettings = ({ dispatch, getState }) => (settings?: unknown) => {
   const currentState: RootState = getState()
   const options: any = settings || currentState.settings
@@ -87,7 +87,7 @@ export const processSettings = ({ dispatch, getState }) => (settings?: unknown) 
   console.log('[background] Processing options', options)
 
   if (typeof options.isHeuristicsBackendEnabled !== 'undefined') {
-    if (options.isHeuristicsBackendEnabled) {
+    if (options.isHeuristicsBackendEnabled && !nativePort) {
       // remove any listeners that might already exist
       removeListeners()
 
@@ -100,11 +100,12 @@ export const processSettings = ({ dispatch, getState }) => (settings?: unknown) 
         // TODO: disable heuristics? send a notification?
         setupListeners({ dispatch, getState })
       }
-    } else {
+    } else if (!options.isHeuristicsBackendEnabled) {
       // if there is a native port, but the heuristics have been disabled, close the port
-      if (typeof nativePort !== 'undefined') {
+      if (nativePort) {
         removeListeners(nativePort)
         nativePort.disconnect()
+        nativePort = null
       }
       setupListeners({ dispatch, getState })
     }
