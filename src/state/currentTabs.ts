@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
 import { Tabs, Runtime } from 'webextension-polyfill-ts'
 import { take, prepend, append, findIndex, remove, update, find, keys, any } from 'ramda'
+import _debounce from 'lodash.debounce'
+
 import {
   getBrowserSafe,
   augmentTabExtras,
@@ -212,6 +214,21 @@ export const openCurrentTab = createAsyncThunk<
   }
 )
 
+const generateUpdateContents = (tabData) => () => ({
+  action: TAB_ACTION.UPDATE,
+  // TODO: get rid of this double hash calculation
+  payload: pickRelevantProperties(augmentTabExtras(tabData as Partial<ITab>)),
+})
+
+const DEBOUNCERS = {}
+const debounceUpdateNotification = (tabId: number) => {
+  if (DEBOUNCERS[tabId]) {
+    return DEBOUNCERS[tabId]
+  }
+  DEBOUNCERS[tabId] = _debounce(postNativeMessage, 2000)
+  return DEBOUNCERS[tabId]
+}
+
 export const updateTabAndNotify = createAsyncThunk<
   void,
   {
@@ -242,12 +259,8 @@ export const updateTabAndNotify = createAsyncThunk<
     }
 
     // notify the heuristics engine about the new tab if the tab change has completed
-    if (nativePort && newTab && status === 'complete') {
-      await postNativeMessage(nativePort, {
-        action: TAB_ACTION.UPDATE,
-        // TODO: get rid of this double hash calculation
-        payload: pickRelevantProperties(augmentTabExtras(newTab as Partial<ITab>)),
-      })
+    if (nativePort && newTab) {
+      debounceUpdateNotification(id)(nativePort, generateUpdateContents(newTab))
     }
   }
 )

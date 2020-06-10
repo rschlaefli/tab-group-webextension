@@ -147,17 +147,25 @@ export function pickRelevantProperties(tabData: Partial<ITab>): Partial<ITab> {
  * @param nativePort
  * @param message
  */
+type MessageContents = { action: TAB_ACTION; payload: any }
+type MessageGenerator = () => { action: TAB_ACTION; payload: any }
 export async function postNativeMessage(
   nativePort: Runtime.Port,
-  message: { action: TAB_ACTION; payload: any }
+  message: MessageContents | MessageGenerator
 ): Promise<void> {
   if (!nativePort) {
     return Promise.resolve()
   }
 
   try {
-    console.info('[postNativeMessage] Sending message to Heuristics Engine', message)
-    nativePort.postMessage(message)
+    if (typeof message === 'function') {
+      const messageContents = message()
+      console.info('[currentTabs] Sending lazy message to Heuristics Engine', messageContents)
+      nativePort.postMessage(messageContents)
+    } else {
+      console.info('[currentTabs] Sending message to Heuristics Engine', message)
+      nativePort.postMessage(message)
+    }
     return Promise.resolve()
   } catch (e) {
     console.error(e)
