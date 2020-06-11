@@ -52,7 +52,7 @@ export default function onNativeMessage({ dispatch, getState }, nativePort) {
           '[background] Received status update from heuristics',
           messageFromHeuristics.payload
         )
-        dispatch(updateHeuristicsStatus(messageFromHeuristics.payload))
+        dispatch(updateHeuristicsStatus(messageFromHeuristics.payload?.message))
         break
       }
     }
