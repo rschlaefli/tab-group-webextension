@@ -225,7 +225,7 @@ const debounceUpdateNotification = (tabId: number) => {
   if (DEBOUNCERS[tabId]) {
     return DEBOUNCERS[tabId]
   }
-  DEBOUNCERS[tabId] = _debounce(postNativeMessage, 2000)
+  DEBOUNCERS[tabId] = _debounce(postNativeMessage, 1500)
   return DEBOUNCERS[tabId]
 }
 
@@ -241,9 +241,7 @@ export const updateTabAndNotify = createAsyncThunk<
 >(
   'currentTabs/updateTabAndNotify',
   async ({ id, changeData, newTab, nativePort }, thunkAPI): Promise<void> => {
-    const { status, ...rest } = changeData
-
-    const updatedKeys = keys(rest)
+    const updatedKeys = keys(changeData)
 
     if (
       any((propertyName: any) => updatedKeys.includes(propertyName), [
@@ -258,7 +256,7 @@ export const updateTabAndNotify = createAsyncThunk<
       await thunkAPI.dispatch(updateTab({ tabId: id, tabData: changeData }))
 
       // notify the heuristics engine about the new tab if the tab change has completed
-      if (nativePort && newTab && newTab.status == 'complete') {
+      if (nativePort && newTab) {
         debounceUpdateNotification(id)(nativePort, generateUpdateContents(newTab))
       }
     }
