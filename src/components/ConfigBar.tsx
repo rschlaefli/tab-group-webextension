@@ -1,7 +1,8 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { FormControlLabel, Switch, Tooltip } from '@material-ui/core'
+import { FormControlLabel, Switch, Tooltip, Typography } from '@material-ui/core'
 import { InfoRounded, ZoomOutMap, Settings, ChromeReaderModeSharp } from '@material-ui/icons'
+import clsx from 'clsx'
 
 import { RootState } from '@src/state/configureStore'
 import {
@@ -19,6 +20,7 @@ function ConfigBar(): React.ReactElement {
   const heuristicsEnabled = useSelector(
     (state: RootState) => state.settings.isHeuristicsBackendEnabled
   )
+  const heuristicsStatus = useSelector((state: RootState) => state.settings.heuristicsStatus)
 
   const handleOpenOptions = async (): Promise<void> => {
     dispatch(openOptionsPageAlias())
@@ -65,8 +67,22 @@ function ConfigBar(): React.ReactElement {
         </Tooltip>
       </div>
 
-      <div className="flex flex-row items-center">
-        {self == top && (
+      <div className="flex items-center">
+        <div className="flex items-center mr-4">
+          {heuristicsEnabled && (
+            <div
+              className={clsx(
+                'px-2 py-1 rounded',
+                heuristicsStatus === 'RUNNING' && 'bg-green-800 text-white',
+                heuristicsStatus === 'FAILED' && 'bg-red-800 text-white',
+                heuristicsStatus === 'STOPPED' && 'bg-gray-200'
+              )}
+            >
+              {heuristicsStatus}
+            </div>
+          )}
+        </div>
+        {(self == top || self.name === 'New Tab') && (
           <FormControlLabel
             control={
               <Switch
@@ -80,7 +96,7 @@ function ConfigBar(): React.ReactElement {
             label="Heuristics"
           />
         )}
-        {self != top && (
+        {self != top && self.name !== 'New Tab' && (
           <button
             className="mr-2 text-lg text-gray-600 dark:text-gray-100"
             onClick={handlePinSidebar}
@@ -90,7 +106,7 @@ function ConfigBar(): React.ReactElement {
           </button>
         )}
 
-        {self != top && (
+        {self != top && self.name !== 'New Tab' && (
           <button
             className="mr-2 text-lg text-gray-600 dark:text-gray-100"
             onClick={handleOpenUI}

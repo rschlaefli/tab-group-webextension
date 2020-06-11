@@ -5,6 +5,7 @@ import { AppDispatch } from '@src/background'
 import { RootState } from './configureStore'
 import { processSettings } from '@src/lib/listeners'
 import { openCurrentTab } from './currentTabs'
+import { HEURISTICS_STATUS } from '@src/types/Extension'
 
 const settingsSlice = createSlice({
   name: 'settings',
@@ -12,8 +13,12 @@ const settingsSlice = createSlice({
     isDebugLoggingEnabled: true,
     isHeuristicsBackendEnabled: false,
     isFocusModeEnabled: false,
+    heuristicsStatus: null,
   },
   reducers: {
+    updateHeuristicsStatus(state, action): void {
+      state.heuristicsStatus = action.payload
+    },
     updateIsDebugLoggingEnabled(state, action): void {
       state.isDebugLoggingEnabled = action.payload
     },
@@ -28,6 +33,7 @@ const settingsSlice = createSlice({
 
 const { actions, reducer } = settingsSlice
 export const {
+  updateHeuristicsStatus,
   toggleFocusMode,
   updateIsDebugLoggingEnabled,
   updateIsHeuristicsBackendEnabled,
@@ -76,6 +82,9 @@ export const toggleHeuristicsBackend = createAsyncThunk<
   async (_, thunkAPI): Promise<void> => {
     const state = thunkAPI.getState()
     const isHeuristicsBackendEnabled = !state.settings.isHeuristicsBackendEnabled
+    if (!isHeuristicsBackendEnabled) {
+      thunkAPI.dispatch(updateHeuristicsStatus(null))
+    }
     thunkAPI.dispatch(updateIsHeuristicsBackendEnabled(isHeuristicsBackendEnabled))
     processSettings(thunkAPI)({ isHeuristicsBackendEnabled })
   }
@@ -111,6 +120,23 @@ export const openExtensionUI = createAsyncThunk<
     }
   }
 )
+
+export const processHeuristicsStatusUpdate = createAsyncThunk<
+  void,
+  string,
+  { dispatch: AppDispatch; state: RootState }
+>('settings/updateHeuristicsStatus', async (heuristicsStatus, thunkAPI) => {
+  switch (heuristicsStatus) {
+    case HEURISTICS_STATUS.ALREADY_RUNNING: {
+      thunkAPI.dispatch(updateHeuristicsStatus(HEURISTICS_STATUS.ALREADY_RUNNING))
+      break
+    }
+    case HEURISTICS_STATUS.RUNNING: {
+      thunkAPI.dispatch(updateHeuristicsStatus(HEURISTICS_STATUS.RUNNING))
+      break
+    }
+  }
+})
 
 // ALIASES
 export const openOptionsPageAlias = createAction('settings/openOptionsPageAlias')

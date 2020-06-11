@@ -7,9 +7,10 @@ import {
 } from '@src/types/Extension'
 import { updateSuggestedGroups } from '@src/state/suggestions'
 import { postNativeMessage, pickRelevantProperties } from '../utils'
+import { updateHeuristicsStatus } from '@src/state/settings'
 
 export default function onNativeMessage({ dispatch, getState }, nativePort) {
-  return function onNativeMessageListener(messageFromHeuristics: IHeuristicsAction) {
+  return function onNativeMessageListener(messageFromHeuristics: IHeuristicsAction): void {
     console.log('[background] Received message over native port:', messageFromHeuristics)
 
     switch (messageFromHeuristics.action) {
@@ -19,16 +20,6 @@ export default function onNativeMessage({ dispatch, getState }, nativePort) {
 
       case HEURISTICS_ACTION.NEW_TAB:
         browser.tabs.create({ url: messageFromHeuristics.payload.url })
-        break
-
-      case HEURISTICS_ACTION.NOTIFY:
-        browser.notifications.create('heuristics-notify', {
-          title: 'New Event',
-          type: 'basic',
-          message: messageFromHeuristics.payload.message,
-          iconUrl:
-            'data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7',
-        })
         break
 
       case HEURISTICS_ACTION.QUERY_TABS: {
@@ -53,6 +44,15 @@ export default function onNativeMessage({ dispatch, getState }, nativePort) {
             })),
           },
         })
+        break
+      }
+
+      case HEURISTICS_ACTION.HEURISTICS_STATUS: {
+        console.log(
+          '[background] Received status update from heuristics',
+          messageFromHeuristics.payload
+        )
+        dispatch(updateHeuristicsStatus(messageFromHeuristics.payload))
         break
       }
     }
