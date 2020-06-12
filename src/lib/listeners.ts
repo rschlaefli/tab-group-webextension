@@ -9,6 +9,7 @@ import onTabCreated from './listeners/onTabCreated'
 import onTabRemoved from './listeners/onTabRemoved'
 import onTabUpdated from './listeners/onTabUpdated'
 import { RootState } from '@src/state/configureStore'
+import onIdleStateChanged from './listeners/onIdleStateChanged'
 
 const RELEVANT_TAB_PROPS = ['pinned', 'title', 'status', 'favIconUrl', 'url']
 
@@ -50,29 +51,39 @@ function setupListeners({ dispatch, getState }, nativePort?: Runtime.Port): void
   LISTENERS.onTabRemoved = onTabRemoved({ dispatch }, nativePort)
   browser.tabs.onRemoved.addListener(LISTENERS.onTabRemoved)
 
+  // setup a listener that tracks window focus changes
+  LISTENERS.onWindowFocusChanged = (...params) => console.log(params)
+  browser.windows.onFocusChanged.addListener(LISTENERS.onWindowFocusChanged)
+
   if (nativePort) {
     LISTENERS.onNativeMessage = onNativeMessage({ dispatch, getState }, nativePort)
     nativePort.onMessage.addListener(LISTENERS.onNativeMessage)
 
-    LISTENERS.onNativeDisconnect = onNativeDisconnect
+    LISTENERS.onNativeDisconnect = onNativeDisconnect({ dispatch })
     nativePort.onDisconnect.addListener(LISTENERS.onNativeDisconnect)
+
+    // setup a listener to track idle status
+    LISTENERS.onIdleStateChanged = onIdleStateChanged(nativePort)
+    browser.idle.onStateChanged.addListener(LISTENERS.onIdleStateChanged)
   }
 }
 
 function removeListeners(nativePort?: Runtime.Port): void {
   try {
     browser.browserAction.onClicked.removeListener(LISTENERS.onBrowserActionClicked)
-
     browser.tabs.onCreated.removeListener(LISTENERS.onTabCreated)
     browser.tabs.onUpdated.removeListener(LISTENERS.onTabUpdated)
     browser.tabs.onActivated.removeListener(LISTENERS.onTabActivated)
     browser.tabs.onAttached.removeListener(LISTENERS.onTabAttached)
     browser.tabs.onRemoved.removeListener(LISTENERS.onTabRemoved)
+    browser.windows.onFocusChanged.removeListener(LISTENERS.onWindowFocusChanged)
+    browser.idle.onStateChanged.removeListener(LISTENERS.onIdleStateChanged)
 
     if (nativePort) {
       console.log('[background] Removing native messaging listeners')
       nativePort.onMessage.removeListener(LISTENERS.onNativeMessage)
       nativePort.onDisconnect.removeListener(LISTENERS.onNativeDisconnect)
+      browser.idle.onStateChanged.removeListener(LISTENERS.onIdleStateChanged)
     }
   } catch (e) {
     console.error(e)

@@ -57,6 +57,7 @@
     "@svgr/webpack": "5.4.0",
     "@types/chrome": "0.0.114",
     "@types/jest": "26.0.0",
+    "@types/lodash.debounce": "4.0.6",
     "@types/node": "14.0.13",
     "@types/papaparse": "5.0.4",
     "@types/ramda": "0.27.6",

@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
 import { Tabs, Runtime } from 'webextension-polyfill-ts'
 import { take, prepend, append, findIndex, remove, update, find, keys, any } from 'ramda'
 import _debounce from 'lodash.debounce'
+import _delay from 'lodash.delay'
 
 import {
   getBrowserSafe,
@@ -270,8 +271,6 @@ export const activateTabAndNotify = createAsyncThunk<
 >(
   'currentTabs/activateTabAndNotify',
   async ({ activeInfo, nativePort }, thunkAPI): Promise<void> => {
-    // TODO: lookup hashes of new and previous active tab and send to the heuristics engine?
-
     await thunkAPI.dispatch(
       activateTab({
         tabId: activeInfo.tabId,

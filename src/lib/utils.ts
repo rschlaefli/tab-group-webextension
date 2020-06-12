@@ -41,7 +41,7 @@ export async function performBrowserActionSafe(
   try {
     await func(await getBrowserSafe())
   } catch (e) {
-    console.error(e)
+    if (console) console.error(e)
   }
 }
 
