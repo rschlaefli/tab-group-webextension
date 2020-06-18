@@ -103,7 +103,7 @@
     "husky": "4.2.5",
     "jest": "26.0.1",
     "json-stringify-safe": "5.0.1",
-    "lint-staged": "10.2.9",
+    "lint-staged": "10.2.11",
     "lodash.debounce": "4.0.8",
     "lz-string": "1.4.4",
     "markdown-loader": "5.1.0",
