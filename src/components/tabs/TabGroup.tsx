@@ -93,10 +93,10 @@ function TabGroup({
     handleCloseContextMenu,
   } = useContextMenu()
 
-  const filteredTabs = tabs.filter((tab) => typeof tab.id !== 'undefined')
+  const filteredTabs = tabs.filter((tab) => typeof tab.hash !== 'undefined')
 
   const mapTab = (tab: ITab) => (index: number): React.ReactElement => {
-    const uniqueId = `${tab.id}-${tab.hash}-${id}`
+    const uniqueId = `${tab.hash}-${id}`
     return (
       <Tab
         uniqueId={uniqueId}

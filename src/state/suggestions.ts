@@ -2,17 +2,16 @@ import { createSlice } from '@reduxjs/toolkit'
 import { v4 as uuidv4 } from 'uuid'
 
 import { ITabGroup } from '@src/types/Extension'
-import { augmentTabExtras } from '@src/lib/utils'
 
 const suggestionsSlice = createSlice({
   name: 'suggestions',
   initialState: [] as ITabGroup[],
   reducers: {
     updateSuggestedGroups(_, action): ITabGroup[] {
-      return action.payload.map(([keywords, tabs]) => ({
+      return action.payload.map(({ name, tabs }) => ({
         id: uuidv4(),
-        name: keywords ?? 'xyz',
-        tabs: tabs.map(augmentTabExtras),
+        name: name ?? 'xyz',
+        tabs,
         readOnly: true,
         collapsed: false,
       }))
