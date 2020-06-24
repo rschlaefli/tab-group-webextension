@@ -140,7 +140,7 @@
     "ts-loader": "7.0.5",
     "typescript": "3.9.5",
     "url-loader": "4.1.0",
-    "uuid": "8.1.0",
+    "uuid": "8.2.0",
     "webext-base-css": "1.1.0",
     "webext-redux": "2.1.6",
     "webext-storage-cache": "3.0.0",
