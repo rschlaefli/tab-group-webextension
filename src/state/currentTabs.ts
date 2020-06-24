@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
 import { Tabs, Runtime } from 'webextension-polyfill-ts'
 import { take, prepend, append, findIndex, remove, update, find, keys, any } from 'ramda'
 import _debounce from 'lodash.debounce'
-import _delay from 'lodash.delay'
 
 import {
   getBrowserSafe,

@@ -47,17 +47,17 @@ export interface IHeuristicsAction {
 export interface ITab {
   // Tabs.Tab properties that are important for grouping
   favIconUrl?: string
-  id: number
-  index: number
+  id?: number
+  index?: number
   lastAccessed?: number
   openerTabId?: number
-  pinned: boolean
+  pinned?: boolean
   sessionId?: string
   status?: 'loading' | 'complete'
   successorTabId?: number
-  title?: string
-  url?: string
-  windowId: number
+  title: string
+  url: string
+  windowId?: number
 
   // derived properties
   normalizedTitle?: string
