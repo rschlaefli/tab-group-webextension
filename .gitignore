@@ -3,6 +3,7 @@ node_modules/
 
 # do not track build output
 build/
+builds/
 
 # do not track generated tailwind css
 src/styles/tailwind.css
