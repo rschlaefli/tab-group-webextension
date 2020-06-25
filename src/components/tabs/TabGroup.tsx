@@ -28,10 +28,11 @@ interface IProps {
   onChangeGroupName?: (newName: string) => void
   onOpenTabGroup?: (newWindow?: boolean) => () => void
   onCloseTab?: (tabHash: string) => () => void
-  onSaveSuggestion?: () => void
   onOpenCurrentTab?: (tabHash: string) => () => void
   onCloseTabGroup?: () => void
   onCloseTabsOutsideGroup?: () => void
+  onAcceptSuggestion?: () => void
+  onDiscardSuggestion?: () => void
 }
 
 const getListStyle = (isDraggingOver: boolean): any => ({
@@ -81,10 +82,11 @@ function TabGroup({
   onRemoveTab,
   onRemoveTabGroup,
   onCloseTab,
-  onSaveSuggestion,
   onOpenCurrentTab,
   onCloseTabGroup,
   onCloseTabsOutsideGroup,
+  onAcceptSuggestion,
+  onDiscardSuggestion,
 }: IProps): React.ReactElement {
   const {
     isContextMenuOpen,
@@ -174,7 +176,7 @@ function TabGroup({
                   </button>
                 )}
 
-                {!isReadOnly && [
+                {!isReadOnly && (
                   <button
                     key="close"
                     className="ml-2 text-xs text-gray-600 dark:text-gray-400"
@@ -182,23 +184,14 @@ function TabGroup({
                     title="close group"
                   >
                     <Close fontSize="inherit" />
-                  </button>,
-                  // <button
-                  //   key="remove"
-                  //   className="ml-2 text-sm text-gray-600 dark:text-gray-400"
-                  //   onClick={onRemoveTabGroup}
-                  //   title="remove group"
-                  // >
-                  //   <Delete fontSize="inherit" />
-                  // </button>,
-                ]}
+                  </button>
+                )}
 
                 {isSuggested && [
                   <button
-                    disabled
                     key="discard"
-                    className="ml-2 mr-2 text-xs text-gray-400 dark:text-gray-600"
-                    onClick={() => null}
+                    className="ml-2 mr-2 text-xs text-gray-600 dark:text-gray-400"
+                    onClick={onDiscardSuggestion}
                     title="discard suggestion"
                   >
                     <Delete fontSize="inherit" />
@@ -206,7 +199,7 @@ function TabGroup({
                   <button
                     key="save"
                     className="text-xs text-gray-600 dark:text-gray-400"
-                    onClick={onSaveSuggestion}
+                    onClick={onAcceptSuggestion}
                     title="save suggestion"
                   >
                     <Save fontSize="inherit" />

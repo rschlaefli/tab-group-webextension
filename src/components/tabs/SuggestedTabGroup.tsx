@@ -7,9 +7,15 @@ import { ITabGroup } from '@src/types/Extension'
 
 interface IProps {
   selector: (state: RootState) => ITabGroup
+  onAcceptSuggestion: () => void
+  onDiscardSuggestion: () => void
 }
 
-function SuggestedTabGroup({ selector }: IProps): React.ReactElement {
+function SuggestedTabGroup({
+  selector,
+  onAcceptSuggestion,
+  onDiscardSuggestion,
+}: IProps): React.ReactElement {
   const tabHashes = useSelector((state: RootState) => state.currentTabs.tabHashes)
 
   const { id, name, tabs } = useSelector(selector)
@@ -18,13 +24,14 @@ function SuggestedTabGroup({ selector }: IProps): React.ReactElement {
     <TabGroup
       isSuggested
       isDropDisabled
-      isDragDisabled
       isReadOnly
       currentTabs={tabHashes}
-      key={id}
-      id={id}
+      key={`suggest-${id}`}
+      id={`suggest-${id}`}
       name={name}
       tabs={tabs}
+      onAcceptSuggestion={onAcceptSuggestion}
+      onDiscardSuggestion={onDiscardSuggestion}
     />
   )
 }

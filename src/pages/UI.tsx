@@ -83,7 +83,7 @@ function UI(): React.ReactElement {
 
           {heuristicsEnabled && (
             <div>
-              <div className="flex flex-row justify-between">
+              <div className="flex flex-row items-center justify-between">
                 <Typography variant="body1">Suggestions</Typography>
                 <button className="text-lg">
                   <Refresh fontSize="inherit" />
@@ -98,6 +98,8 @@ function UI(): React.ReactElement {
                     <SuggestedTabGroup
                       key={suggestionIndex}
                       selector={(state: RootState) => state.suggestions[suggestionIndex]}
+                      onAcceptSuggestion={() => console.log('accepted tab group')}
+                      onDiscardSuggestion={() => console.log('discarded tab group')}
                     />
                   ))
                 )}
