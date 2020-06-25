@@ -155,7 +155,10 @@ function TabGroup({
                 )}
               </button>
 
-              <h1 className="mr-2 text-xs font-bold text-gray-600 dark:text-gray-400 ellipsis">
+              <h1
+                className="mr-2 text-xs font-bold text-gray-600 dark:text-gray-400 ellipsis"
+                title={name}
+              >
                 {isReadOnly ? name : <Input fullWidth value={name} onChange={onChangeGroupName} />}
               </h1>
 
