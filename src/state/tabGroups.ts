@@ -354,8 +354,21 @@ export const processDragEvent = createAsyncThunk<
     }
 
     if (properties.sourceGroupId === 'recent') {
-      const recentTab = state.currentTabs.recentTabs[properties.sourceTabIndex]
-      thunkAPI.dispatch(moveCurrentTab({ ...properties, recentTab }))
+      const currentTab = state.currentTabs.recentTabs[properties.sourceTabIndex]
+      thunkAPI.dispatch(moveCurrentTab({ ...properties, currentTab }))
+      return
+    }
+
+    if (properties.sourceGroupId.includes('suggest-')) {
+      const suggestedGroup = state.suggestions.find(
+        (tabGroup) => tabGroup.id === properties.sourceGroupId.replace('suggest-', '')
+      )
+
+      if (suggestedGroup) {
+        const currentTab = suggestedGroup.tabs[properties.sourceTabIndex]
+        thunkAPI.dispatch(moveCurrentTab({ ...properties, currentTab }))
+      }
+
       return
     }
 
