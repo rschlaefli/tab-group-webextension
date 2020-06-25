@@ -2,7 +2,7 @@ import React from 'react'
 import { DragDropContext, DropResult, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
 import { Button, Typography } from '@material-ui/core'
-import { Add } from '@material-ui/icons'
+import { Add, Refresh } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles'
 import { range } from 'ramda'
 import clsx from 'clsx'
@@ -83,9 +83,14 @@ function UI(): React.ReactElement {
 
           {heuristicsEnabled && (
             <div>
-              <Typography variant="body1">Suggestions</Typography>
+              <div className="flex flex-row items-center justify-between">
+                <Typography variant="body1">Suggestions</Typography>
+                <button className="text-lg">
+                  <Refresh fontSize="inherit" />
+                </button>
+              </div>
 
-              <div className="flex flex-col md:flex-wrap md:flex-row">
+              <div className="flex flex-col md:overflow-x-auto md:flex-row">
                 {numSuggestions === 0 ? (
                   <Typography variant="body2">Collecting more data...</Typography>
                 ) : (

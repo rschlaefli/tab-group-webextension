@@ -28,10 +28,11 @@ interface IProps {
   onChangeGroupName?: (newName: string) => void
   onOpenTabGroup?: (newWindow?: boolean) => () => void
   onCloseTab?: (tabHash: string) => () => void
-  onSaveSuggestion?: () => void
   onOpenCurrentTab?: (tabHash: string) => () => void
   onCloseTabGroup?: () => void
   onCloseTabsOutsideGroup?: () => void
+  onAcceptSuggestion?: () => void
+  onDiscardSuggestion?: () => void
 }
 
 const getListStyle = (isDraggingOver: boolean): any => ({
@@ -40,7 +41,7 @@ const getListStyle = (isDraggingOver: boolean): any => ({
 
 const injectWindowSeparators = (inputTabs: ITab[], mapTab: any) => {
   // group tabs by their window
-  const windowGroups = groupBy((tab) => tab.windowId.toString(), inputTabs)
+  const windowGroups = groupBy((tab) => tab?.windowId?.toString() ?? '0', inputTabs)
 
   // inject window separators
   const tabListWithSeparators = Object.entries(
@@ -81,10 +82,11 @@ function TabGroup({
   onRemoveTab,
   onRemoveTabGroup,
   onCloseTab,
-  onSaveSuggestion,
   onOpenCurrentTab,
   onCloseTabGroup,
   onCloseTabsOutsideGroup,
+  onAcceptSuggestion,
+  onDiscardSuggestion,
 }: IProps): React.ReactElement {
   const {
     isContextMenuOpen,
@@ -136,7 +138,7 @@ function TabGroup({
             style={getListStyle(snapshot.isDraggingOver)}
           >
             <div
-              className="flex flex-row items-center justify-between h-6 px-2 py-1 bg-gray-100 dark:text-gray-900 dark:bg-gray-700"
+              className="flex flex-row items-center justify-between px-2 py-1 bg-gray-100 min-h-6 dark:text-gray-900 dark:bg-gray-700"
               onContextMenu={(!isReadOnly || isSuggested) && handleOpenContextMenu}
             >
               <button
@@ -155,19 +157,18 @@ function TabGroup({
                 )}
               </button>
 
-              <h1 className="w-full mr-2 text-xs font-bold text-gray-600 dark:text-gray-400">
-                {isReadOnly ? (
-                  `${name} (${tabs.length})`
-                ) : (
-                  <Input fullWidth value={name} onChange={onChangeGroupName} />
-                )}
+              <h1
+                className="mr-2 text-xs font-bold text-gray-600 dark:text-gray-400 ellipsis"
+                title={name}
+              >
+                {isReadOnly ? name : <Input fullWidth value={name} onChange={onChangeGroupName} />}
               </h1>
 
               <div className="flex flex-row">
                 {(!isReadOnly || isSuggested) && (
                   <button
                     key="open"
-                    className="text-sm text-gray-600 dark:text-gray-400"
+                    className="text-xs text-gray-600 dark:text-gray-400"
                     onClick={onOpenTabGroup && onOpenTabGroup()}
                     title="open group"
                   >
@@ -175,39 +176,30 @@ function TabGroup({
                   </button>
                 )}
 
-                {!isReadOnly && [
+                {!isReadOnly && (
                   <button
                     key="close"
-                    className="ml-2 text-sm text-gray-600 dark:text-gray-400"
+                    className="ml-2 text-xs text-gray-600 dark:text-gray-400"
                     onClick={onCloseTabGroup}
                     title="close group"
                   >
                     <Close fontSize="inherit" />
-                  </button>,
-                  // <button
-                  //   key="remove"
-                  //   className="ml-2 text-sm text-gray-600 dark:text-gray-400"
-                  //   onClick={onRemoveTabGroup}
-                  //   title="remove group"
-                  // >
-                  //   <Delete fontSize="inherit" />
-                  // </button>,
-                ]}
+                  </button>
+                )}
 
                 {isSuggested && [
                   <button
-                    disabled
                     key="discard"
-                    className="ml-2 mr-2 text-sm text-gray-400 dark:text-gray-600"
-                    onClick={() => null}
+                    className="ml-2 mr-2 text-xs text-gray-600 dark:text-gray-400"
+                    onClick={onDiscardSuggestion}
                     title="discard suggestion"
                   >
                     <Delete fontSize="inherit" />
                   </button>,
                   <button
                     key="save"
-                    className="text-sm text-gray-600 dark:text-gray-400"
-                    onClick={onSaveSuggestion}
+                    className="text-xs text-gray-600 dark:text-gray-400"
+                    onClick={onAcceptSuggestion}
                     title="save suggestion"
                   >
                     <Save fontSize="inherit" />
@@ -217,7 +209,11 @@ function TabGroup({
             </div>
 
             <div
-              className={clsx('min-h-8', tabs.length > 0 && isCollapsed && 'hidden', 'md:block')}
+              className={clsx(
+                'min-h-8 max-h-64 overflow-y-auto',
+                tabs.length > 0 && isCollapsed && 'hidden',
+                'md:block'
+              )}
             >
               {isGroupedByWindow
                 ? injectWindowSeparators(filteredTabs, mapTab)

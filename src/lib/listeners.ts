@@ -10,6 +10,9 @@ import onTabRemoved from './listeners/onTabRemoved'
 import onTabUpdated from './listeners/onTabUpdated'
 import { RootState } from '@src/state/configureStore'
 import onIdleStateChanged from './listeners/onIdleStateChanged'
+import onPauseProcessing from './listeners/onPauseProcessing'
+import onResumeProcessing from './listeners/onResumeProcessing'
+import { updateIsHeuristicsBackendEnabled } from '@src/state/settings'
 
 const RELEVANT_TAB_PROPS = ['pinned', 'title', 'status', 'favIconUrl', 'url']
 
@@ -65,6 +68,33 @@ function setupListeners({ dispatch, getState }, nativePort?: Runtime.Port): void
     // setup a listener to track idle status
     LISTENERS.onIdleStateChanged = onIdleStateChanged(nativePort)
     browser.idle.onStateChanged.addListener(LISTENERS.onIdleStateChanged)
+
+    browser.contextMenus.create({
+      id: 'pause',
+      title: 'Pause Processing',
+      contexts: ['browser_action'],
+    })
+
+    browser.contextMenus.create({
+      id: 'resume',
+      title: 'Resume Processing',
+      contexts: ['browser_action'],
+    })
+
+    LISTENERS.onResumeProcessing = onResumeProcessing(nativePort)
+    LISTENERS.onPauseProcessing = onPauseProcessing(nativePort)
+    LISTENERS.onContextMenuClicked = function ({ menuItemId }) {
+      switch (menuItemId) {
+        case 'resume':
+          LISTENERS.onResumeProcessing()
+          break
+        case 'pause':
+          LISTENERS.onPauseProcessing()
+          break
+      }
+    }
+
+    browser.contextMenus.onClicked.addListener(LISTENERS.onContextMenuClicked)
   }
 }
 
@@ -81,9 +111,15 @@ function removeListeners(nativePort?: Runtime.Port): void {
 
     if (nativePort) {
       console.log('[background] Removing native messaging listeners')
+
       nativePort.onMessage.removeListener(LISTENERS.onNativeMessage)
       nativePort.onDisconnect.removeListener(LISTENERS.onNativeDisconnect)
+
       browser.idle.onStateChanged.removeListener(LISTENERS.onIdleStateChanged)
+
+      browser.contextMenus.onClicked.removeListener(LISTENERS.onContextMenuClicked)
+      browser.contextMenus.remove('pause')
+      browser.contextMenus.remove('resume')
     }
   } catch (e) {
     console.error(e)
@@ -107,7 +143,7 @@ export const processSettings = ({ dispatch, getState }) => (settings?: unknown) 
       setupListeners({ dispatch, getState }, nativePort)
     } catch (e) {
       console.error('[background] Failed to connect to the native backend', e)
-      // TODO: disable heuristics? send a notification?
+      dispatch(updateIsHeuristicsBackendEnabled(false))
       setupListeners({ dispatch, getState })
     }
   } else if (!options.isHeuristicsBackendEnabled) {

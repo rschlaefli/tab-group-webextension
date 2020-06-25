@@ -154,7 +154,11 @@ export const closeTabsWithHashes = createAsyncThunk<
       matchingTabs = state.currentTabs.tabs.filter((tab) => closeHashes.includes(tab.hash))
     }
 
-    await Promise.all(matchingTabs.map((tab) => browser.tabs.remove(tab.id)))
+    await Promise.all(
+      matchingTabs
+        .filter((tab) => typeof tab.id !== 'undefined')
+        .map((tab) => browser.tabs.remove(tab.id as number))
+    )
   }
 )
 

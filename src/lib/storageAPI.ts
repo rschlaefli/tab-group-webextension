@@ -12,7 +12,7 @@ function createStorageAPI(type: 'sync' | 'local'): Storage {
         // value from the returned Object to match the `getItem` API.
         return value[key]
       } else {
-        throw new Error()
+        throw new Error(browser.runtime.lastError.message)
       }
     },
     async removeItem(key: string): Promise<any> {
@@ -20,7 +20,7 @@ function createStorageAPI(type: 'sync' | 'local'): Storage {
       if (browser.runtime.lastError == null) {
         return
       } else {
-        throw new Error()
+        throw new Error(browser.runtime.lastError.message)
       }
     },
     async setItem(key: string, value: any): Promise<void> {
@@ -28,7 +28,7 @@ function createStorageAPI(type: 'sync' | 'local'): Storage {
       if (browser.runtime.lastError == null) {
         return
       } else {
-        throw new Error()
+        throw new Error(browser.runtime.lastError.message)
       }
     },
   }

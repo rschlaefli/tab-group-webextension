@@ -24,24 +24,32 @@ window.requestIdleCallback =
     }, 1)
   }
 
-const UNSYNCED_PROPERTIES = ['tutorial']
-
 export default function syncStorage(): Storage {
+  // browser.storage.sync.clear()
   browser.storage.sync
     .get()
-    .then(async (data) => {
-      console.log('[syncStorage] sync storage available', data)
-
-      const currentState = (await StorageAPI.local.getItem('persist:root')) || {}
+    .then(async (data: any) => {
+      const currentState = JSON.parse(await StorageAPI.local.getItem('persist:root')) || {}
       const lastUpdate = await StorageAPI.local.getItem('lastUpdate')
 
-      if (data.lastUpdate && lastUpdate < data.lastUpdate) {
-        await Promise.all([
-          StorageAPI.local.setItem('persist:root', { ...currentState, ...data['persist:root'] }),
-          StorageAPI.local.setItem('lastUpdate', data.lastUpdate),
-        ])
+      console.log(
+        `[syncStorage] sync data available (local: ${lastUpdate}, sync: ${data.lastUpdate})`,
+        data
+      )
 
-        console.log('[syncStorage] hydrated latest state from sync data')
+      if (data.lastUpdate && lastUpdate < data.lastUpdate) {
+        const { tabGroups, settings, _persist: persistState } = data
+
+        const mergedData = Object.assign({}, currentState, {
+          tabGroups,
+          settings,
+          _persist: persistState,
+        })
+
+        await StorageAPI.local.setItem('persist:root', mergedData)
+        await StorageAPI.local.setItem('lastUpdate', data.lastUpdate)
+
+        console.log('[syncStorage] hydrated latest state from sync data', mergedData)
       }
 
       console.log('[syncStorage] resuming redux persistor')
@@ -76,16 +84,25 @@ export default function syncStorage(): Storage {
     const lastUpdateLocal: number = await StorageAPI.local.getItem('lastUpdate')
     const lastUpdateSync = await StorageAPI.sync.getItem('lastUpdate')
 
-    console.log('[syncStorage] triggering local<->sync update')
+    console.log(
+      `[syncStorage] triggering local<->sync update (local: ${lastUpdateLocal}, sync: ${lastUpdateSync}`
+    )
 
     // if the local version is more current than the one on sync
     // we want to upload our changes
-    const localData = await StorageAPI.local.getItem('persist:root')
-    if (lastUpdateLocal > lastUpdateSync) {
+    const localData = JSON.parse(await StorageAPI.local.getItem('persist:root'))
+    if (typeof lastUpdateSync === 'undefined' || lastUpdateLocal > lastUpdateSync) {
+      console.log('[syncStorage] persisting data', localData)
+
+      const { tabGroups, settings, _persist: persistState } = localData
+
       await Promise.all([
-        StorageAPI.sync.setItem('persist:root', omit(UNSYNCED_PROPERTIES, localData)),
-        StorageAPI.sync.setItem('lastUpdate', lastUpdateLocal),
+        StorageAPI.sync.setItem('tabGroups', tabGroups),
+        StorageAPI.sync.setItem('settings', settings),
+        StorageAPI.sync.setItem('persistState', persistState),
       ])
+
+      await StorageAPI.sync.setItem('lastUpdate', lastUpdateLocal)
 
       console.log('[syncStorage] updated sync storage with local changes')
 
@@ -94,13 +111,21 @@ export default function syncStorage(): Storage {
 
     // if the sync version is more current than the one locally
     // we want to download remote changes
-    if (lastUpdateLocal < lastUpdateSync) {
-      const syncData = await StorageAPI.sync.getItem('persist:root')
-
-      await Promise.all([
-        StorageAPI.local.setItem('persist:root', { ...localData, ...syncData }),
-        StorageAPI.local.setItem('lastUpdate', lastUpdateSync),
+    if (typeof lastUpdateLocal === 'undefined' || lastUpdateLocal < lastUpdateSync) {
+      const [settings, tabGroups, persistState] = await Promise.all([
+        StorageAPI.sync.getItem('settings'),
+        StorageAPI.sync.getItem('tabGroups'),
+        StorageAPI.sync.getItem('persistState'),
       ])
+
+      const mergedData = Object.assign({}, localData, {
+        settings,
+        tabGroups,
+        _persist: persistState,
+      })
+
+      await StorageAPI.local.setItem('persist:root', mergedData)
+      await StorageAPI.local.setItem('lastUpdate', lastUpdateSync)
 
       console.log('[syncStorage] updated local storage with remote changes')
 
@@ -111,7 +136,7 @@ export default function syncStorage(): Storage {
     // if the update timestamps are the same, we could either compare hashes and merge states
     // or we could simply do nothing and wait for the next update (could get inconsistencies)
   }
-  setInterval(() => window.requestIdleCallback(syncLocalStorage, { timeout: 5000 }), 30000)
+  setInterval(() => window.requestIdleCallback(syncLocalStorage, { timeout: 5000 }), 10000)
 
   return {
     getItem: StorageAPI.local.getItem,

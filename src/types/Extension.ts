@@ -9,6 +9,7 @@ export enum TAB_ACTION {
   'REMOVE' = 'REMOVE',
   'INIT_TABS' = 'INIT_TABS',
   'INIT_GROUPS' = 'INIT_GROUPS',
+  'REFRESH_GROUPS' = 'REFRESH_GROUPS',
   'PAUSE' = 'PAUSE',
   'RESUME' = 'RESUME',
 }
