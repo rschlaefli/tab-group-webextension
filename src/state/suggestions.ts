@@ -19,11 +19,14 @@ const suggestionsSlice = createSlice({
         collapsed: false,
       }))
     },
+    removeSuggestedGroup(state, action): ITabGroup[] {
+      return state.filter((tabGroup) => tabGroup.id !== action.payload)
+    },
   },
 })
 
 const { actions, reducer } = suggestionsSlice
-export const { updateSuggestedGroups } = actions
+export const { updateSuggestedGroups, removeSuggestedGroup } = actions
 export default reducer
 
 export const acceptSuggestedGroup = createAsyncThunk<
@@ -34,10 +37,12 @@ export const acceptSuggestedGroup = createAsyncThunk<
   'suggestions/acceptSuggestedGroup',
   async ({ payload: sourceGroupId }, thunkAPI): Promise<void> => {
     const state = thunkAPI.getState()
-    const selectedGroup = state.suggestions.find(
-      (suggestion) => suggestion.id === sourceGroupId.replace('suggest-', '')
-    )
+
+    const groupId = sourceGroupId.replace('suggest-', '')
+    const selectedGroup = state.suggestions.find((suggestion) => suggestion.id === groupId)
+
     thunkAPI.dispatch(updateGroup({ ...selectedGroup, readOnly: false, collapsed: false }))
+    thunkAPI.dispatch(removeSuggestedGroup(groupId))
   }
 )
 
@@ -47,8 +52,12 @@ export const discardSuggestedGroup = createAsyncThunk<
   { dispatch: AppDispatch; state: RootState }
 >(
   'suggestions/discardSuggestedGroup',
-  async ({ payload }, thunkAPI): Promise<void> => {
-    console.log('discard a group')
+  async ({ payload: sourceGroupId }, thunkAPI): Promise<void> => {
+    const groupId = sourceGroupId.replace('suggest-', '')
+
+    thunkAPI.dispatch(removeSuggestedGroup(groupId))
+
+    // TODO: send the discard action to the heuristics engine
   }
 )
 
