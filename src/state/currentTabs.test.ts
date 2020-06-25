@@ -18,6 +18,7 @@ const TABS: ITab[] = [
     successorTabId: 1,
     hash: 'abcd',
     origin: '',
+    url: 'https://qwertz.ch',
     baseUrl: 'https://qwertz.ch',
     title: 'test tab 1',
     normalizedTitle: 'test tab 1',

@@ -8,7 +8,7 @@ import Input from '../common/Input'
 import Tab from './Tab'
 import { ITab } from '@src/types/Extension'
 import useContextMenu from '@src/lib/useContextMenu'
-import { Menu, MenuItem, Typography } from '@material-ui/core'
+import { Menu, MenuItem } from '@material-ui/core'
 import WindowSeparator from './WindowSeparator'
 
 interface IProps {
@@ -40,7 +40,7 @@ const getListStyle = (isDraggingOver: boolean): any => ({
 
 const injectWindowSeparators = (inputTabs: ITab[], mapTab: any) => {
   // group tabs by their window
-  const windowGroups = groupBy((tab) => tab.windowId.toString(), inputTabs)
+  const windowGroups = groupBy((tab) => tab?.windowId?.toString() ?? '0', inputTabs)
 
   // inject window separators
   const tabListWithSeparators = Object.entries(
