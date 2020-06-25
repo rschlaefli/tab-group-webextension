@@ -6,6 +6,12 @@
 
 @import 'tailwindcss/utilities';
 
+.ellipsis {
+  @apply whitespace-no-wrap;
+  @apply overflow-hidden;
+  text-overflow: ellipsis;
+}
+
 .markdown p,
 .markdown h1,
 .markdown h2,
