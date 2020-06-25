@@ -85,9 +85,6 @@ function UI(): React.ReactElement {
             <div>
               <div className="flex flex-row items-center justify-between">
                 <Typography variant="body1">Suggestions</Typography>
-                <button className="text-lg">
-                  <Refresh fontSize="inherit" />
-                </button>
               </div>
 
               <div className="flex flex-col md:overflow-x-auto md:flex-row">

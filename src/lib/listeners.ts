@@ -12,6 +12,7 @@ import { RootState } from '@src/state/configureStore'
 import onIdleStateChanged from './listeners/onIdleStateChanged'
 import onPauseProcessing from './listeners/onPauseProcessing'
 import onResumeProcessing from './listeners/onResumeProcessing'
+import onSuggestionsRefresh from './listeners/onSuggestionsRefresh'
 import { updateIsHeuristicsBackendEnabled } from '@src/state/settings'
 
 const RELEVANT_TAB_PROPS = ['pinned', 'title', 'status', 'favIconUrl', 'url']
@@ -81,8 +82,15 @@ function setupListeners({ dispatch, getState }, nativePort?: Runtime.Port): void
       contexts: ['browser_action'],
     })
 
+    browser.contextMenus.create({
+      id: 'refresh',
+      title: 'Refresh Suggestions',
+      contexts: ['browser_action'],
+    })
+
     LISTENERS.onResumeProcessing = onResumeProcessing(nativePort)
     LISTENERS.onPauseProcessing = onPauseProcessing(nativePort)
+    LISTENERS.onSuggestionsRefresh = onSuggestionsRefresh(nativePort)
     LISTENERS.onContextMenuClicked = function ({ menuItemId }) {
       switch (menuItemId) {
         case 'resume':
@@ -90,6 +98,9 @@ function setupListeners({ dispatch, getState }, nativePort?: Runtime.Port): void
           break
         case 'pause':
           LISTENERS.onPauseProcessing()
+          break
+        case 'refresh':
+          LISTENERS.onSuggestionsRefresh()
           break
       }
     }
@@ -120,6 +131,7 @@ function removeListeners(nativePort?: Runtime.Port): void {
       browser.contextMenus.onClicked.removeListener(LISTENERS.onContextMenuClicked)
       browser.contextMenus.remove('pause')
       browser.contextMenus.remove('resume')
+      browser.contextMenus.remove('refresh')
     }
   } catch (e) {
     console.error(e)
