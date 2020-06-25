@@ -48,7 +48,3 @@ browser.commands.onCommand.addListener(async (command) => {
     sendMessageToActiveContentScript('TOGGLE_SIDEBAR')
   }
 })
-
-// setup context menu entries
-// browser.contextMenus.create({ title: 'group this', contexts: ['tab'] }, () => null)
-// browser.contextMenus.removeAll()
