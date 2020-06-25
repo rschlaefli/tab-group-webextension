@@ -98,8 +98,6 @@ function UI(): React.ReactElement {
                     <SuggestedTabGroup
                       key={suggestionIndex}
                       selector={(state: RootState) => state.suggestions[suggestionIndex]}
-                      onAcceptSuggestion={() => console.log('accepted tab group')}
-                      onDiscardSuggestion={() => console.log('discarded tab group')}
                     />
                   ))
                 )}

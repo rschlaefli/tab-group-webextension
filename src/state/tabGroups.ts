@@ -195,6 +195,9 @@ const tabGroupsSlice = createSlice({
       }
       return removeTabFromGroup(sourceGroupIndex, action.payload.sourceTabIndex as number)(state)
     },
+    appendGroup(state, action): ITabGroup[] {
+      return append(action.payload, state)
+    },
   },
 })
 
@@ -207,6 +210,7 @@ export const {
   reorderTab,
   removeTab,
   moveCurrentTab,
+  appendGroup,
 } = actions
 export default reducer
 
@@ -255,9 +259,18 @@ export const openTabGroup = createAsyncThunk<
     const browser = await getBrowserSafe()
     const state = thunkAPI.getState()
 
-    const tabGroupIndex = findIndex((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
+    const isSuggestedGroup = tabGroupId.includes('suggest-')
+
+    const tabGroupIndex = isSuggestedGroup
+      ? findIndex(
+          (group: ITabGroup) => group.id === tabGroupId.replace('suggest-', ''),
+          state.suggestions
+        )
+      : findIndex((group: ITabGroup) => group.id === tabGroupId, state.tabGroups)
     if (tabGroupIndex > -1) {
-      const tabGroup = state.tabGroups[tabGroupIndex]
+      const tabGroup = isSuggestedGroup
+        ? state.suggestions[tabGroupIndex]
+        : state.tabGroups[tabGroupIndex]
 
       // if the tab group is to be opened in a new window, create one
       let createdWindow
