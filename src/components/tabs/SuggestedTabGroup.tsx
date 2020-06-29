@@ -6,8 +6,11 @@ import { RootState } from '@src/state/configureStore'
 import { ITabGroup } from '@src/types/Extension'
 import { openTabGroupAlias } from '@src/state/tabGroups'
 import { openCurrentTabAlias } from '@src/state/currentTabs'
-import { acceptSuggestedGroupAlias, discardSuggestedGroupAlias } from '@src/state/suggestions'
-import { sort } from 'ramda'
+import {
+  acceptSuggestedGroupAlias,
+  discardSuggestedGroupAlias,
+  discardSuggestedTabAlias,
+} from '@src/state/suggestions'
 
 interface IProps {
   selector: (state: RootState) => ITabGroup
@@ -36,6 +39,10 @@ function SuggestedTabGroup({ selector }: IProps): React.ReactElement {
     dispatch(discardSuggestedGroupAlias(sourceGroupId))
   }
 
+  const handleRemoveSuggestedTab = (sourceGroupId: string) => (targetTabIndex: number) => () => {
+    dispatch(discardSuggestedTabAlias({ sourceGroupId, targetTabIndex }))
+  }
+
   const extendedId = `suggest-${id}`
 
   return (
@@ -47,11 +54,12 @@ function SuggestedTabGroup({ selector }: IProps): React.ReactElement {
       key={extendedId}
       id={extendedId}
       name={name}
-      tabs={sort((tab1, tab2) => tab1.url.localeCompare(tab2.url), tabs)}
+      tabs={tabs}
       onAcceptSuggestion={handleAcceptSuggestion(extendedId)}
       onDiscardSuggestion={handleDiscardSuggestion(extendedId)}
       onOpenCurrentTab={handleOpenCurrentTab}
       onOpenTabGroup={handleOpenTabGroup(extendedId)}
+      onRemoveTab={handleRemoveSuggestedTab(extendedId)}
     />
   )
 }

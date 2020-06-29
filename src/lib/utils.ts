@@ -150,7 +150,7 @@ export function pickRelevantProperties(tabData: Partial<ITab>): Partial<ITab> {
 type MessageContents = { action: TAB_ACTION; payload: any }
 type MessageGenerator = () => { action: TAB_ACTION; payload: any }
 export async function postNativeMessage(
-  nativePort: Runtime.Port,
+  nativePort: Runtime.Port | null,
   message: MessageContents | MessageGenerator
 ): Promise<void> {
   if (!nativePort) {

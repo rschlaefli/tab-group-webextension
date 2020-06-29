@@ -6,7 +6,7 @@ import {
   DraggingStyle,
   NotDraggingStyle,
 } from 'react-beautiful-dnd'
-import { Close } from '@material-ui/icons'
+import { Close, Remove, Delete } from '@material-ui/icons'
 import { Menu, MenuItem, Typography } from '@material-ui/core'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
@@ -130,13 +130,23 @@ function Tab({
               <button
                 disabled={!isOpen}
                 className={clsx(
-                  'flex-auto ml-2 text-sm text-right ',
+                  'flex-auto ml-2 text-xs text-right ',
                   isOpen ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400 dark:text-gray-600'
                 )}
                 onClick={onCloseTab}
                 title="close tab"
               >
                 <Close fontSize="inherit" />
+              </button>
+            )}
+
+            {isSuggested && onRemoveTab && (
+              <button
+                className="flex-auto ml-2 text-xs text-right text-gray-600 dark:text-gray-400"
+                onClick={onRemoveTab}
+                title="discard tab"
+              >
+                <Delete fontSize="inherit" />
               </button>
             )}
           </div>
