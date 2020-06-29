@@ -24,7 +24,14 @@ const suggestionsSlice = createSlice({
     },
     removeSuggestedTab(state, action): void {
       const groupIndex = findIndex((group) => group.id === action.payload.sourceGroupId, state)
-      state[groupIndex].tabs = remove(action.payload.targetTabIndex, 1, state[groupIndex].tabs)
+      const tabIndex = findIndex(
+        (tab) => tab.hash === action.payload.targetTabHash,
+        state[groupIndex].tabs
+      )
+
+      if (tabIndex > -1) {
+        state[groupIndex].tabs = remove(tabIndex, 1, state[groupIndex].tabs)
+      }
     },
     removeSuggestedGroup(state, action): ITabGroup[] {
       return state.filter((tabGroup) => tabGroup.id !== action.payload)
@@ -53,18 +60,18 @@ export const acceptSuggestedGroup = createAsyncThunk<
 
     postNativeMessage(nativePort, {
       action: TAB_ACTION.ACCEPT_GROUP,
-      payload: { groupId: 1 },
+      payload: { groupHash: sourceGroupId },
     })
   }
 )
 
 export const discardSuggestedTab = createAsyncThunk<
   void,
-  { _sender?: any; payload: { sourceGroupId: string; targetTabIndex: number } },
+  { _sender?: any; payload: { sourceGroupId: string; targetTabHash: string } },
   { dispatch: AppDispatch; state: RootState }
 >(
   'suggestions/discardSuggestedTab',
-  async ({ payload: { sourceGroupId, targetTabIndex } }, thunkAPI) => {
+  async ({ payload: { sourceGroupId, targetTabHash } }, thunkAPI) => {
     const state = thunkAPI.getState()
 
     const cleanSourceGroupId = sourceGroupId.replace('suggest-', '')
@@ -75,19 +82,19 @@ export const discardSuggestedTab = createAsyncThunk<
 
       postNativeMessage(nativePort, {
         action: TAB_ACTION.DISCARD_GROUP,
-        payload: { groupId: 1 },
+        payload: { groupHash: cleanSourceGroupId },
       })
     } else {
       thunkAPI.dispatch(
         removeSuggestedTab({
           sourceGroupId: cleanSourceGroupId,
-          targetTabIndex,
+          targetTabHash,
         })
       )
 
       postNativeMessage(nativePort, {
         action: TAB_ACTION.DISCARD_TAB,
-        payload: { groupId: 1, tabHash: 2 },
+        payload: { groupHash: cleanSourceGroupId, tabHash: targetTabHash },
       })
     }
   }
@@ -106,7 +113,7 @@ export const discardSuggestedGroup = createAsyncThunk<
 
     postNativeMessage(nativePort, {
       action: TAB_ACTION.DISCARD_GROUP,
-      payload: { groupId: 1 },
+      payload: { groupHash: sourceGroupId },
     })
   }
 )
@@ -120,7 +127,7 @@ export const discardSuggestedGroupAlias = createAction<string>(
 )
 export const discardSuggestedTabAlias = createAction<{
   sourceGroupId: string
-  targetTabIndex: number
+  targetTabHash: string
 }>('suggestions/discardSuggestedTabAlias')
 
 export const suggestionsAliases = {

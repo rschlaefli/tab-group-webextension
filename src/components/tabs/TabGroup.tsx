@@ -23,7 +23,7 @@ interface IProps {
   isDragDisabled?: boolean
   isGroupedByWindow?: boolean
   onCollapseGroup?: () => void
-  onRemoveTab?: (tabIndex: number) => () => void
+  onRemoveTab?: (tabHash: string) => () => void
   onRemoveTabGroup?: () => void
   onChangeGroupName?: (newName: string) => void
   onOpenTabGroup?: (newWindow?: boolean) => () => void
@@ -113,7 +113,7 @@ function TabGroup({
         // eslint-disable-next-line react/prop-types
         isOpen={!!tab.hash && currentTabs && currentTabs.includes(tab.hash)}
         isSuggested={isSuggested}
-        onRemoveTab={onRemoveTab && onRemoveTab(index)}
+        onRemoveTab={onRemoveTab && onRemoveTab(tab.hash as string)}
         onCloseTab={!!tab.hash && onCloseTab && onCloseTab(tab.hash)}
         onOpenCurrentTab={!!tab.hash && onOpenCurrentTab && onOpenCurrentTab(tab.hash)}
       />

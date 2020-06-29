@@ -39,8 +39,8 @@ function SuggestedTabGroup({ selector }: IProps): React.ReactElement {
     dispatch(discardSuggestedGroupAlias(sourceGroupId))
   }
 
-  const handleRemoveSuggestedTab = (sourceGroupId: string) => (targetTabIndex: number) => () => {
-    dispatch(discardSuggestedTabAlias({ sourceGroupId, targetTabIndex }))
+  const handleRemoveSuggestedTab = (sourceGroupId: string) => (targetTabHash: string) => () => {
+    dispatch(discardSuggestedTabAlias({ sourceGroupId, targetTabHash }))
   }
 
   const extendedId = `suggest-${id}`
