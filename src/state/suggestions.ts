@@ -14,8 +14,8 @@ const suggestionsSlice = createSlice({
   initialState: [] as ITabGroup[],
   reducers: {
     updateSuggestedGroups(_, action): ITabGroup[] {
-      return action.payload.map(({ name, tabs }) => ({
-        id: uuidv4(),
+      return action.payload.map(({ id, name, tabs }) => ({
+        id: id ?? uuidv4(),
         name: name ?? 'xyz',
         tabs,
         readOnly: true,
@@ -52,15 +52,17 @@ export const acceptSuggestedGroup = createAsyncThunk<
   async ({ payload: sourceGroupId }, thunkAPI): Promise<void> => {
     const state = thunkAPI.getState()
 
-    const groupId = sourceGroupId.replace('suggest-', '')
-    const selectedGroup = state.suggestions.find((suggestion) => suggestion.id === groupId)
+    const cleanSourceGroupId = sourceGroupId.replace('suggest-', '')
+    const selectedGroup = state.suggestions.find(
+      (suggestion) => suggestion.id === cleanSourceGroupId
+    )
 
     thunkAPI.dispatch(updateGroup({ ...selectedGroup, readOnly: false, collapsed: false }))
-    thunkAPI.dispatch(removeSuggestedGroup(groupId))
+    thunkAPI.dispatch(removeSuggestedGroup(cleanSourceGroupId))
 
     postNativeMessage(nativePort, {
       action: TAB_ACTION.ACCEPT_GROUP,
-      payload: { groupHash: sourceGroupId },
+      payload: { groupHash: cleanSourceGroupId },
     })
   }
 )
@@ -107,13 +109,13 @@ export const discardSuggestedGroup = createAsyncThunk<
 >(
   'suggestions/discardSuggestedGroup',
   async ({ payload: sourceGroupId }, thunkAPI): Promise<void> => {
-    const groupId = sourceGroupId.replace('suggest-', '')
+    const cleanSourceGroupId = sourceGroupId.replace('suggest-', '')
 
-    thunkAPI.dispatch(removeSuggestedGroup(groupId))
+    thunkAPI.dispatch(removeSuggestedGroup(cleanSourceGroupId))
 
     postNativeMessage(nativePort, {
       action: TAB_ACTION.DISCARD_GROUP,
-      payload: { groupHash: sourceGroupId },
+      payload: { groupHash: cleanSourceGroupId },
     })
   }
 )
