@@ -114,7 +114,7 @@ function CuratedGroup({ selector }: IProps): React.ReactElement {
                   index={ix}
                   title={tab.title}
                   url={tab.url}
-                  onRemoveTab={handleRemoveTab(tab.hash as string, ix)}
+                  onRemoveTab={handleRemoveTab(id, ix)}
                   onOpenCurrentTab={handleOpenCurrentTab(tab.hash as string)}
                   onCloseTab={handleCloseCurrentTab(tab.hash as string)}
                 />

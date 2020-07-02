@@ -72,7 +72,7 @@ function UI(): React.ReactElement {
               {(provided: DroppableProvided): React.ReactElement => (
                 <Button
                   ref={provided.innerRef}
-                  {...provided.droppableProps}
+                  // {...provided.droppableProps}
                   className={clsx(styles.root, 'w-full min-h-8 md:w-56')}
                   onClick={handleAddTabGroup}
                   title="add group"
