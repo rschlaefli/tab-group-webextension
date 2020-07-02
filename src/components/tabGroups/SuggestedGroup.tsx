@@ -52,12 +52,12 @@ function SuggestedGroup({ selector }: IProps): React.ReactElement {
             <TabGroup.Title isReadOnly value={name} />
             <div className="flex flex-row">
               <TabGroup.OpenGroup onOpenTabGroup={handleOpenTabGroup(extendedId)} />
-              <TabGroup.AcceptGroup onAcceptSuggestion={handleAcceptSuggestion(extendedId)} />
               <TabGroup.DiscardGroup onDiscardSuggestion={handleDiscardSuggestion(extendedId)} />
+              <TabGroup.AcceptGroup onAcceptSuggestion={handleAcceptSuggestion(extendedId)} />
             </div>
           </TabGroup.Header>
 
-          <TabGroup.Tabs id={extendedId}>
+          <TabGroup.Tabs isReadOnly id={extendedId}>
             {tabs.map((tab, ix) => {
               const uniqueId = `${extendedId}-${tab.hash}`
               return (

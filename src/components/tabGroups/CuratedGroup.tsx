@@ -105,7 +105,7 @@ function CuratedGroup({ selector }: IProps): React.ReactElement {
 
           <TabGroup.Tabs isCollapsed={collapsed} id={id}>
             {tabs.map((tab, ix) => {
-              const uniqueId = `${tab.hash}-${id}`
+              const uniqueId = `${id}-${tab.hash}`
               return (
                 <CuratedTab
                   isOpen={(tab.hash && tabHashes && tabHashes.includes(tab.hash)) || false}
@@ -123,23 +123,28 @@ function CuratedGroup({ selector }: IProps): React.ReactElement {
           </TabGroup.Tabs>
 
           {matchingSuggestions && (
-            <TabGroup.Tabs id={`suggest-${id}`}>
-              {matchingSuggestions?.tabs.map((tab, ix) => {
-                const uniqueId = `suggest-${tab.hash}-${id}`
-                return (
-                  <CuratedTab
-                    isOpen={(tab.hash && tabHashes && tabHashes.includes(tab.hash)) || false}
-                    key={uniqueId}
-                    id={uniqueId}
-                    index={ix}
-                    title={tab.title}
-                    url={tab.url}
-                    onOpenCurrentTab={handleOpenCurrentTab(tab.hash as string)}
-                    onCloseTab={handleCloseCurrentTab(tab.hash as string)}
-                  />
-                )
-              })}
-            </TabGroup.Tabs>
+            <>
+              <div className="pl-2 font-bold text-gray-700 border-b border-gray-300">
+                Suggested Additions
+              </div>
+              <TabGroup.Tabs id={`additional-${id}`}>
+                {matchingSuggestions?.tabs.map((tab, ix) => {
+                  const uniqueId = `additional-${id}-${tab.hash}`
+                  return (
+                    <CuratedTab
+                      isOpen={(tab.hash && tabHashes && tabHashes.includes(tab.hash)) || false}
+                      key={uniqueId}
+                      id={uniqueId}
+                      index={ix}
+                      title={tab.title}
+                      url={tab.url}
+                      onOpenCurrentTab={handleOpenCurrentTab(tab.hash as string)}
+                      onCloseTab={handleCloseCurrentTab(tab.hash as string)}
+                    />
+                  )
+                })}
+              </TabGroup.Tabs>
+            </>
           )}
         </>
       )}

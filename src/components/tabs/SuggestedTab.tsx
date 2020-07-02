@@ -32,6 +32,13 @@ function SuggestedTab({ id, index, title, url, onDiscardTab }: IProps): React.Re
         &quot; in New Tab
       </MenuItem>,
     ],
+    <MenuItem dense key="discard" onClick={onDiscardTab}>
+      Discard &quot;
+      <Typography noWrap variant="inherit">
+        {title}
+      </Typography>
+      &quot;
+    </MenuItem>,
   ]
 
   return (

@@ -73,12 +73,12 @@ function CurrentTabs(): React.ReactElement {
 
           <TabGroup.Tabs isReadOnly isCollapsed={collapsed} id="current">
             {injectWindowSeparators(tabs, (tab) => (ix) => {
-              const uniqueId = `${tab.hash}-current`
+              const uniqueId = `current-${tab.hash}`
               return (
                 <CuratedTab
                   isReadOnly
                   isOpen
-                  key={uniqueId}
+                  key={uniqueId + ix}
                   id={uniqueId}
                   index={ix}
                   title={tab.title}

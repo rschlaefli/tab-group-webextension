@@ -41,7 +41,7 @@ function RecentTabs(): React.ReactElement {
               return (
                 <CuratedTab
                   isReadOnly
-                  key={uniqueId}
+                  key={uniqueId + ix}
                   id={uniqueId}
                   index={ix}
                   title={tab.title}

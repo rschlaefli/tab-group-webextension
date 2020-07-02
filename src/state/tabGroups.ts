@@ -23,6 +23,7 @@ import { closeTabsWithHashes, openCurrentTab } from './currentTabs'
 import { AppDispatch } from '@src/background'
 import { RootState } from './configureStore'
 import { DropResult } from 'react-beautiful-dnd'
+import { removeSuggestedTab } from './suggestions'
 
 function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): any {
   return pipe(path([sourceGroupIndex, 'tabs', sourceTabIndex]), assoc('uuid', uuidv4()))
@@ -369,6 +370,22 @@ export const processDragEvent = createAsyncThunk<
     if (properties.sourceGroupId === 'recent') {
       const currentTab = state.currentTabs.recentTabs[properties.sourceTabIndex]
       thunkAPI.dispatch(moveCurrentTab({ ...properties, currentTab }))
+      return
+    }
+
+    if (properties.sourceGroupId.includes('additional-')) {
+      const suggestedGroup = state.suggestions.find(
+        (tabGroup) => tabGroup.id === properties.sourceGroupId.replace('additional-', '')
+      )
+
+      if (suggestedGroup) {
+        const currentTab = suggestedGroup.tabs[properties.sourceTabIndex]
+        thunkAPI.dispatch(moveCurrentTab({ ...properties, currentTab }))
+        thunkAPI.dispatch(
+          removeSuggestedTab({ sourceGroupId: suggestedGroup.id, targetTabHash: currentTab.hash })
+        )
+      }
+
       return
     }
 
