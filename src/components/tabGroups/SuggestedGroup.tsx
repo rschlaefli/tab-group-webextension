@@ -5,13 +5,13 @@ import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '@src/state/configureStore'
 import { ITabGroup } from '@src/types/Extension'
 import { openTabGroupAlias } from '@src/state/tabGroups'
-import { openCurrentTabAlias } from '@src/state/currentTabs'
 import {
   acceptSuggestedGroupAlias,
   discardSuggestedGroupAlias,
   discardSuggestedTabAlias,
 } from '@src/state/suggestions'
 import SuggestedTab from '../tabs/SuggestedTab'
+import { MenuItem } from '@material-ui/core'
 
 interface IProps {
   selector: (state: RootState) => ITabGroup
@@ -21,10 +21,6 @@ function SuggestedGroup({ selector }: IProps): React.ReactElement {
   const dispatch = useDispatch()
 
   const { id, name, tabs } = useSelector(selector)
-
-  const handleOpenCurrentTab = (tabHash: string) => (): void => {
-    dispatch(openCurrentTabAlias(tabHash))
-  }
 
   const handleOpenTabGroup = (sourceGroupId: string) => (newWindow?: boolean) => () => {
     dispatch(openTabGroupAlias({ tabGroupId: sourceGroupId, newWindow }))
@@ -44,14 +40,29 @@ function SuggestedGroup({ selector }: IProps): React.ReactElement {
 
   const extendedId = `suggest-${id}`
 
+  const contextMenuItems = [
+    <MenuItem dense key="openGroup" onClick={handleOpenTabGroup(extendedId)()}>
+      Open Tab Group
+    </MenuItem>,
+    <MenuItem dense key="openGroupInWindow" onClick={handleOpenTabGroup(extendedId)(true)}>
+      Open Tab Group in New Window
+    </MenuItem>,
+    <MenuItem dense key="remove" onClick={handleAcceptSuggestion(extendedId)}>
+      Save Suggestion
+    </MenuItem>,
+    <MenuItem dense key="remove" onClick={handleDiscardSuggestion(extendedId)}>
+      Discard Suggestion
+    </MenuItem>,
+  ]
+
   return (
-    <TabGroup>
+    <TabGroup contextMenuItems={contextMenuItems}>
       {({ handleOpenContextMenu }) => (
         <>
           <TabGroup.Header onOpenContextMenu={handleOpenContextMenu}>
             <TabGroup.Title isReadOnly value={name} />
             <div className="flex flex-row">
-              <TabGroup.OpenGroup onOpenTabGroup={handleOpenTabGroup(extendedId)} />
+              <TabGroup.OpenGroup onOpenTabGroup={handleOpenTabGroup(extendedId)()} />
               <TabGroup.DiscardGroup onDiscardSuggestion={handleDiscardSuggestion(extendedId)} />
               <TabGroup.AcceptGroup onAcceptSuggestion={handleAcceptSuggestion(extendedId)} />
             </div>

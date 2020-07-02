@@ -98,7 +98,7 @@ function CuratedGroup({ selector }: IProps): React.ReactElement {
             />
             <TabGroup.Title value={name} onChangeGroupName={handleRenameTabGroup(id)} />
             <div className="flex flex-row">
-              <TabGroup.OpenGroup onOpenTabGroup={handleOpenTabGroup(id)} />
+              <TabGroup.OpenGroup onOpenTabGroup={handleOpenTabGroup(id)()} />
               <TabGroup.CloseGroup onCloseTabGroup={handleCloseTabGroup(id)} />
             </div>
           </TabGroup.Header>
