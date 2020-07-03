@@ -63,8 +63,8 @@ function SuggestedGroup({ selector }: IProps): React.ReactElement {
             <TabGroup.Title isReadOnly value={name} />
             <div className="flex flex-row">
               <TabGroup.OpenGroup onOpenTabGroup={handleOpenTabGroup(extendedId)()} />
-              <TabGroup.DiscardGroup onDiscardSuggestion={handleDiscardSuggestion(extendedId)} />
               <TabGroup.AcceptGroup onAcceptSuggestion={handleAcceptSuggestion(extendedId)} />
+              <TabGroup.DiscardGroup onDiscardSuggestion={handleDiscardSuggestion(extendedId)} />
             </div>
           </TabGroup.Header>
 

@@ -57,6 +57,10 @@ function UI(): React.ReactElement {
         <div className="w-full h-auto p-2 min-h-64 min-w-64">
           <ConfigBar />
 
+          <div className="flex flex-row items-center justify-between">
+            <Typography variant="overline">Curated Groups</Typography>
+          </div>
+
           <div className="flex flex-col md:flex-wrap md:flex-row">
             <RecentTabs />
             <CurrentTabs />
@@ -86,7 +90,7 @@ function UI(): React.ReactElement {
           {heuristicsEnabled && (
             <div>
               <div className="flex flex-row items-center justify-between">
-                <Typography variant="body1">Suggestions</Typography>
+                <Typography variant="overline">Suggested Groups</Typography>
               </div>
 
               <div className="flex flex-col md:overflow-x-auto md:flex-row">

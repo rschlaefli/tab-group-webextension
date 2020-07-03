@@ -173,7 +173,7 @@ Tab.Close = function CloseButton({ isOpen, onCloseTab }: ICloseButtonProps) {
       disabled={!isOpen}
       className={clsx(
         'flex-auto ml-2 text-xs text-right ',
-        isOpen ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400 dark:text-gray-600'
+        isOpen ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400 dark:text-gray-600'
       )}
       onClick={onCloseTab}
       title="close tab"
@@ -189,7 +189,7 @@ interface IDiscardButtonProps {
 Tab.Discard = function DiscardButton({ onDiscardTab }: IDiscardButtonProps) {
   return (
     <button
-      className="flex-auto ml-2 text-xs text-right text-gray-600 dark:text-gray-400"
+      className="flex-auto ml-2 text-xs text-right text-gray-500 dark:text-gray-400"
       onClick={onDiscardTab}
       title="discard tab"
     >

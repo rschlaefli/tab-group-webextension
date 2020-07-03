@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import TabGroup from './TabGroup'
 import CuratedTab from '../tabs/CuratedTab'
+import AdditionalTab from '../tabs/AdditionalTab'
 import { RootState } from '@src/state/configureStore'
 import { ITabGroup } from '@src/types/Extension'
 import {
@@ -16,6 +17,7 @@ import {
 } from '@src/state/tabGroups'
 import { closeCurrentTabAlias, openCurrentTabAlias } from '@src/state/currentTabs'
 import { MenuItem } from '@material-ui/core'
+import { discardSuggestedTabAlias } from '@src/state/suggestions'
 
 interface IProps {
   selector: (state: RootState) => ITabGroup
@@ -66,6 +68,10 @@ function CuratedGroup({ selector }: IProps): React.ReactElement {
 
   const handleCloseTabsOutsideGroup = (sourceGroupId: string) => (): void => {
     dispatch(closeTabsOutsideGroupAlias(sourceGroupId))
+  }
+
+  const handleRemoveSuggestedTab = (sourceGroupId: string, targetTabHash: string) => () => {
+    dispatch(discardSuggestedTabAlias({ sourceGroupId, targetTabHash }))
   }
 
   const contextMenuItems = [
@@ -123,28 +129,27 @@ function CuratedGroup({ selector }: IProps): React.ReactElement {
           </TabGroup.Tabs>
 
           {matchingSuggestions && (
-            <>
-              <div className="pl-2 font-bold text-gray-700 border-b border-gray-300">
-                Suggested Additions
+            <TabGroup.Tabs isCollapsed={collapsed} id={`additional-${id}`}>
+              <div className="pt-1 pl-2 mt-1 text-gray-700 bg-gray-100 border-b border-gray-300 dark:text-gray-900 dark:bg-gray-700 ">
+                Suggestions
               </div>
-              <TabGroup.Tabs id={`additional-${id}`}>
-                {matchingSuggestions?.tabs.map((tab, ix) => {
-                  const uniqueId = `additional-${id}-${tab.hash}`
-                  return (
-                    <CuratedTab
-                      isOpen={(tab.hash && tabHashes && tabHashes.includes(tab.hash)) || false}
-                      key={uniqueId}
-                      id={uniqueId}
-                      index={ix}
-                      title={tab.title}
-                      url={tab.url}
-                      onOpenCurrentTab={handleOpenCurrentTab(tab.hash as string)}
-                      onCloseTab={handleCloseCurrentTab(tab.hash as string)}
-                    />
-                  )
-                })}
-              </TabGroup.Tabs>
-            </>
+              {matchingSuggestions?.tabs.map((tab, ix) => {
+                const uniqueId = `${id}-${tab.hash}`
+                return (
+                  <AdditionalTab
+                    isOpen={(tab.hash && tabHashes && tabHashes.includes(tab.hash)) || false}
+                    key={uniqueId}
+                    id={uniqueId}
+                    index={ix}
+                    title={tab.title}
+                    url={tab.url}
+                    onOpenCurrentTab={handleOpenCurrentTab(tab.hash as string)}
+                    onCloseTab={handleCloseCurrentTab(tab.hash as string)}
+                    onDiscardTab={handleRemoveSuggestedTab(`additional-${id}`, tab.hash as string)}
+                  />
+                )
+              })}
+            </TabGroup.Tabs>
           )}
         </>
       )}

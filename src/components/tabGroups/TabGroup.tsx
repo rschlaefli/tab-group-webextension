@@ -116,7 +116,7 @@ TabGroup.Title = function Title({ isReadOnly, onChangeGroupName, value }: ITitle
 
   return (
     <h1
-      className="flex-1 mr-2 text-xs font-bold text-gray-600 dark:text-gray-400 ellipsis"
+      className="flex-1 text-xs font-bold text-gray-600 dark:text-gray-400 ellipsis"
       title={value}
     >
       {isReadOnly ? (
@@ -145,7 +145,7 @@ TabGroup.OpenGroup = function OpenGroupButton({ onOpenTabGroup }: IOpenGroupButt
   return (
     <button
       key="open"
-      className="text-xs text-gray-600 dark:text-gray-400"
+      className="ml-2 text-xs text-gray-600 dark:text-gray-400"
       onClick={onOpenTabGroup}
       title="open group"
     >
@@ -179,7 +179,7 @@ TabGroup.DiscardGroup = function DiscardGroupButton({
   return (
     <button
       key="discard"
-      className="ml-2 mr-2 text-xs text-gray-600 dark:text-gray-400"
+      className="ml-2 text-xs text-gray-600 dark:text-gray-400"
       onClick={onDiscardSuggestion}
       title="discard suggestion"
     >
@@ -195,7 +195,7 @@ TabGroup.AcceptGroup = function AcceptGroupButton({ onAcceptSuggestion }: IAccep
   return (
     <button
       key="save"
-      className="text-xs text-gray-600 dark:text-gray-400"
+      className="ml-2 text-xs text-gray-600 dark:text-gray-400"
       onClick={onAcceptSuggestion}
       title="save suggestion"
     >
@@ -216,7 +216,7 @@ TabGroup.Tabs = function Tabs({ id, isCollapsed, isReadOnly, children }: ITabsPr
       {(provided: DroppableProvided, snapshot: DroppableStateSnapshot): React.ReactElement => (
         <div
           className={clsx(
-            'min-h-8 max-h-64 overflow-y-auto',
+            'min-h-8 max-h-48 overflow-y-auto',
             !!children && isCollapsed && 'hidden',
             'md:block'
           )}
