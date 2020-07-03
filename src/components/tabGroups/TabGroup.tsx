@@ -5,6 +5,7 @@ import { Menu, Input } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { ArrowDropDown, ArrowDropUp, Launch, Close, Delete, Save } from '@material-ui/icons'
 import { Droppable, DroppableProvided, DroppableStateSnapshot } from 'react-beautiful-dnd'
+
 interface IChildrenParams {
   handleOpenContextMenu: () => void
 }
@@ -14,9 +15,14 @@ interface IProps {
   contextMenuItems?: any[]
 }
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   contextMenu: { maxWidth: 400 },
-})
+  input: {
+    color: theme.palette.type === 'dark' ? '#cbd5e0' : '#718096',
+    fontSize: 'inherit',
+    fontWeight: 'bold',
+  },
+}))
 
 const getListStyle = (isDraggingOver: boolean): any => ({
   backgroundColor: isDraggingOver && '#CFDAFC',
@@ -104,15 +110,23 @@ interface ITitleProps {
   onChangeGroupName?: (name: string) => void
 }
 TabGroup.Title = function Title({ isReadOnly, onChangeGroupName, value }: ITitleProps) {
+  const styles = useStyles()
+
   const [internalValue, updateInternalValue] = React.useState(value)
 
   return (
-    <h1 className="mr-2 text-xs font-bold text-gray-600 dark:text-gray-400 ellipsis" title={value}>
+    <h1
+      className="flex-1 mr-2 text-xs font-bold text-gray-600 dark:text-gray-400 ellipsis"
+      title={value}
+    >
       {isReadOnly ? (
         value
       ) : (
         <Input
           fullWidth
+          classes={{
+            root: styles.input,
+          }}
           value={internalValue}
           onChange={(e) => {
             updateInternalValue(e.target.value)
