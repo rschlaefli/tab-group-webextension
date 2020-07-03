@@ -23,7 +23,7 @@ import { closeTabsWithHashes, openCurrentTab } from './currentTabs'
 import { AppDispatch } from '@src/background'
 import { RootState } from './configureStore'
 import { DropResult } from 'react-beautiful-dnd'
-import { removeSuggestedTab } from './suggestions'
+import { removeSuggestedTab, acceptSuggestedTab, acceptSuggestedTabAlias } from './suggestions'
 
 function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): any {
   return pipe(path([sourceGroupIndex, 'tabs', sourceTabIndex]), assoc('uuid', uuidv4()))
@@ -384,6 +384,13 @@ export const processDragEvent = createAsyncThunk<
         thunkAPI.dispatch(
           removeSuggestedTab({ sourceGroupId: suggestedGroup.id, targetTabHash: currentTab.hash })
         )
+        thunkAPI.dispatch(
+          acceptSuggestedTabAlias({
+            sourceGroupId: suggestedGroup.id,
+            targetTabHash: currentTab.hash as string,
+            targetGroupId: properties.targetGroupId,
+          })
+        )
       }
 
       return
@@ -397,6 +404,13 @@ export const processDragEvent = createAsyncThunk<
       if (suggestedGroup) {
         const currentTab = suggestedGroup.tabs[properties.sourceTabIndex]
         thunkAPI.dispatch(moveCurrentTab({ ...properties, currentTab }))
+        thunkAPI.dispatch(
+          acceptSuggestedTabAlias({
+            sourceGroupId: suggestedGroup.id,
+            targetTabHash: currentTab.hash as string,
+            targetGroupId: properties.targetGroupId,
+          })
+        )
       }
 
       return

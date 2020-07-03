@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
 import { v4 as uuidv4 } from 'uuid'
-import { findIndex, remove } from 'ramda'
+import { findIndex, remove, any } from 'ramda'
 
 import { ITabGroup, TAB_ACTION } from '@src/types/Extension'
 import { AppDispatch } from '@src/background'
@@ -67,6 +67,23 @@ export const acceptSuggestedGroup = createAsyncThunk<
   }
 )
 
+export const acceptSuggestedTab = createAsyncThunk<
+  void,
+  {
+    _sender?: any
+    payload: { sourceGroupId: string; targetTabHash: string; targetGroupId: string }
+  },
+  { dispatch: AppDispatch; state: RootState }
+>(
+  'suggestions/acceptSuggestedTab',
+  async ({ payload: { sourceGroupId, targetTabHash, targetGroupId } }): Promise<void> => {
+    postNativeMessage(nativePort, {
+      action: TAB_ACTION.ACCEPT_TAB,
+      payload: { groupHash: sourceGroupId, tabHash: targetTabHash, targetGroup: targetGroupId },
+    })
+  }
+)
+
 export const discardSuggestedTab = createAsyncThunk<
   void,
   { _sender?: any; payload: { sourceGroupId: string; targetTabHash: string } },
@@ -121,6 +138,11 @@ export const discardSuggestedGroup = createAsyncThunk<
 )
 
 // ALIASES
+export const acceptSuggestedTabAlias = createAction<{
+  sourceGroupId: string
+  targetTabHash: string
+  targetGroupId: string
+}>('suggestions/acceptSuggestedTabAlias')
 export const acceptSuggestedGroupAlias = createAction<string>(
   'suggestions/acceptSuggestedGroupAlias'
 )
@@ -133,6 +155,7 @@ export const discardSuggestedTabAlias = createAction<{
 }>('suggestions/discardSuggestedTabAlias')
 
 export const suggestionsAliases = {
+  [acceptSuggestedTabAlias.type]: acceptSuggestedTab,
   [acceptSuggestedGroupAlias.type]: acceptSuggestedGroup,
   [discardSuggestedGroupAlias.type]: discardSuggestedGroup,
   [discardSuggestedTabAlias.type]: discardSuggestedTab,
