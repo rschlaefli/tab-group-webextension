@@ -1,15 +1,10 @@
 import React from 'react'
 import clsx from 'clsx'
 import useContextMenu from '@src/lib/useContextMenu'
-import { Menu, Input, Typography } from '@material-ui/core'
+import { Menu, Input } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { ArrowDropDown, ArrowDropUp, Launch, Close, Delete, Save } from '@material-ui/icons'
 import { Droppable, DroppableProvided, DroppableStateSnapshot } from 'react-beautiful-dnd'
-import AdditionalTab from '../tabs/AdditionalTab'
-import WindowSeparator from '../tabs/WindowSeparator'
-import { ITab } from '@src/types/Extension'
-import { groupBy } from 'ramda'
-
 interface IChildrenParams {
   handleOpenContextMenu: () => void
 }
@@ -109,6 +104,8 @@ interface ITitleProps {
   onChangeGroupName?: (name: string) => void
 }
 TabGroup.Title = function Title({ isReadOnly, onChangeGroupName, value }: ITitleProps) {
+  const [internalValue, updateInternalValue] = React.useState(value)
+
   return (
     <h1 className="mr-2 text-xs font-bold text-gray-600 dark:text-gray-400 ellipsis" title={value}>
       {isReadOnly ? (
@@ -116,8 +113,11 @@ TabGroup.Title = function Title({ isReadOnly, onChangeGroupName, value }: ITitle
       ) : (
         <Input
           fullWidth
-          value={value || 'Name'}
-          onChange={onChangeGroupName && ((e) => onChangeGroupName(e.target.value))}
+          value={internalValue}
+          onChange={(e) => {
+            updateInternalValue(e.target.value)
+            onChangeGroupName && onChangeGroupName(e.target.value)
+          }}
         />
       )}
     </h1>
