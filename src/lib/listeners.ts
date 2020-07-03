@@ -14,6 +14,8 @@ import onPauseProcessing from './listeners/onPauseProcessing'
 import onResumeProcessing from './listeners/onResumeProcessing'
 import onSuggestionsRefresh from './listeners/onSuggestionsRefresh'
 import { updateIsHeuristicsBackendEnabled } from '@src/state/settings'
+import onRuntimeMessage from './listeners/onRuntimeMessage'
+import onCommand from './listeners/onCommand'
 
 const RELEVANT_TAB_PROPS = ['pinned', 'title', 'status', 'favIconUrl', 'url']
 
@@ -58,6 +60,14 @@ function setupListeners({ dispatch, getState }, nativePort?: Runtime.Port): void
   // setup a listener that tracks window focus changes
   LISTENERS.onWindowFocusChanged = (...params) => console.log(params)
   browser.windows.onFocusChanged.addListener(LISTENERS.onWindowFocusChanged)
+
+  // setup a listener for keyboard shortcuts
+  LISTENERS.onCommand = onCommand({ dispatch, nativePort })
+  browser.commands.onCommand.addListener(LISTENERS.onCommand)
+
+  // setup a listener for runtime messages
+  LISTENERS.onRuntimeMessage = onRuntimeMessage({ dispatch, nativePort })
+  browser.runtime.onMessage.addListener(LISTENERS.onRuntimeMessage)
 
   if (nativePort) {
     LISTENERS.onNativeMessage = onNativeMessage({ dispatch, getState }, nativePort)
@@ -138,7 +148,7 @@ function removeListeners(nativePort?: Runtime.Port): void {
   }
 }
 
-let nativePort: Runtime.Port | null
+export let nativePort: Runtime.Port | null
 export const processSettings = ({ dispatch, getState }) => (settings?: unknown) => {
   const currentState: RootState = getState()
   const options: any = settings || currentState.settings

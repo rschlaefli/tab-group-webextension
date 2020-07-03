@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import {
   Draggable,
@@ -6,29 +7,24 @@ import {
   DraggingStyle,
   NotDraggingStyle,
 } from 'react-beautiful-dnd'
-import { Close } from '@material-ui/icons'
-import { Menu, MenuItem, Typography } from '@material-ui/core'
-import clsx from 'clsx'
-import { makeStyles } from '@material-ui/core/styles'
 
 import useContextMenu from '@src/lib/useContextMenu'
-import { useDispatch } from 'react-redux'
-import { openInNewTabAlias } from '@src/state/tabGroups'
+import { makeStyles } from '@material-ui/core/styles'
+import { Menu, Typography } from '@material-ui/core'
+import clsx from 'clsx'
+import { Close, Delete } from '@material-ui/icons'
+
+interface IChildrenParams {
+  handleOpenContextMenu: () => void
+  provided: DraggableProvided
+  snapshot: DraggableStateSnapshot
+}
 
 interface IProps {
-  uniqueId: string
-  index: number
-  title?: string
-  url?: string
-  windowId?: number
-  isOpen?: boolean
-  isReadOnly?: boolean
-  isSuggested?: boolean
-  isDragDisabled?: boolean
-  faviconUrl?: string
-  onRemoveTab?: (() => void) | false
-  onCloseTab?: (() => void) | false
-  onOpenCurrentTab?: (() => void) | false
+  children: (params: IChildrenParams) => React.ReactElement
+  contextMenuItems?: any[]
+  draggableId: string
+  draggableIndex: number
 }
 
 const getItemStyle = (
@@ -41,165 +37,164 @@ const getItemStyle = (
 })
 
 const useStyles = makeStyles({
-  contextMenu: {
-    maxWidth: 400,
-  },
+  contextMenu: { maxWidth: 400 },
 })
 
 function Tab({
-  uniqueId,
-  index,
-  title,
-  url,
-  isOpen,
-  isReadOnly,
-  isSuggested,
-  isDragDisabled,
-  faviconUrl,
-  onRemoveTab,
-  onCloseTab,
-  onOpenCurrentTab,
+  children,
+  draggableId,
+  draggableIndex,
+  contextMenuItems,
 }: IProps): React.ReactElement {
-  const dispatch = useDispatch()
   const styles = useStyles()
 
   const {
     isContextMenuOpen,
-    contextAnchorPosition,
     handleOpenContextMenu,
     handleCloseContextMenu,
+    contextAnchorPosition,
   } = useContextMenu()
-
-  const handleOpenTab = (url, newTab = false) => () => {
-    if (newTab) {
-      dispatch(openInNewTabAlias(url))
-    } else {
-      if (window.location !== window.parent.location) {
-        window.parent.location.replace(url)
-      } else {
-        window.location.replace(url)
-      }
-    }
-  }
 
   return (
     <>
       <Draggable
-        key={uniqueId}
-        draggableId={`draggable-${uniqueId}`}
-        index={index}
-        isDragDisabled={isDragDisabled}
+        key={draggableId}
+        draggableId={draggableId}
+        index={draggableIndex}
+        isDragDisabled={!draggableId}
       >
-        {(provided: DraggableProvided, snapshot: DraggableStateSnapshot): React.ReactElement => (
-          <div
-            className={clsx(
-              'flex flex-row h-6 items-center justify-start px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0',
-              !isReadOnly && isOpen && 'bg-orange-200 dark:bg-gray-700'
-            )}
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-            style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
-            onContextMenu={handleOpenContextMenu}
-          >
-            {!isSuggested && (
-              <div className="flex-none w-3 h-3 mr-2">
-                <img src={faviconUrl} />
-              </div>
-            )}
-
-            <div className="flex-auto w-40 leading-tight">
-              <Typography noWrap display="block" variant="inherit" title={title}>
-                {isOpen && onOpenCurrentTab && (
-                  <a role="button" onClick={onOpenCurrentTab as any}>
-                    {title}
-                  </a>
-                )}
-                {!isOpen &&
-                  (url ? (
-                    <a role="button" onClick={handleOpenTab(url)}>
-                      {title}
-                    </a>
-                  ) : (
-                    title
-                  ))}
-              </Typography>
-            </div>
-
-            {onCloseTab && (
-              <button
-                disabled={!isOpen}
-                className={clsx(
-                  'flex-auto ml-2 text-sm text-right ',
-                  isOpen ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400 dark:text-gray-600'
-                )}
-                onClick={onCloseTab}
-                title="close tab"
-              >
-                <Close fontSize="inherit" />
-              </button>
-            )}
-          </div>
-        )}
+        {(provided: DraggableProvided, snapshot: DraggableStateSnapshot): React.ReactElement =>
+          children({ handleOpenContextMenu, provided, snapshot })
+        }
       </Draggable>
 
-      <Menu
-        onClickCapture={handleCloseContextMenu}
-        className={styles.contextMenu}
-        open={isContextMenuOpen}
-        onClose={handleCloseContextMenu}
-        anchorReference="anchorPosition"
-        anchorPosition={contextAnchorPosition}
-      >
-        {isOpen && onOpenCurrentTab && (
-          <MenuItem dense onClick={onOpenCurrentTab}>
-            Switch To &quot;
-            <Typography noWrap variant="inherit">
-              {title}
-            </Typography>
-            &quot;
-          </MenuItem>
-        )}
-
-        {!isOpen &&
-          (!isReadOnly || isSuggested) &&
-          url && [
-            <MenuItem dense key="open" onClick={handleOpenTab(url)}>
-              Open &quot;
-              <Typography noWrap variant="inherit">
-                {title}
-              </Typography>
-              &quot;
-            </MenuItem>,
-            <MenuItem dense key="openBlank" onClick={handleOpenTab(url, true)}>
-              Open &quot;
-              <Typography noWrap variant="inherit">
-                {title}
-              </Typography>
-              &quot; in New Tab
-            </MenuItem>,
-          ]}
-        {isOpen && onCloseTab && (
-          <MenuItem dense onClick={onCloseTab}>
-            Close &quot;
-            <Typography noWrap variant="inherit">
-              {title}
-            </Typography>
-            &quot;
-          </MenuItem>
-        )}
-
-        {!isReadOnly && onRemoveTab && (
-          <MenuItem dense onClick={onRemoveTab}>
-            Remove &quot;
-            <Typography noWrap variant="inherit">
-              {title}
-            </Typography>
-            &quot; From Group
-          </MenuItem>
-        )}
-      </Menu>
+      {typeof contextMenuItems !== 'undefined' && (
+        <Menu
+          onClickCapture={handleCloseContextMenu}
+          className={styles.contextMenu}
+          open={isContextMenuOpen}
+          onClose={handleCloseContextMenu}
+          anchorReference="anchorPosition"
+          anchorPosition={contextAnchorPosition}
+        >
+          {contextMenuItems.flat().filter((item) => !!item)}
+        </Menu>
+      )}
     </>
+  )
+}
+
+interface IContainerProps {
+  isReadOnly?: boolean
+  isOpen?: boolean
+  provided: DraggableProvided
+  snapshot: DraggableStateSnapshot
+  onOpenContextMenu: () => void
+  children: React.ReactNode
+}
+Tab.Container = function Container({
+  isReadOnly,
+  isOpen,
+  provided,
+  snapshot,
+  onOpenContextMenu,
+  children,
+}: IContainerProps): React.ReactElement {
+  return (
+    <div
+      className={clsx(
+        'flex flex-row h-6 items-center justify-start px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0',
+        !isReadOnly && isOpen && 'bg-orange-200 dark:bg-gray-700'
+      )}
+      ref={provided.innerRef}
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+      style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
+      onContextMenu={onOpenContextMenu}
+    >
+      {children}
+    </div>
+  )
+}
+
+interface IFavIconProps {
+  favIconUrl?: string
+}
+Tab.FavIcon = function FavIcon({ favIconUrl }: IFavIconProps): React.ReactElement {
+  return (
+    <div className="flex-none w-3 h-3 mr-2">
+      <img src={favIconUrl} />
+    </div>
+  )
+}
+
+interface ITitleProps {
+  title: string
+  url?: string
+  isOpen?: boolean
+  onOpenCurrentTab?: () => void
+  onOpenTab: (url: string, newTab?: boolean) => () => void
+}
+Tab.Title = function Title({
+  title,
+  url,
+  isOpen,
+  onOpenCurrentTab,
+  onOpenTab,
+}: ITitleProps): React.ReactElement {
+  return (
+    <div className="flex-auto w-40 leading-tight">
+      <Typography noWrap display="block" variant="inherit" title={title}>
+        {isOpen && (
+          <a role="button" onClick={onOpenCurrentTab}>
+            {title}
+          </a>
+        )}
+        {!isOpen &&
+          (url ? (
+            <a role="button" onClick={onOpenTab(url)}>
+              {title}
+            </a>
+          ) : (
+            title
+          ))}
+      </Typography>
+    </div>
+  )
+}
+
+interface ICloseButtonProps {
+  isOpen?: boolean
+  onCloseTab: () => void
+}
+Tab.Close = function CloseButton({ isOpen, onCloseTab }: ICloseButtonProps) {
+  return (
+    <button
+      disabled={!isOpen}
+      className={clsx(
+        'flex-auto ml-2 text-xs text-right ',
+        isOpen ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400 dark:text-gray-600'
+      )}
+      onClick={onCloseTab}
+      title="close tab"
+    >
+      <Close fontSize="inherit" />
+    </button>
+  )
+}
+
+interface IDiscardButtonProps {
+  onDiscardTab: () => void
+}
+Tab.Discard = function DiscardButton({ onDiscardTab }: IDiscardButtonProps) {
+  return (
+    <button
+      className="flex-auto ml-2 text-xs text-right text-gray-500 dark:text-gray-400"
+      onClick={onDiscardTab}
+      title="discard tab"
+    >
+      <Delete fontSize="inherit" />
+    </button>
   )
 }
 
