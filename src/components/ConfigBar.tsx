@@ -27,7 +27,11 @@ const STATUS_DESCRIPTION = {
   UNKNOWN: 'The status of the heuristics engine could not be determined.',
 }
 
-function ConfigBar(): React.ReactElement {
+interface IProps {
+  withFocusMode?: boolean
+}
+
+function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
   const dispatch = useDispatch()
 
   const focusModeEnabled = useSelector((state: RootState) => state.settings.isFocusModeEnabled)
@@ -126,26 +130,30 @@ function ConfigBar(): React.ReactElement {
         </span>
       </div>
 
-      <div className="flex flex-row items-center pl-2 md:order-1">
-        <FormControlLabel
-          control={
-            <Switch
-              size="small"
-              checked={focusModeEnabled}
-              onChange={handleToggleFocusMode}
-              name="focusModeEnabled"
-              inputProps={{ 'aria-label': 'secondary checkbox' }}
-            />
-          }
-          label="Focus Mode"
-        />
-        <Tooltip
-          title="Focus Mode: On opening of a tab group, close all tabs belonging to other groups"
-          aria-label="Focus Mode: On opening of a tab group, close all tabs belonging to other groups"
-        >
-          <InfoRounded className="text-blue-400" fontSize="inherit" />
-        </Tooltip>
-      </div>
+      {withFocusMode ? (
+        <div className="flex flex-row items-center pl-2 md:order-1">
+          <FormControlLabel
+            control={
+              <Switch
+                size="small"
+                checked={focusModeEnabled}
+                onChange={handleToggleFocusMode}
+                name="focusModeEnabled"
+                inputProps={{ 'aria-label': 'secondary checkbox' }}
+              />
+            }
+            label="Focus Mode"
+          />
+          <Tooltip
+            title="Focus Mode: On opening of a tab group, close all tabs belonging to other groups"
+            aria-label="Focus Mode: On opening of a tab group, close all tabs belonging to other groups"
+          >
+            <InfoRounded className="text-blue-400" fontSize="inherit" />
+          </Tooltip>
+        </div>
+      ) : (
+        <div />
+      )}
     </div>
   )
 }
