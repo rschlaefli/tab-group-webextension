@@ -3,9 +3,11 @@ import React from 'react'
 import Tab from './Tab'
 import { Typography, MenuItem } from '@material-ui/core'
 import useOpenTab from './useOpenTab'
+import { Snooze } from '@material-ui/icons'
 
 interface IProps {
   isReadOnly?: boolean
+  isStale?: boolean
   id: string
   index: number
   title: string
@@ -19,6 +21,7 @@ interface IProps {
 
 function CuratedTab({
   isReadOnly,
+  isStale,
   id,
   index,
   title,
@@ -99,6 +102,7 @@ function CuratedTab({
             onOpenCurrentTab={onOpenCurrentTab}
             onOpenTab={handleOpenTab}
           />
+          {isStale && <Snooze fontSize="inherit" />}
           {onCloseTab && <Tab.Close isOpen={isOpen} onCloseTab={onCloseTab} />}
         </Tab.Container>
       )}
