@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { DragDropContext, DropResult, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
-import { Button, Typography } from '@material-ui/core'
+import { Button, Typography, Snackbar } from '@material-ui/core'
 import { Add } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles'
 import { range } from 'ramda'
@@ -30,6 +30,14 @@ function UI(): React.ReactElement {
   const styles = useStyles()
 
   const dispatch = useDispatch()
+
+  const [wasInteractionRequested, setWasInteractionRequested] = useState(false)
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const interactionRequest = urlParams.get('interactionRequest')
+    if (interactionRequest) setWasInteractionRequested(true)
+  }, [])
 
   const numTabGroups = useSelector((state: RootState) => state.tabGroups.length)
   const newSuggestions = useSelector((state: RootState) =>
@@ -109,6 +117,13 @@ function UI(): React.ReactElement {
           )}
         </div>
       </DragDropContext>
+
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={wasInteractionRequested}
+        onClose={() => setWasInteractionRequested(false)}
+        message="Do you have a minute to interact with our suggestions?"
+      />
     </Layout>
   )
 }
