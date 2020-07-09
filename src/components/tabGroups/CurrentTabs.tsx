@@ -1,11 +1,11 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-// import OldTabGroup from './OldTabGroup'
 import {
   collapseCurrentTabs,
   openCurrentTabAlias,
   closeCurrentTabAlias,
+  closeStaleTabsAlias,
 } from '@src/state/currentTabs'
 import { RootState } from '@src/state/configureStore'
 import TabGroup from './TabGroup'
@@ -13,6 +13,7 @@ import CuratedTab from '../tabs/CuratedTab'
 import { groupBy } from 'ramda'
 import WindowSeparator from '../tabs/WindowSeparator'
 import { ITab } from '@src/types/Extension'
+import { DeleteSweep } from '@material-ui/icons'
 
 function injectWindowSeparators(inputTabs: ITab[], mapTab: any) {
   // group tabs by their window
@@ -44,6 +45,7 @@ function CurrentTabs(): React.ReactElement {
   const dispatch = useDispatch()
 
   const tabs = useSelector((state: RootState) => state.currentTabs.tabs)
+  const staleTabs = useSelector((state: RootState) => state.currentTabs.staleTabs)
   const collapsed = useSelector((state: RootState) => state.currentTabs.collapsed)
 
   const handleCollapseCurrentTabs = (): void => {
@@ -58,6 +60,10 @@ function CurrentTabs(): React.ReactElement {
     dispatch(closeCurrentTabAlias(tabHash))
   }
 
+  const handleCloseStaleTabs = () => {
+    dispatch(closeStaleTabsAlias())
+  }
+
   return (
     <TabGroup>
       {({ handleOpenContextMenu }) => (
@@ -69,6 +75,13 @@ function CurrentTabs(): React.ReactElement {
               onCollapseGroup={handleCollapseCurrentTabs}
             />
             <TabGroup.Title isReadOnly value="Current Tabs" />
+            <TabGroup.GroupAction
+              key="cleanup"
+              title="close stale tabs"
+              onClick={handleCloseStaleTabs}
+            >
+              <DeleteSweep fontSize="inherit" />
+            </TabGroup.GroupAction>
           </TabGroup.Header>
 
           <TabGroup.Tabs isReadOnly isCollapsed={collapsed} id="current">
@@ -78,6 +91,7 @@ function CurrentTabs(): React.ReactElement {
                 <CuratedTab
                   isReadOnly
                   isOpen
+                  isStale={staleTabs.includes(tab.hash)}
                   key={uniqueId + ix}
                   id={uniqueId}
                   index={ix}

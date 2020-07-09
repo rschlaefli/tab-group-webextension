@@ -24,6 +24,7 @@ const currentTabsSlice = createSlice({
     tabHashes: [] as (string | null)[],
     recentTabs: [] as ITab[],
     recentTabsCollapsed: true,
+    staleTabs: [] as string[],
   },
   reducers: {
     collapseCurrentTabs(state): void {
@@ -98,6 +99,9 @@ const currentTabsSlice = createSlice({
         state.tabHashes = remove(tabIndex, 1, state.tabHashes)
       }
     },
+    updateStaleTabs(state, action): void {
+      state.staleTabs = action.payload
+    },
   },
 })
 
@@ -110,6 +114,7 @@ export const {
   removeTab,
   activateTab,
   updateTabs,
+  updateStaleTabs,
 } = actions
 export default reducer
 
@@ -161,6 +166,18 @@ export const closeTabsWithHashes = createAsyncThunk<
     )
   }
 )
+
+export const closeStaleTabs = createAsyncThunk<
+  void,
+  void,
+  { dispatch: AppDispatch; state: RootState }
+>('currentTabs/closeStaleTabs', async (_, thunkAPI) => {
+  const state = thunkAPI.getState()
+  if (state.currentTabs.staleTabs.length > 0) {
+    thunkAPI.dispatch(closeTabsWithHashes({ closeHashes: state.currentTabs.staleTabs }) as any)
+    thunkAPI.dispatch(updateStaleTabs([]))
+  }
+})
 
 export const closeCurrentTab = createAsyncThunk<
   void,
@@ -303,7 +320,9 @@ export const removeTabAndNotify = createAsyncThunk<void, any, { dispatch: AppDis
 // ALIASES
 export const openCurrentTabAlias = createAction<string>('currentTabs/openCurrentTabAlias')
 export const closeCurrentTabAlias = createAction<string>('currentTabs/closeCurrentTabAlias')
+export const closeStaleTabsAlias = createAction('currentTabs/closeStaleTabsAlias')
 export const currentTabsAliases = {
   [openCurrentTabAlias.type]: openCurrentTab,
   [closeCurrentTabAlias.type]: closeCurrentTab,
+  [closeStaleTabsAlias.type]: closeStaleTabs,
 }

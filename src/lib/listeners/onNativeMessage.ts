@@ -9,6 +9,7 @@ import {
 import { updateSuggestedGroups } from '@src/state/suggestions'
 import { postNativeMessage, pickRelevantProperties } from '../utils'
 import { updateHeuristicsStatus } from '@src/state/settings'
+import { updateStaleTabs } from '@src/state/currentTabs'
 
 export default function onNativeMessage({ dispatch, getState }, nativePort) {
   return function onNativeMessageListener(messageFromHeuristics: IHeuristicsAction): void {
@@ -27,6 +28,10 @@ export default function onNativeMessage({ dispatch, getState }, nativePort) {
 
       case HEURISTICS_ACTION.UPDATE_GROUPS:
         dispatch(updateSuggestedGroups(messageFromHeuristics.payload))
+        break
+
+      case HEURISTICS_ACTION.STALE_TABS:
+        dispatch(updateStaleTabs(messageFromHeuristics.payload))
         break
 
       case HEURISTICS_ACTION.NEW_TAB:
