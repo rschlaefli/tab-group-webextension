@@ -24,13 +24,15 @@ const suggestionsSlice = createSlice({
     },
     removeSuggestedTab(state, action): void {
       const groupIndex = findIndex((group) => group.id === action.payload.sourceGroupId, state)
-      const tabIndex = findIndex(
-        (tab) => tab.hash === action.payload.targetTabHash,
-        state[groupIndex].tabs
-      )
+      if (groupIndex > -1) {
+        const tabIndex = findIndex(
+          (tab) => tab.hash === action.payload.targetTabHash,
+          state[groupIndex].tabs
+        )
 
-      if (tabIndex > -1) {
-        state[groupIndex].tabs = remove(tabIndex, 1, state[groupIndex].tabs)
+        if (tabIndex > -1) {
+          state[groupIndex].tabs = remove(tabIndex, 1, state[groupIndex].tabs)
+        }
       }
     },
     removeSuggestedGroup(state, action): ITabGroup[] {
@@ -93,17 +95,12 @@ export const discardSuggestedTab = createAsyncThunk<
   async ({ payload: { sourceGroupId, targetTabHash } }, thunkAPI) => {
     const state = thunkAPI.getState()
 
-    const cleanSourceGroupId = sourceGroupId.replace('suggest-', '')
+    console.log('discarding additional tab', sourceGroupId, targetTabHash, state)
+
+    const cleanSourceGroupId = sourceGroupId.replace('suggest-', '').replace('additional-', '')
     const sourceGroup = state.suggestions.find((group) => group.id === cleanSourceGroupId)
 
-    if (sourceGroup?.tabs?.length === 1) {
-      thunkAPI.dispatch(discardSuggestedGroup({ payload: sourceGroupId }) as any)
-
-      postNativeMessage(nativePort, {
-        action: TAB_ACTION.DISCARD_GROUP,
-        payload: { groupHash: cleanSourceGroupId },
-      })
-    } else {
+    if (sourceGroup) {
       thunkAPI.dispatch(
         removeSuggestedTab({
           sourceGroupId: cleanSourceGroupId,
@@ -115,6 +112,10 @@ export const discardSuggestedTab = createAsyncThunk<
         action: TAB_ACTION.DISCARD_TAB,
         payload: { groupHash: cleanSourceGroupId, tabHash: targetTabHash },
       })
+
+      if (sourceGroup.tabs.length === 1) {
+        thunkAPI.dispatch(removeSuggestedGroup({ sourceGroupId: cleanSourceGroupId }))
+      }
     }
   }
 )
