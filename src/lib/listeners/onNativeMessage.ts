@@ -1,3 +1,4 @@
+import { browser } from 'webextension-polyfill-ts'
 import {
   IHeuristicsAction,
   HEURISTICS_ACTION,
@@ -14,6 +15,16 @@ export default function onNativeMessage({ dispatch, getState }, nativePort) {
     console.log('[background] Received message over native port:', messageFromHeuristics)
 
     switch (messageFromHeuristics.action) {
+      case HEURISTICS_ACTION.REQUEST_INTERACTION:
+        browser.tabs.query({ title: 'Tab Groups' }).then((existingTabs) => {
+          const extensionTabs = existingTabs.filter((tab) => tab.url?.includes('ui.html'))
+          if (extensionTabs.length > 0) {
+            browser.tabs.remove(extensionTabs.map((tab) => tab.id).filter((id) => !!id) as number[])
+          }
+          browser.tabs.create({ url: 'ui.html?interactionRequest=1' })
+        })
+        break
+
       case HEURISTICS_ACTION.UPDATE_GROUPS:
         dispatch(updateSuggestedGroups(messageFromHeuristics.payload))
         break
