@@ -1,4 +1,5 @@
 import { createSlice, createAction, createAsyncThunk } from '@reduxjs/toolkit'
+import jsSHA from 'jssha'
 
 import { performBrowserActionSafe, getBrowserSafe } from '@src/lib/utils'
 import { AppDispatch } from '@src/background'
@@ -10,6 +11,7 @@ import { HEURISTICS_STATUS } from '@src/types/Extension'
 const settingsSlice = createSlice({
   name: 'settings',
   initialState: {
+    groupingActivationKey: '',
     isDebugLoggingEnabled: true,
     isHeuristicsBackendEnabled: false,
     isFocusModeEnabled: false,
@@ -28,6 +30,15 @@ const settingsSlice = createSlice({
     toggleFocusMode(state): void {
       state.isFocusModeEnabled = !state.isFocusModeEnabled
     },
+    setGroupingActivationKey(state, action): void {
+      try {
+        const sha512 = new jsSHA('SHA-512' as any, 'TEXT' as any)
+        sha512.update(action.payload)
+        state.groupingActivationKey = sha512.getHash('HEX')
+      } catch (e) {
+        console.error(e)
+      }
+    },
   },
 })
 
@@ -37,6 +48,7 @@ export const {
   toggleFocusMode,
   updateIsDebugLoggingEnabled,
   updateIsHeuristicsBackendEnabled,
+  setGroupingActivationKey,
 } = actions
 export default reducer
 

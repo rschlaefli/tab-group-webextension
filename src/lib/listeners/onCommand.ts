@@ -1,3 +1,4 @@
+import { browser } from 'webextension-polyfill-ts'
 import { sendMessageToActiveContentScript } from '../utils'
 
 export default function onCommand({ dispatch, nativePort }) {

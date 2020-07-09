@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { DragDropContext, DropResult, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useSelector, useDispatch } from 'react-redux'
-import { Button, Typography, Snackbar } from '@material-ui/core'
-import { Add } from '@material-ui/icons'
+import {
+  Button,
+  Typography,
+  Snackbar,
+  Input,
+  FormControl,
+  InputLabel,
+  FormHelperText,
+} from '@material-ui/core'
+import { Add, Save } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles'
 import { range } from 'ramda'
 import clsx from 'clsx'
@@ -15,6 +23,7 @@ import CurrentTabs from '@src/components/tabGroups/CurrentTabs'
 import SuggestedTabGroup from '@src/components/tabGroups/SuggestedGroup'
 import CuratedGroup from '@src/components/tabGroups/CuratedGroup'
 import ConfigBar from '@src/components/ConfigBar'
+import { setGroupingActivationKey } from '@src/state/settings'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -26,12 +35,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
+const ACTIVATION_KEY =
+  'e0375d59d9cbd5b262f5a4947958e96017ba50d1abfdd7b7239f0817138724e0340fb6801366bc59ca10640ca608ff524820310bea50e2d088ed72b97192e110'
+
 function UI(): React.ReactElement {
   const styles = useStyles()
 
   const dispatch = useDispatch()
 
   const [wasInteractionRequested, setWasInteractionRequested] = useState(false)
+  const [activationKeyInput, setActivationKeyInput] = useState('')
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
@@ -46,6 +59,9 @@ function UI(): React.ReactElement {
   const heuristicsEnabled = useSelector(
     (state: RootState) => state.settings.isHeuristicsBackendEnabled
   )
+  const groupingActivationKey = useSelector(
+    (state: RootState) => state.settings.groupingActivationKey
+  )
 
   const handleDragEnd = (dragEvent: DropResult): void => {
     dispatch(processDragEventAlias(dragEvent))
@@ -55,15 +71,47 @@ function UI(): React.ReactElement {
     dispatch(updateGroup({}))
   }
 
+  const handleSaveActivationKey = () => {
+    dispatch(setGroupingActivationKey(activationKeyInput))
+  }
+
   if (!Number.isInteger(numTabGroups)) {
     return <div>Loading</div>
+  }
+
+  if (!groupingActivationKey || groupingActivationKey !== ACTIVATION_KEY) {
+    return (
+      <Layout>
+        <div className="w-full h-auto p-2 min-h-64 min-w-64">
+          <ConfigBar />
+
+          <div className="flex items-center justify-center">
+            <FormControl>
+              <InputLabel htmlFor="activation-input">Activation Key</InputLabel>
+              <Input
+                id="activation-input"
+                aria-describedby="activation-text"
+                value={activationKeyInput}
+                onChange={(e) => setActivationKeyInput(e.target.value)}
+              />
+              <FormHelperText id="activation-text">
+                Please enter an activation key to enable grouping functionality.
+              </FormHelperText>
+            </FormControl>
+            <Button>
+              <Save onClick={handleSaveActivationKey} />
+            </Button>
+          </div>
+        </div>
+      </Layout>
+    )
   }
 
   return (
     <Layout>
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="w-full h-auto p-2 min-h-64 min-w-64">
-          <ConfigBar />
+          <ConfigBar withFocusMode />
 
           <div className="flex flex-row items-center justify-between">
             <Typography variant="overline">Curated Groups</Typography>
