@@ -1,24 +1,8 @@
 import { postNativeMessage } from '../utils'
-import { TAB_ACTION } from '@src/types/Extension'
-import { Runtime } from 'webextension-polyfill-ts'
-import { RootState } from '@src/state/configureStore'
+import { refreshSuggestedGroups } from '@src/state/suggestions'
 
-export default function onSuggestionsRefresh({ getState }, nativePort: Runtime.Port) {
+export default function onSuggestionsRefresh({ dispatch }) {
   return function onSuggestionsRefreshListener(): void {
-    const state: RootState = getState()
-
-    let heuristicsConfig = {}
-    try {
-      heuristicsConfig = state.settings.heuristicsConfigs[state.settings.heuristicsActiveConfig]
-    } catch (e) {
-      console.error(e)
-    }
-
-    console.log(`[background] Forcing suggestions refresh with parameters`, heuristicsConfig)
-
-    postNativeMessage(nativePort, {
-      action: TAB_ACTION.REFRESH_GROUPS,
-      payload: heuristicsConfig,
-    })
+    dispatch(refreshSuggestedGroups())
   }
 }

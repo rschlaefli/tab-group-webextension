@@ -100,7 +100,7 @@ function setupListeners({ dispatch, getState }, nativePort?: Runtime.Port): void
 
     LISTENERS.onResumeProcessing = onResumeProcessing(nativePort)
     LISTENERS.onPauseProcessing = onPauseProcessing(nativePort)
-    LISTENERS.onSuggestionsRefresh = onSuggestionsRefresh({ getState }, nativePort)
+    LISTENERS.onSuggestionsRefresh = onSuggestionsRefresh({ dispatch })
     LISTENERS.onContextMenuClicked = function ({ menuItemId }) {
       switch (menuItemId) {
         case 'resume':

@@ -10,7 +10,7 @@ import {
   InputLabel,
   FormHelperText,
 } from '@material-ui/core'
-import { Add, Save } from '@material-ui/icons'
+import { Add, Save, Sync } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles'
 import { range } from 'ramda'
 import clsx from 'clsx'
@@ -24,6 +24,7 @@ import SuggestedTabGroup from '@src/components/tabGroups/SuggestedGroup'
 import CuratedGroup from '@src/components/tabGroups/CuratedGroup'
 import ConfigBar from '@src/components/ConfigBar'
 import { setGroupingActivationKey } from '@src/state/settings'
+import { refreshSuggestedGroupsAlias } from '@src/state/suggestions'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -73,6 +74,10 @@ function UI(): React.ReactElement {
 
   const handleSaveActivationKey = () => {
     dispatch(setGroupingActivationKey(activationKeyInput))
+  }
+
+  const handleRefreshSuggestedGroups = () => {
+    dispatch(refreshSuggestedGroupsAlias())
   }
 
   if (!Number.isInteger(numTabGroups)) {
@@ -145,8 +150,11 @@ function UI(): React.ReactElement {
 
           {heuristicsEnabled && (
             <div>
-              <div className="flex flex-row items-center justify-between">
+              <div className="flex flex-row items-center justify-start">
                 <Typography variant="overline">Suggested Groups</Typography>
+                <div className="flex ml-2 text-base text-gray-600">
+                  <Sync fontSize="inherit" onClick={handleRefreshSuggestedGroups} />
+                </div>
               </div>
 
               <div className="flex flex-col md:overflow-x-auto md:flex-row">
