@@ -218,7 +218,10 @@ module.exports = function (webpackEnv, _) {
     plugins: [
       isEnvProduction && new MiniCssExtractPlugin(),
       // fork a ts typechecker
-      isEnvDevelopment && new ForkTsCheckerWebpackPlugin({ eslint: true }),
+      isEnvDevelopment &&
+        new ForkTsCheckerWebpackPlugin({
+          eslint: { enabled: true, files: ['src/**/*.{js,ts,tsx}'] },
+        }),
       // automatically reload if a missing module is newly installed
       isEnvDevelopment && new WatchMissingNodeModulesPlugin('node_modules'),
       // bundle analysis
