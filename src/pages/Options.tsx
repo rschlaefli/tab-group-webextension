@@ -95,7 +95,7 @@ function Options(): React.ReactElement {
           </FormGroup>
         </FormControl>
 
-        <div className="flex-1 h-128">
+        <div className="flex-1">
           <FormLabel component="legend">Heuristics Configurations</FormLabel>
 
           <Tabs value={heuristicsActiveConfig} onChange={handleUpdateActiveHeuristicsConfig}>
@@ -120,7 +120,7 @@ function Options(): React.ReactElement {
             </div>
           ))}
           <Button
-            disabled={heuristicsActiveConfig === 0}
+            disabled={heuristicsActiveConfig <= 1}
             onClick={handleRemoveSelectedConfig(heuristicsActiveConfig)}
           >
             Remove Selected Configuration

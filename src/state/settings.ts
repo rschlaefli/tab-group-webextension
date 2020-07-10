@@ -9,19 +9,36 @@ import { processSettings } from '@src/lib/listeners'
 import { openCurrentTab } from './currentTabs'
 import { HEURISTICS_STATUS } from '@src/types/Extension'
 
-const DEFAULT_HEURISTICS_CONFIG = (name = 'Default') => ({
+const GRAPH_GENERATION_DEFAULTS = {
+  minWeight: 2,
+  expireAfter: 14,
+  sameOriginFactor: 0.3,
+  urlSimilarityFactor: 0.5,
+}
+
+const GROUPING_DEFAULTS = {
+  maxGroups: 10,
+  minGroupSize: 3,
+  maxGroupSize: 10,
+}
+
+const DEFAULT_WATSET_CONFIG = {
+  name: 'Watset Default (Legacy)',
+  heuristics: { algorithm: 'watset', minOverlap: 0.2 },
+  graphGeneration: GRAPH_GENERATION_DEFAULTS,
+  grouping: {
+    ...GROUPING_DEFAULTS,
+    expansion: 2,
+    powerCoefficient: 2,
+  },
+}
+
+const DEFAULT_SIMAP_CONFIG = (name = 'SiMap Default') => ({
   name,
   heuristics: { algorithm: 'simap', minOverlap: 0.2 },
-  graphGeneration: {
-    minWeight: 2,
-    expireAfter: 14,
-    sameOriginFactor: 0.3,
-    urlSimilarityFactor: 0.5,
-  },
+  graphGeneration: GRAPH_GENERATION_DEFAULTS,
   grouping: {
-    maxGroups: 10,
-    minGroupSize: 3,
-    maxGroupSize: 10,
+    ...GROUPING_DEFAULTS,
     tau: 0.15,
     resStart: 0.0001,
     resEnd: 0.05,
@@ -39,7 +56,7 @@ const settingsSlice = createSlice({
     isFocusModeEnabled: false,
     heuristicsStatus: null,
     heuristicsActiveConfig: 0,
-    heuristicsConfigs: [DEFAULT_HEURISTICS_CONFIG()],
+    heuristicsConfigs: [DEFAULT_WATSET_CONFIG, DEFAULT_SIMAP_CONFIG()],
   },
   reducers: {
     updateHeuristicsStatus(state, action): void {
@@ -64,11 +81,11 @@ const settingsSlice = createSlice({
       }
     },
     addHeuristicsConfig(state): void {
-      state.heuristicsConfigs.push(DEFAULT_HEURISTICS_CONFIG(new Date().toDateString()))
+      state.heuristicsConfigs.push(DEFAULT_SIMAP_CONFIG(new Date().toDateString()))
       state.heuristicsActiveConfig = state.heuristicsConfigs.length - 1
     },
     removeHeuristicsConfig(state, action): void {
-      if (action.payload > 0 && state.heuristicsConfigs.length > action.payload) {
+      if (action.payload > 1 && state.heuristicsConfigs.length > action.payload) {
         state.heuristicsConfigs = remove(action.payload, 1, state.heuristicsConfigs)
       }
     },
@@ -84,7 +101,7 @@ const settingsSlice = createSlice({
     updateHeuristicsConfig(state, action): void {
       if (
         Number.isSafeInteger(action.payload.configIndex) &&
-        action.payload.configIndex > 0 &&
+        action.payload.configIndex > 1 &&
         state.heuristicsConfigs.length > action.payload.configIndex
       ) {
         state.heuristicsConfigs[action.payload.configIndex] = action.payload.configValue
