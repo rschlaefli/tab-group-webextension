@@ -24,7 +24,6 @@ import {
   updateActiveHeuristicsConfig,
   updateHeuristicsConfig,
   removeHeuristicsConfig,
-  resetHeuristicsConfig,
 } from '@src/state/settings'
 import { resetProgress } from '@src/state/tutorial'
 
