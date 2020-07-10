@@ -68,6 +68,7 @@ describe('currentTabsReducer', () => {
     collapsed: boolean
     recentTabs: ITab[]
     recentTabsCollapsed: boolean
+    staleTabs: string[]
   }
 
   beforeAll(() => {
@@ -80,6 +81,7 @@ describe('currentTabsReducer', () => {
       collapsed: false,
       recentTabs: [],
       recentTabsCollapsed: true,
+      staleTabs: [],
     }
   })
 
@@ -137,7 +139,7 @@ describe('currentTabsReducer', () => {
     expect(currentState.tabHashes).toMatchInlineSnapshot(`
       Array [
         "839fe8e384092f11a81cc1452e214407",
-        "abcd",
+        "839fe8e384092f11a81cc1452e214407",
       ]
     `)
   })
@@ -150,7 +152,7 @@ describe('currentTabsReducer', () => {
 
     expect(currentState.tabHashes).toMatchInlineSnapshot(`
       Array [
-        "abcd",
+        "839fe8e384092f11a81cc1452e214407",
       ]
     `)
     expect(currentState.recentTabs).toHaveLength(1)
