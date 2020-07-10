@@ -9,7 +9,26 @@ import { processSettings } from '@src/lib/listeners'
 import { openCurrentTab } from './currentTabs'
 import { HEURISTICS_STATUS } from '@src/types/Extension'
 
-const DEFAULT_HEURISTICS_CONFIG = (name = 'Default') => ({ name, algorithm: 'simap' })
+const DEFAULT_HEURISTICS_CONFIG = (name = 'Default') => ({
+  name,
+  heuristics: { algorithm: 'simap', minOverlap: 0.2 },
+  graphGeneration: {
+    minWeight: 2,
+    expireAfter: 14,
+    sameOriginFactor: 0.3,
+    urlSimilarityFactor: 0.5,
+  },
+  grouping: {
+    maxGroups: 10,
+    minGroupSize: 3,
+    maxGroupSize: 10,
+    tau: 0.15,
+    resStart: 0.0001,
+    resEnd: 0.05,
+    resAcc: 0.001,
+    largestCC: false,
+  },
+})
 
 const settingsSlice = createSlice({
   name: 'settings',
