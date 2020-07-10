@@ -55,7 +55,7 @@ const settingsSlice = createSlice({
     isHeuristicsBackendEnabled: false,
     isFocusModeEnabled: false,
     heuristicsStatus: null,
-    heuristicsActiveConfig: 0,
+    heuristicsActiveConfig: 1,
     heuristicsConfigs: [DEFAULT_WATSET_CONFIG, DEFAULT_SIMAP_CONFIG()],
   },
   reducers: {
