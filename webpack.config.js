@@ -125,7 +125,12 @@ module.exports = function (webpackEnv, _) {
             },
             {
               test: /\.css$/,
-              include: [PATHS.styles, path.resolve(__dirname, 'node_modules/webext-base-css')],
+              include: [
+                PATHS.styles,
+                path.resolve(__dirname, 'node_modules/webext-base-css'),
+                path.resolve(__dirname, 'node_modules/jsoneditor'),
+                path.resolve(__dirname, 'node_modules/jsoneditor-react'),
+              ],
               use: [
                 isEnvProduction
                   ? {

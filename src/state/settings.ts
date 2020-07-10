@@ -1,5 +1,6 @@
 import { createSlice, createAction, createAsyncThunk } from '@reduxjs/toolkit'
 import jsSHA from 'jssha'
+import { remove } from 'ramda'
 
 import { performBrowserActionSafe, getBrowserSafe } from '@src/lib/utils'
 import { AppDispatch } from '@src/background'
@@ -7,6 +8,8 @@ import { RootState } from './configureStore'
 import { processSettings } from '@src/lib/listeners'
 import { openCurrentTab } from './currentTabs'
 import { HEURISTICS_STATUS } from '@src/types/Extension'
+
+const DEFAULT_HEURISTICS_CONFIG = (name = 'Default') => ({ name, algorithm: 'simap' })
 
 const settingsSlice = createSlice({
   name: 'settings',
@@ -16,6 +19,8 @@ const settingsSlice = createSlice({
     isHeuristicsBackendEnabled: false,
     isFocusModeEnabled: false,
     heuristicsStatus: null,
+    heuristicsActiveConfig: 0,
+    heuristicsConfigs: [DEFAULT_HEURISTICS_CONFIG()],
   },
   reducers: {
     updateHeuristicsStatus(state, action): void {
@@ -39,6 +44,33 @@ const settingsSlice = createSlice({
         console.error(e)
       }
     },
+    addHeuristicsConfig(state): void {
+      state.heuristicsConfigs.push(DEFAULT_HEURISTICS_CONFIG(new Date().toDateString()))
+      state.heuristicsActiveConfig = state.heuristicsConfigs.length - 1
+    },
+    removeHeuristicsConfig(state, action): void {
+      if (action.payload > 0 && state.heuristicsConfigs.length > action.payload) {
+        state.heuristicsConfigs = remove(action.payload, 1, state.heuristicsConfigs)
+      }
+    },
+    updateActiveHeuristicsConfig(state, action): void {
+      if (
+        Number.isSafeInteger(action.payload) &&
+        action.payload >= 0 &&
+        state.heuristicsConfigs.length > action.payload
+      ) {
+        state.heuristicsActiveConfig = action.payload
+      }
+    },
+    updateHeuristicsConfig(state, action): void {
+      if (
+        Number.isSafeInteger(action.payload.configIndex) &&
+        action.payload.configIndex > 0 &&
+        state.heuristicsConfigs.length > action.payload.configIndex
+      ) {
+        state.heuristicsConfigs[action.payload.configIndex] = action.payload.configValue
+      }
+    },
   },
 })
 
@@ -49,6 +81,10 @@ export const {
   updateIsDebugLoggingEnabled,
   updateIsHeuristicsBackendEnabled,
   setGroupingActivationKey,
+  addHeuristicsConfig,
+  removeHeuristicsConfig,
+  updateActiveHeuristicsConfig,
+  updateHeuristicsConfig,
 } = actions
 export default reducer
 

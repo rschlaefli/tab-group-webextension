@@ -95,8 +95,6 @@ export const discardSuggestedTab = createAsyncThunk<
   async ({ payload: { sourceGroupId, targetTabHash } }, thunkAPI) => {
     const state = thunkAPI.getState()
 
-    console.log('discarding additional tab', sourceGroupId, targetTabHash, state)
-
     const cleanSourceGroupId = sourceGroupId.replace('suggest-', '').replace('additional-', '')
     const sourceGroup = state.suggestions.find((group) => group.id === cleanSourceGroupId)
 
