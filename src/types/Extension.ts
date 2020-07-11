@@ -36,6 +36,7 @@ export enum HEURISTICS_STATUS {
   'DISABLED' = 'DISABLED',
   'RUNNING' = 'RUNNING',
   'ALREADY_RUNNING' = 'ALREADY_RUNNING',
+  'STOPPED' = 'STOPPED',
 }
 
 export interface ITabGroup {

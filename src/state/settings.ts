@@ -2,12 +2,13 @@ import { createSlice, createAction, createAsyncThunk } from '@reduxjs/toolkit'
 import jsSHA from 'jssha'
 import { remove } from 'ramda'
 
-import { performBrowserActionSafe, getBrowserSafe } from '@src/lib/utils'
+import { performBrowserActionSafe, getBrowserSafe, postNativeMessage } from '@src/lib/utils'
 import { AppDispatch } from '@src/background'
 import { RootState } from './configureStore'
 import { processSettings } from '@src/lib/listeners'
 import { openCurrentTab } from './currentTabs'
-import { HEURISTICS_STATUS } from '@src/types/Extension'
+import { HEURISTICS_STATUS, TAB_ACTION } from '@src/types/Extension'
+import { Runtime } from 'webextension-polyfill-ts'
 
 const GRAPH_GENERATION_DEFAULTS = {
   minWeight: 2,
@@ -220,6 +221,30 @@ export const processHeuristicsStatusUpdate = createAsyncThunk<
       break
     }
   }
+})
+
+export const pauseHeuristicsProcessing = createAsyncThunk<
+  void,
+  Runtime.Port,
+  { dispatch: AppDispatch; state: RootState }
+>('settings/pauseHeuristicsProcessing', async (nativePort) => {
+  console.log('[background] Pausing background processing')
+  postNativeMessage(nativePort, {
+    action: TAB_ACTION.PAUSE,
+    payload: {},
+  })
+})
+
+export const resumeHeuristicsProcessing = createAsyncThunk<
+  void,
+  Runtime.Port,
+  { dispatch: AppDispatch; state: RootState }
+>('settings/resumeHeuristicsProcessing', async (nativePort) => {
+  console.log('[background] Resuming background processing')
+  postNativeMessage(nativePort, {
+    action: TAB_ACTION.RESUME,
+    payload: {},
+  })
 })
 
 // ALIASES

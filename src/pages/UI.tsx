@@ -153,7 +153,11 @@ function UI(): React.ReactElement {
               <div className="flex flex-row items-center justify-start">
                 <Typography variant="overline">Suggested Groups</Typography>
                 <div className="flex ml-2 text-base text-gray-600">
-                  <Sync fontSize="inherit" onClick={handleRefreshSuggestedGroups} />
+                  <Sync
+                    className="cursor-pointer"
+                    fontSize="inherit"
+                    onClick={handleRefreshSuggestedGroups}
+                  />
                 </div>
               </div>
 

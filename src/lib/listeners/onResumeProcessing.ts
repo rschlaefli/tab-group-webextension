@@ -1,12 +1,8 @@
 import { postNativeMessage } from '../utils'
-import { TAB_ACTION } from '@src/types/Extension'
+import { resumeHeuristicsProcessing } from '@src/state/settings'
 
-export default function onResumeProcessing(nativePort) {
+export default function onResumeProcessing({ dispatch }, nativePort) {
   return function onResumeProcessingListener(): void {
-    console.log('[background] Resuming background processing')
-    postNativeMessage(nativePort, {
-      action: TAB_ACTION.RESUME,
-      payload: {},
-    })
+    dispatch(resumeHeuristicsProcessing(nativePort))
   }
 }
