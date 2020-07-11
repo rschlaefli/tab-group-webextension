@@ -76,9 +76,10 @@ function setupListeners({ dispatch, getState }, nativePort?: Runtime.Port): void
     LISTENERS.onNativeDisconnect = onNativeDisconnect({ dispatch })
     nativePort.onDisconnect.addListener(LISTENERS.onNativeDisconnect)
 
-    // setup a listener to track idle status
+    // setup a listener to track idle status (5 minutes)
     LISTENERS.onIdleStateChanged = onIdleStateChanged(nativePort)
     browser.idle.onStateChanged.addListener(LISTENERS.onIdleStateChanged)
+    browser.idle.setDetectionInterval(60 * 5)
 
     browser.contextMenus.create({
       id: 'pause',
