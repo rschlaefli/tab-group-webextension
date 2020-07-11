@@ -2,7 +2,9 @@ import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
 import { AppDispatch } from '@src/background'
 import { RootState } from './configureStore'
 import { toggleHeuristicsBackend } from './settings'
-import { getBrowserSafe } from '@src/lib/utils'
+import { getBrowserSafe, performBrowserActionSafe } from '@src/lib/utils'
+
+import { nativePort } from '../lib/listeners'
 
 const tutorialSlice = createSlice({
   name: 'tutorial',
@@ -66,9 +68,10 @@ export const establishHeuristicsConnection = createAsyncThunk<
       thunkAPI.dispatch(toggleHeuristicsBackend() as any)
     }
     try {
-      const browser = await getBrowserSafe()
-      await browser.runtime.sendNativeMessage('tabs', { action: 'PING' })
-      thunkAPI.dispatch(updateHeuristicsConnectionEstablished({ success: true }))
+      performBrowserActionSafe(async () => {
+        nativePort?.postMessage({ action: 'PING' })
+        thunkAPI.dispatch(updateHeuristicsConnectionEstablished({ success: true }))
+      })
     } catch (e) {
       console.error(e)
       thunkAPI.dispatch(updateHeuristicsConnectionEstablished({ error: e.message }))

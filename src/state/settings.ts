@@ -23,7 +23,7 @@ const GROUPING_DEFAULTS = {
   maxGroupSize: 10,
 }
 
-const DEFAULT_WATSET_CONFIG = {
+export const DEFAULT_WATSET_CONFIG = {
   name: 'Watset Default (Legacy)',
   heuristics: { algorithm: 'watset', minOverlap: 0.2 },
   graphGeneration: GRAPH_GENERATION_DEFAULTS,
@@ -34,7 +34,7 @@ const DEFAULT_WATSET_CONFIG = {
   },
 }
 
-const DEFAULT_SIMAP_CONFIG = (name = 'SiMap Default') => ({
+export const DEFAULT_SIMAP_CONFIG = (name = 'SiMap Default') => ({
   name,
   heuristics: { algorithm: 'simap', minOverlap: 0.2 },
   graphGeneration: GRAPH_GENERATION_DEFAULTS,

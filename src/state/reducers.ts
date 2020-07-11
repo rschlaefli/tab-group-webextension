@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import { persistReducer } from 'redux-persist'
+import { persistReducer, createMigrate } from 'redux-persist'
 
 import createCompressor from '@src/lib/compress'
 import syncStorage from '@src/lib/syncStorage'
@@ -8,6 +8,7 @@ import tabGroups from './tabGroups'
 import suggestions from './suggestions'
 import settings from './settings'
 import tutorial from './tutorial'
+import migrations from './migrations'
 
 const compressor = createCompressor({ whitelist: ['tabGroups'] } as any)
 
@@ -18,7 +19,8 @@ export default persistReducer(
     blacklist: ['currentTabs'],
     transforms: [compressor],
     throttle: 500,
-    version: 1,
+    version: 2,
+    migrate: createMigrate(migrations, { debug: false }),
   },
   combineReducers({
     currentTabs,
