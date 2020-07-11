@@ -95,8 +95,6 @@ export const discardSuggestedTab = createAsyncThunk<
   async ({ payload: { sourceGroupId, targetTabHash } }, thunkAPI) => {
     const state = thunkAPI.getState()
 
-    console.log('discarding additional tab', sourceGroupId, targetTabHash, state)
-
     const cleanSourceGroupId = sourceGroupId.replace('suggest-', '').replace('additional-', '')
     const sourceGroup = state.suggestions.find((group) => group.id === cleanSourceGroupId)
 
@@ -138,6 +136,28 @@ export const discardSuggestedGroup = createAsyncThunk<
   }
 )
 
+export const refreshSuggestedGroups = createAsyncThunk<
+  void,
+  void,
+  { dispatch: AppDispatch; state: RootState }
+>('suggestions/refreshSuggestedGroups', async (_, thunkAPI) => {
+  const state = thunkAPI.getState()
+
+  let heuristicsConfig = {}
+  try {
+    heuristicsConfig = state.settings.heuristicsConfigs[state.settings.heuristicsActiveConfig]
+  } catch (e) {
+    console.error(e)
+  }
+
+  console.log(`[background] Forcing suggestions refresh with parameters`, heuristicsConfig)
+
+  postNativeMessage(nativePort, {
+    action: TAB_ACTION.REFRESH_GROUPS,
+    payload: heuristicsConfig,
+  })
+})
+
 // ALIASES
 export const acceptSuggestedTabAlias = createAction<{
   sourceGroupId: string
@@ -155,9 +175,12 @@ export const discardSuggestedTabAlias = createAction<{
   targetTabHash: string
 }>('suggestions/discardSuggestedTabAlias')
 
+export const refreshSuggestedGroupsAlias = createAction('suggestions/refreshSuggestedGroupsAlias')
+
 export const suggestionsAliases = {
   [acceptSuggestedTabAlias.type]: acceptSuggestedTab,
   [acceptSuggestedGroupAlias.type]: acceptSuggestedGroup,
   [discardSuggestedGroupAlias.type]: discardSuggestedGroup,
   [discardSuggestedTabAlias.type]: discardSuggestedTab,
+  [refreshSuggestedGroupsAlias.type]: refreshSuggestedGroups,
 }

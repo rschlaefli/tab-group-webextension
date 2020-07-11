@@ -1,12 +1,52 @@
 import { createSlice, createAction, createAsyncThunk } from '@reduxjs/toolkit'
 import jsSHA from 'jssha'
+import { remove } from 'ramda'
 
-import { performBrowserActionSafe, getBrowserSafe } from '@src/lib/utils'
+import { performBrowserActionSafe, getBrowserSafe, postNativeMessage } from '@src/lib/utils'
 import { AppDispatch } from '@src/background'
 import { RootState } from './configureStore'
 import { processSettings } from '@src/lib/listeners'
 import { openCurrentTab } from './currentTabs'
-import { HEURISTICS_STATUS } from '@src/types/Extension'
+import { HEURISTICS_STATUS, TAB_ACTION } from '@src/types/Extension'
+import { Runtime } from 'webextension-polyfill-ts'
+
+const GRAPH_GENERATION_DEFAULTS = {
+  minWeight: 2,
+  expireAfter: 14,
+  sameOriginFactor: 0.3,
+  urlSimilarityFactor: 0.5,
+}
+
+const GROUPING_DEFAULTS = {
+  maxGroups: 10,
+  minGroupSize: 3,
+  maxGroupSize: 10,
+}
+
+const DEFAULT_WATSET_CONFIG = {
+  name: 'Watset Default (Legacy)',
+  heuristics: { algorithm: 'watset', minOverlap: 0.2 },
+  graphGeneration: GRAPH_GENERATION_DEFAULTS,
+  grouping: {
+    ...GROUPING_DEFAULTS,
+    expansion: 2,
+    powerCoefficient: 2,
+  },
+}
+
+const DEFAULT_SIMAP_CONFIG = (name = 'SiMap Default') => ({
+  name,
+  heuristics: { algorithm: 'simap', minOverlap: 0.2 },
+  graphGeneration: GRAPH_GENERATION_DEFAULTS,
+  grouping: {
+    ...GROUPING_DEFAULTS,
+    tau: 0.15,
+    resStart: 0.0001,
+    resEnd: 0.05,
+    resAcc: 0.001,
+    largestCC: false,
+  },
+})
 
 const settingsSlice = createSlice({
   name: 'settings',
@@ -16,6 +56,8 @@ const settingsSlice = createSlice({
     isHeuristicsBackendEnabled: false,
     isFocusModeEnabled: false,
     heuristicsStatus: null,
+    heuristicsActiveConfig: 1,
+    heuristicsConfigs: [DEFAULT_WATSET_CONFIG, DEFAULT_SIMAP_CONFIG()],
   },
   reducers: {
     updateHeuristicsStatus(state, action): void {
@@ -39,6 +81,33 @@ const settingsSlice = createSlice({
         console.error(e)
       }
     },
+    addHeuristicsConfig(state): void {
+      state.heuristicsConfigs.push(DEFAULT_SIMAP_CONFIG(new Date().toDateString()))
+      state.heuristicsActiveConfig = state.heuristicsConfigs.length - 1
+    },
+    removeHeuristicsConfig(state, action): void {
+      if (action.payload > 1 && state.heuristicsConfigs.length > action.payload) {
+        state.heuristicsConfigs = remove(action.payload, 1, state.heuristicsConfigs)
+      }
+    },
+    updateActiveHeuristicsConfig(state, action): void {
+      if (
+        Number.isSafeInteger(action.payload) &&
+        action.payload >= 0 &&
+        state.heuristicsConfigs.length > action.payload
+      ) {
+        state.heuristicsActiveConfig = action.payload
+      }
+    },
+    updateHeuristicsConfig(state, action): void {
+      if (
+        Number.isSafeInteger(action.payload.configIndex) &&
+        action.payload.configIndex > 1 &&
+        state.heuristicsConfigs.length > action.payload.configIndex
+      ) {
+        state.heuristicsConfigs[action.payload.configIndex] = action.payload.configValue
+      }
+    },
   },
 })
 
@@ -49,6 +118,10 @@ export const {
   updateIsDebugLoggingEnabled,
   updateIsHeuristicsBackendEnabled,
   setGroupingActivationKey,
+  addHeuristicsConfig,
+  removeHeuristicsConfig,
+  updateActiveHeuristicsConfig,
+  updateHeuristicsConfig,
 } = actions
 export default reducer
 
@@ -148,6 +221,30 @@ export const processHeuristicsStatusUpdate = createAsyncThunk<
       break
     }
   }
+})
+
+export const pauseHeuristicsProcessing = createAsyncThunk<
+  void,
+  Runtime.Port,
+  { dispatch: AppDispatch; state: RootState }
+>('settings/pauseHeuristicsProcessing', async (nativePort) => {
+  console.log('[background] Pausing background processing')
+  postNativeMessage(nativePort, {
+    action: TAB_ACTION.PAUSE,
+    payload: {},
+  })
+})
+
+export const resumeHeuristicsProcessing = createAsyncThunk<
+  void,
+  Runtime.Port,
+  { dispatch: AppDispatch; state: RootState }
+>('settings/resumeHeuristicsProcessing', async (nativePort) => {
+  console.log('[background] Resuming background processing')
+  postNativeMessage(nativePort, {
+    action: TAB_ACTION.RESUME,
+    payload: {},
+  })
 })
 
 // ALIASES
