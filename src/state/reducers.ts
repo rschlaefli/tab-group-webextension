@@ -19,8 +19,8 @@ export default persistReducer(
     blacklist: ['currentTabs'],
     transforms: [compressor],
     throttle: 500,
-    version: 2,
-    migrate: createMigrate(migrations, { debug: false }),
+    version: 4,
+    migrate: createMigrate(migrations, { debug: true }),
   },
   combineReducers({
     currentTabs,
