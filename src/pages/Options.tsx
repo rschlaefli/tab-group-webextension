@@ -112,7 +112,7 @@ function Options(): React.ReactElement {
                   search={false}
                   theme="ace/theme/github"
                   ace={ace}
-                  mode="code"
+                  mode={ix <= 1 ? 'view' : 'code'}
                   value={config}
                   onChange={handleUpdateHeuristicsConfig(ix)}
                 />
