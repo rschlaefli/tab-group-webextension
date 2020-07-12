@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import {
   Button,
-  Stepper,
-  Step,
-  Container,
   Select,
   MenuItem,
   FormControl,
   InputLabel,
-  StepLabel,
   ExpansionPanel as MuiExpansionPanel,
   ExpansionPanelSummary as MuiExpansionPanelSummary,
   FormControlLabel,
@@ -20,7 +16,6 @@ import { withStyles } from '@material-ui/core/styles'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 
-import Layout from '@src/components/common/Layout'
 import Markdown from '@src/components/common/Markdown'
 import { RootState } from '@src/state/configureStore'
 import {
@@ -29,7 +24,8 @@ import {
   establishHeuristicsConnectionAlias,
 } from '@src/state/tutorial'
 import { useBrowserAndOS } from '@src/lib/utils'
-import TUTORIAL_CONTENTS from '@src/docs/tutorial'
+import TUTORIAL_CONTENTS from '@src/docs/setupInstructions/index'
+import DocStepper from '@src/components/tutorial/DocStepper'
 
 const STEPS = ['Introduction', 'Heuristics Setup', 'Data Collection']
 
@@ -103,243 +99,234 @@ function Tutorial(): React.ReactElement {
   const { Introduction: OSIntroduction, Requirements, Setup } = TUTORIAL_CONTENTS[os]
 
   return (
-    <Layout>
-      <Container className="p-4">
-        <div className="p-4 bg-gray-100 border border-gray-300 border-solid dark:bg-gray-700 min-h-64 dark:border-none">
-          {progress === 0 && (
-            <div>
-              <Markdown content={Introduction} />
-              <Button onClick={() => dispatch(updateProgress(1))}>Next Step</Button>
+    <DocStepper activeStep={progress} steps={STEPS}>
+      <DocStepper.Step
+        activeStep={progress}
+        currentStep={0}
+        hasNext
+        onChangeStep={(newStep) => dispatch(updateProgress(newStep))}
+      >
+        <Markdown content={Introduction} />
+      </DocStepper.Step>
+
+      <DocStepper.Step
+        activeStep={progress}
+        currentStep={1}
+        hasNext
+        hasPrev
+        onChangeStep={(newStep) => dispatch(updateProgress(newStep))}
+      >
+        <div className="flex flex-row justify-end -mb-12">
+          <FormControl>
+            <InputLabel>Browser</InputLabel>
+            <Select value={browser} onChange={(e: any) => setBrowser(e.target.value)}>
+              <MenuItem value="Chrome">Google Chrome</MenuItem>
+              <MenuItem value="Firefox">Mozilla Firefox</MenuItem>
+              <MenuItem value="Other">Other</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl>
+            <InputLabel>OS</InputLabel>
+            <Select value={os} onChange={(e: any) => setOS(e.target.value)}>
+              <MenuItem value="Windows">Windows</MenuItem>
+              <MenuItem value="Mac OS">Mac OS</MenuItem>
+              <MenuItem value="Linux">Linux</MenuItem>
+              <MenuItem value="Other">Other</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
+
+        {(os !== 'Other' && browser !== 'Other' && (
+          <>
+            <div className="pb-4">
+              <Markdown content={OSIntroduction} />
             </div>
-          )}
 
-          {progress === 1 && (
-            <div>
-              <div className="flex flex-row justify-end -mb-12">
-                <FormControl>
-                  <InputLabel>Browser</InputLabel>
-                  <Select value={browser} onChange={(e: any) => setBrowser(e.target.value)}>
-                    <MenuItem value="Chrome">Google Chrome</MenuItem>
-                    <MenuItem value="Firefox">Mozilla Firefox</MenuItem>
-                    <MenuItem value="Other">Other</MenuItem>
-                  </Select>
-                </FormControl>
-                <FormControl>
-                  <InputLabel>OS</InputLabel>
-                  <Select value={os} onChange={(e: any) => setOS(e.target.value)}>
-                    <MenuItem value="Windows">Windows</MenuItem>
-                    <MenuItem value="Mac OS">Mac OS</MenuItem>
-                    <MenuItem value="Linux">Linux</MenuItem>
-                    <MenuItem value="Other">Other</MenuItem>
-                  </Select>
-                </FormControl>
-              </div>
-
-              {(os !== 'Other' && browser !== 'Other' && (
-                <>
-                  <div className="pb-4">
-                    <Markdown content={OSIntroduction} />
-                  </div>
-
-                  <ExpansionPanel expanded={!heuristicsRequirementsSatisfied}>
-                    <ExpansionPanelSummary
-                      expandIcon={<ExpandMore />}
-                      aria-label="Expand"
-                      aria-controls="additional-actions3-content"
-                      id="additional-actions3-header"
-                    >
-                      <FormControlLabel
-                        aria-label="requirements"
-                        onClick={(event) => event.stopPropagation()}
-                        onFocus={(event) => event.stopPropagation()}
-                        control={
-                          <Checkbox
-                            checked={heuristicsRequirementsSatisfied}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                dispatch(
-                                  updateHeuristicsInstallationStep({
-                                    heuristicsRequirementsSatisfied: true,
-                                  })
-                                )
-                              } else {
-                                dispatch(
-                                  updateHeuristicsInstallationStep({
-                                    heuristicsRequirementsSatisfied: false,
-                                  })
-                                )
-                              }
-                            }}
-                          />
-                        }
-                        label="System Requirements"
-                      />
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails style={{ display: 'flex', flexDirection: 'column' }}>
-                      <Markdown content={Requirements} />
-                      <Button
-                        style={{ marginTop: '1rem' }}
-                        onClick={() => {
+            <ExpansionPanel expanded={!heuristicsRequirementsSatisfied}>
+              <ExpansionPanelSummary
+                expandIcon={<ExpandMore />}
+                aria-label="Expand"
+                aria-controls="additional-actions3-content"
+                id="additional-actions3-header"
+              >
+                <FormControlLabel
+                  aria-label="requirements"
+                  onClick={(event) => event.stopPropagation()}
+                  onFocus={(event) => event.stopPropagation()}
+                  control={
+                    <Checkbox
+                      checked={heuristicsRequirementsSatisfied}
+                      onChange={(e) => {
+                        if (e.target.checked) {
                           dispatch(
                             updateHeuristicsInstallationStep({
                               heuristicsRequirementsSatisfied: true,
                             })
                           )
-                        }}
-                      >
-                        Continue
-                      </Button>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
-
-                  <ExpansionPanel
-                    disabled={!heuristicsRequirementsSatisfied}
-                    expanded={heuristicsRequirementsSatisfied && !heuristicsSetupCompleted}
-                  >
-                    <ExpansionPanelSummary
-                      expandIcon={<ExpandMore />}
-                      aria-label="Expand"
-                      aria-controls="additional-actions3-content"
-                      id="additional-actions3-header"
-                    >
-                      <FormControlLabel
-                        aria-label="setup"
-                        onClick={(event) => event.stopPropagation()}
-                        onFocus={(event) => event.stopPropagation()}
-                        control={
-                          <Checkbox
-                            disabled={!heuristicsRequirementsSatisfied}
-                            checked={heuristicsSetupCompleted}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                dispatch(
-                                  updateHeuristicsInstallationStep({
-                                    heuristicsSetupCompleted: true,
-                                  })
-                                )
-                                dispatch(establishHeuristicsConnectionAlias())
-                              } else {
-                                dispatch(
-                                  updateHeuristicsInstallationStep({
-                                    heuristicsSetupCompleted: false,
-                                  })
-                                )
-                              }
-                            }}
-                          />
-                        }
-                        label="Heuristics Setup"
-                      />
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails style={{ display: 'flex', flexDirection: 'column' }}>
-                      <Markdown
-                        content={Setup}
-                        replace={{ key: '__VERSION__', value: heuristicsVersion || 'X.X.X' }}
-                      />
-                      <Button
-                        style={{ marginTop: '1rem' }}
-                        onClick={() => {
+                        } else {
                           dispatch(
-                            updateHeuristicsInstallationStep({ heuristicsSetupCompleted: true })
+                            updateHeuristicsInstallationStep({
+                              heuristicsRequirementsSatisfied: false,
+                            })
+                          )
+                        }
+                      }}
+                    />
+                  }
+                  label="System Requirements"
+                />
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails style={{ display: 'flex', flexDirection: 'column' }}>
+                <Markdown content={Requirements} />
+                <Button
+                  style={{ marginTop: '1rem' }}
+                  onClick={() => {
+                    dispatch(
+                      updateHeuristicsInstallationStep({
+                        heuristicsRequirementsSatisfied: true,
+                      })
+                    )
+                  }}
+                >
+                  Continue
+                </Button>
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
+
+            <ExpansionPanel
+              disabled={!heuristicsRequirementsSatisfied}
+              expanded={heuristicsRequirementsSatisfied && !heuristicsSetupCompleted}
+            >
+              <ExpansionPanelSummary
+                expandIcon={<ExpandMore />}
+                aria-label="Expand"
+                aria-controls="additional-actions3-content"
+                id="additional-actions3-header"
+              >
+                <FormControlLabel
+                  aria-label="setup"
+                  onClick={(event) => event.stopPropagation()}
+                  onFocus={(event) => event.stopPropagation()}
+                  control={
+                    <Checkbox
+                      disabled={!heuristicsRequirementsSatisfied}
+                      checked={heuristicsSetupCompleted}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          dispatch(
+                            updateHeuristicsInstallationStep({
+                              heuristicsSetupCompleted: true,
+                            })
                           )
                           dispatch(establishHeuristicsConnectionAlias())
-                        }}
-                      >
-                        Continue
-                      </Button>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
-
-                  <ExpansionPanel
-                    disabled={!heuristicsRequirementsSatisfied || !heuristicsSetupCompleted}
-                    expanded={heuristicsRequirementsSatisfied && heuristicsSetupCompleted}
-                  >
-                    <ExpansionPanelSummary
-                      expandIcon={<ExpandMore />}
-                      aria-label="Expand"
-                      aria-controls="additional-actions3-content"
-                      id="additional-actions3-header"
-                    >
-                      <FormControlLabel
-                        aria-label="connection"
-                        onClick={(event) => event.stopPropagation()}
-                        onFocus={(event) => event.stopPropagation()}
-                        control={
-                          <Checkbox
-                            disabled={!heuristicsConnectionEstablished}
-                            checked={heuristicsConnectionEstablished}
-                          />
+                        } else {
+                          dispatch(
+                            updateHeuristicsInstallationStep({
+                              heuristicsSetupCompleted: false,
+                            })
+                          )
                         }
-                        label="Heuristics Connection"
-                      />
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                      {heuristicsConnectionEstablished && (
-                        <div>Connection established. Please continue with the final step.</div>
-                      )}
+                      }}
+                    />
+                  }
+                  label="Heuristics Setup"
+                />
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails style={{ display: 'flex', flexDirection: 'column' }}>
+                <Markdown
+                  content={Setup}
+                  replace={{ key: '__VERSION__', value: heuristicsVersion || 'X.X.X' }}
+                />
+                <Button
+                  style={{ marginTop: '1rem' }}
+                  onClick={() => {
+                    dispatch(updateHeuristicsInstallationStep({ heuristicsSetupCompleted: true }))
+                    dispatch(establishHeuristicsConnectionAlias())
+                  }}
+                >
+                  Continue
+                </Button>
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
 
-                      {heuristicsConnectionError && (
-                        <div>
-                          Encountered an issue while trying to connect: {heuristicsConnectionError}
-                        </div>
-                      )}
+            <ExpansionPanel
+              disabled={!heuristicsRequirementsSatisfied || !heuristicsSetupCompleted}
+              expanded={heuristicsRequirementsSatisfied && heuristicsSetupCompleted}
+            >
+              <ExpansionPanelSummary
+                expandIcon={<ExpandMore />}
+                aria-label="Expand"
+                aria-controls="additional-actions3-content"
+                id="additional-actions3-header"
+              >
+                <FormControlLabel
+                  aria-label="connection"
+                  onClick={(event) => event.stopPropagation()}
+                  onFocus={(event) => event.stopPropagation()}
+                  control={
+                    <Checkbox
+                      disabled={!heuristicsConnectionEstablished}
+                      checked={heuristicsConnectionEstablished}
+                    />
+                  }
+                  label="Heuristics Connection"
+                />
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails>
+                {heuristicsConnectionEstablished && (
+                  <div>Connection established. Please continue with the final step.</div>
+                )}
 
-                      {!heuristicsConnectionEstablished && (
-                        <div>
-                          <p>
-                            Connection not ready. If you have only just installed the heuristics
-                            engine, please try to restart your browser.
-                          </p>
+                {heuristicsConnectionError && (
+                  <div>
+                    Encountered an issue while trying to connect: {heuristicsConnectionError}
+                  </div>
+                )}
 
-                          <Button onClick={() => dispatch(establishHeuristicsConnectionAlias())}>
-                            Try again
-                          </Button>
+                {!heuristicsConnectionEstablished && (
+                  <div>
+                    <p>
+                      Connection not ready. If you have only just installed the heuristics engine,
+                      please try to restart your browser.
+                    </p>
 
-                          <a href="troubleshooting.html">Troubleshooting</a>
-                        </div>
-                      )}
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
-                </>
-              )) || (
-                <div className="markdown">
-                  <h1>Error</h1>
-                  <p>Unsupported browser or OS.</p>
-                </div>
-              )}
+                    <Button onClick={() => dispatch(establishHeuristicsConnectionAlias())}>
+                      Try again
+                    </Button>
 
-              <div className="flex justify-between">
-                <Button onClick={() => dispatch(updateProgress(0))}>Previous Step</Button>
-                <Button onClick={() => dispatch(updateProgress(2))}>Next Step</Button>
-              </div>
-            </div>
-          )}
+                    <a href="troubleshooting.html">Troubleshooting</a>
+                  </div>
+                )}
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
+          </>
+        )) || (
+          <div className="markdown">
+            <h1>Error</h1>
+            <p>Unsupported browser or OS.</p>
+          </div>
+        )}
+      </DocStepper.Step>
 
-          {progress === 2 && (
-            <div>
-              <Markdown content={DataCollection} />
+      <DocStepper.Step
+        activeStep={progress}
+        currentStep={2}
+        hasNext
+        hasPrev
+        onChangeStep={(newStep) => dispatch(updateProgress(newStep))}
+      >
+        <Markdown content={DataCollection} />
+      </DocStepper.Step>
 
-              <Button onClick={() => dispatch(updateProgress(1))}>Previous Step</Button>
-              <Button onClick={() => dispatch(updateProgress(3))}>Finish Tutorial</Button>
-            </div>
-          )}
-
-          {progress === 3 && (
-            <div>
-              <Markdown content={Conclusion} />
-            </div>
-          )}
-        </div>
-
-        <Stepper activeStep={progress}>
-          {STEPS.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-      </Container>
-    </Layout>
+      <DocStepper.Step
+        activeStep={progress}
+        currentStep={3}
+        hasPrev
+        onChangeStep={(newStep) => dispatch(updateProgress(newStep))}
+      >
+        <Markdown content={Conclusion} />
+      </DocStepper.Step>
+    </DocStepper>
   )
 }
 

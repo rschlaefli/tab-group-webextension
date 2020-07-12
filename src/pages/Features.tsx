@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 
 import DocStepper from '@src/components/tutorial/DocStepper'
 
-const STEPS = ['Introduction', 'Compile', 'Review', 'Submit']
+const STEPS = ['Introduction', 'Manual Grouping', 'Suggestions']
 
-function Data(): React.ReactElement {
+function Features(): React.ReactElement {
   const [activeStep, setActiveStep] = useState(0)
 
   return (
@@ -28,4 +28,4 @@ function Data(): React.ReactElement {
   )
 }
 
-export default Data
+export default Features
