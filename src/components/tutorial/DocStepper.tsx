@@ -53,8 +53,16 @@ DocStepper.Step = function Step({
     <div>
       {children}
       <div className="flex justify-between">
-        {hasPrev && <Button onClick={() => onChangeStep(currentStep - 1)}>Previous Step</Button>}
-        {hasNext && <Button onClick={() => onChangeStep(currentStep + 1)}>Next Step</Button>}
+        {hasPrev ? (
+          <Button onClick={() => onChangeStep(currentStep - 1)}>Previous Step</Button>
+        ) : (
+          <div />
+        )}
+        {hasNext ? (
+          <Button onClick={() => onChangeStep(currentStep + 1)}>Next Step</Button>
+        ) : (
+          <div />
+        )}
       </div>
     </div>
   )
