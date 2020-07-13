@@ -82,7 +82,7 @@ function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
   return (
     <div className="flex flex-col pb-2 md:justify-between md:flex-row dark:text-gray-100">
       <div className="flex flex-row items-center justify-between pl-2 md:order-2">
-        <div className="flex items-center mr-4">
+        <div className="flex flex-row items-center mr-4">
           <FormControlLabel
             control={
               <Switch
@@ -95,7 +95,7 @@ function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
             }
             label="Heuristics"
           />
-          <div className="text-lg">
+          <div className="flex items-center text-lg">
             {heuristicsEnabled ? (
               <Tooltip
                 title={`Heuristics Status: ${STATUS_DESCRIPTION[heuristicsStatus ?? 'UNKNOWN']}`}
@@ -126,7 +126,7 @@ function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
           </div>
         </div>
 
-        <span>
+        <span className="flex items-center">
           {self != top && self.name !== 'New Tab' && (
             <button
               className="mr-2 text-lg text-gray-600 dark:text-gray-100"
@@ -148,7 +148,7 @@ function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
           )}
 
           <button
-            className="text-lg text-gray-600 dark:text-gray-100"
+            className="flex items-center text-lg text-gray-600 dark:text-gray-100"
             onClick={handleOpenOptions}
             title="open settings"
           >
@@ -176,7 +176,13 @@ function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
               label="Focus Mode"
             />
           </Tooltip>
-          <IconButton color="primary" href="features.html" target="_blank">
+          <IconButton
+            color="primary"
+            href="features.html"
+            target="_blank"
+            size="small"
+            title="Documentation"
+          >
             <HelpOutline fontSize="inherit" />
           </IconButton>
         </div>
