@@ -18,6 +18,8 @@ You will be presented with an overview of your manually curated groups (empty), 
 - `Ctrl+Shift+Q`: Open the extension sidebar on any page
 - `Ctrl+Shift+S`: Open the extension overview in a new tab
 
+You can customize these shortcuts in the Browser extension settings (Chrome: <chrome://extensions/shortcuts>, Firefox: <https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox>).
+
 ## Manual Grouping
 
 ### Current Tabs

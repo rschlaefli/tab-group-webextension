@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { FormControlLabel, Switch, Tooltip } from '@material-ui/core'
+import { FormControlLabel, Switch, Tooltip, Button, IconButton } from '@material-ui/core'
 import {
   InfoRounded,
   ZoomOutMap,
@@ -9,6 +9,7 @@ import {
   RadioButtonUncheckedRounded,
   CheckCircleRounded,
   PauseCircleOutline,
+  HelpOutline,
 } from '@material-ui/icons'
 import clsx from 'clsx'
 
@@ -158,24 +159,26 @@ function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
 
       {withFocusMode ? (
         <div className="flex flex-row items-center pl-2 md:order-1">
-          <FormControlLabel
-            control={
-              <Switch
-                size="small"
-                checked={focusModeEnabled}
-                onChange={handleToggleFocusMode}
-                name="focusModeEnabled"
-                inputProps={{ 'aria-label': 'secondary checkbox' }}
-              />
-            }
-            label="Focus Mode"
-          />
           <Tooltip
             title="Focus Mode: On opening of a tab group, close all tabs belonging to other groups"
             aria-label="Focus Mode: On opening of a tab group, close all tabs belonging to other groups"
           >
-            <InfoRounded className="text-blue-400" fontSize="inherit" />
+            <FormControlLabel
+              control={
+                <Switch
+                  size="small"
+                  checked={focusModeEnabled}
+                  onChange={handleToggleFocusMode}
+                  name="focusModeEnabled"
+                  inputProps={{ 'aria-label': 'secondary checkbox' }}
+                />
+              }
+              label="Focus Mode"
+            />
           </Tooltip>
+          <IconButton color="primary" href="features.html" target="_blank">
+            <HelpOutline fontSize="inherit" />
+          </IconButton>
         </div>
       ) : (
         <div />
