@@ -139,15 +139,13 @@ TabGroup.Title = function Title({ isReadOnly, onChangeGroupName, value }: ITitle
 }
 
 interface IGroupActionProps {
-  key: string
   title: string
   children: React.ReactNode
   onClick: () => void
 }
-TabGroup.GroupAction = function GroupAction({ key, title, onClick, children }: IGroupActionProps) {
+TabGroup.GroupAction = function GroupAction({ title, onClick, children }: IGroupActionProps) {
   return (
     <button
-      key={key}
       className="ml-2 text-xs text-gray-600 dark:text-gray-400"
       onClick={onClick}
       title={title}

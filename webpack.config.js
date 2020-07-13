@@ -35,6 +35,7 @@ const PATHS = {
   cwd: path.resolve(resolveCwd(), '.'),
   data: path.resolve(__dirname, 'src/data.tsx'),
   docs: path.resolve(__dirname, 'src/docs'),
+  features: path.resolve(__dirname, 'src/features.tsx'),
   manifest: path.resolve(__dirname, 'manifest.json'),
   options: path.resolve(__dirname, 'src/options.tsx'),
   output: path.resolve(__dirname, 'build/dev'),
@@ -76,6 +77,8 @@ module.exports = function (webpackEnv, _) {
       background: PATHS.background,
       // create a build for the data page
       data: PATHS.data,
+      // create a build for the features page
+      features: PATHS.features,
       // create a build for the settings/options page
       options: PATHS.options,
       // content script for sidebar injection
@@ -284,6 +287,13 @@ module.exports = function (webpackEnv, _) {
         template: PATHS.template,
         filename: 'data.html',
         chunks: ['data'],
+      }),
+      // dynamically generate the extension feature description page
+      new HtmlWebpackPlugin({
+        title: 'Features',
+        template: PATHS.template,
+        filename: 'features.html',
+        chunks: ['features'],
       }),
       // ensure that webpack always writes files (for dev-server)
       // new WriteFilePlugin(),

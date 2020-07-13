@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { FormControlLabel, Switch, Tooltip } from '@material-ui/core'
+import { FormControlLabel, Switch, Tooltip, Button, IconButton } from '@material-ui/core'
 import {
   InfoRounded,
   ZoomOutMap,
@@ -9,6 +9,7 @@ import {
   RadioButtonUncheckedRounded,
   CheckCircleRounded,
   PauseCircleOutline,
+  HelpOutline,
 } from '@material-ui/icons'
 import clsx from 'clsx'
 
@@ -81,7 +82,7 @@ function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
   return (
     <div className="flex flex-col pb-2 md:justify-between md:flex-row dark:text-gray-100">
       <div className="flex flex-row items-center justify-between pl-2 md:order-2">
-        <div className="flex items-center mr-4">
+        <div className="flex flex-row items-center mr-4">
           <FormControlLabel
             control={
               <Switch
@@ -94,7 +95,7 @@ function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
             }
             label="Heuristics"
           />
-          <div className="text-lg">
+          <div className="flex items-center text-lg">
             {heuristicsEnabled ? (
               <Tooltip
                 title={`Heuristics Status: ${STATUS_DESCRIPTION[heuristicsStatus ?? 'UNKNOWN']}`}
@@ -125,7 +126,7 @@ function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
           </div>
         </div>
 
-        <span>
+        <span className="flex items-center">
           {self != top && self.name !== 'New Tab' && (
             <button
               className="mr-2 text-lg text-gray-600 dark:text-gray-100"
@@ -147,7 +148,7 @@ function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
           )}
 
           <button
-            className="text-lg text-gray-600 dark:text-gray-100"
+            className="flex items-center text-lg text-gray-600 dark:text-gray-100"
             onClick={handleOpenOptions}
             title="open settings"
           >
@@ -158,24 +159,32 @@ function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
 
       {withFocusMode ? (
         <div className="flex flex-row items-center pl-2 md:order-1">
-          <FormControlLabel
-            control={
-              <Switch
-                size="small"
-                checked={focusModeEnabled}
-                onChange={handleToggleFocusMode}
-                name="focusModeEnabled"
-                inputProps={{ 'aria-label': 'secondary checkbox' }}
-              />
-            }
-            label="Focus Mode"
-          />
           <Tooltip
             title="Focus Mode: On opening of a tab group, close all tabs belonging to other groups"
             aria-label="Focus Mode: On opening of a tab group, close all tabs belonging to other groups"
           >
-            <InfoRounded className="text-blue-400" fontSize="inherit" />
+            <FormControlLabel
+              control={
+                <Switch
+                  size="small"
+                  checked={focusModeEnabled}
+                  onChange={handleToggleFocusMode}
+                  name="focusModeEnabled"
+                  inputProps={{ 'aria-label': 'secondary checkbox' }}
+                />
+              }
+              label="Focus Mode"
+            />
           </Tooltip>
+          <IconButton
+            color="primary"
+            href="features.html"
+            target="_blank"
+            size="small"
+            title="Documentation"
+          >
+            <HelpOutline fontSize="inherit" />
+          </IconButton>
         </div>
       ) : (
         <div />

@@ -1,0 +1,152 @@
+{
+  "addons": {
+    "automated-tab-organization@rschlaefli": {
+      "updates": [
+        {
+          "version": "0.0.1",
+          "update_link": "https://www.dropbox.com/s/q66u7fr896x46te/firefox-v0.0.1.xpi?raw=1"
+        },
+        {
+          "version": "0.0.2",
+          "update_link": "https://www.dropbox.com/s/mz01zc03xbclgvn/firefox-v0.0.2.xpi?raw=1"
+        },
+        {
+          "version": "0.0.3",
+          "update_link": "https://www.dropbox.com/s/oeof5o2t12rr6j5/firefox-v0.0.3.xpi?raw=1"
+        },
+        {
+          "version": "0.0.4",
+          "update_link": "https://www.dropbox.com/s/1tuduvcihcesala/firefox-v0.0.4.xpi?dl=1"
+        },
+        {
+          "version": "0.0.5",
+          "update_link": "https://www.dropbox.com/s/pa2c7qthk9c2943/firefox-v0.0.5.xpi?dl=1"
+        },
+        {
+          "version": "0.0.7",
+          "update_link": "https://www.dropbox.com/s/i2kns3srdu0u3jy/firefox-v0.0.7.xpi?dl=1&raw=1"
+        },
+        {
+          "version": "0.0.8",
+          "update_link": "https://www.dropbox.com/s/5nk5nytde0wg5qc/firefox-v0.0.8.xpi?dl=1&raw=1"
+        },
+        {
+          "version": "0.0.9",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/firefox-v0.0.9.xpi"
+        },
+        {
+          "version": "0.1.0",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/firefox-v0.1.0.xpi"
+        },
+        {
+          "version": "0.1.1",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/firefox-v0.1.1.xpi"
+        },
+        {
+          "version": "0.1.2",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.1.2-fx.xpi"
+        },
+        {
+          "version": "0.1.3",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.1.3-fx.xpi"
+        },
+        {
+          "version": "0.1.4",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.1.4-fx.xpi"
+        },
+        {
+          "version": "0.1.5",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.1.5-fx.xpi"
+        },
+        {
+          "version": "0.1.6",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.1.6-fx.xpi"
+        },
+        {
+          "version": "0.1.7",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.1.7-fx.xpi"
+        },
+        {
+          "version": "0.1.8",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.1.8-fx.xpi"
+        },
+        {
+          "version": "0.1.9",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.1.9-fx.xpi"
+        },
+        {
+          "version": "0.1.10",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.1.10-fx.xpi"
+        },
+        {
+          "version": "0.1.11",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.1.11-fx.xpi"
+        },
+        {
+          "version": "0.1.12",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.1.12-fx.xpi"
+        },
+        {
+          "version": "0.1.13",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.1.13-fx.xpi"
+        },
+        {
+          "version": "0.1.14",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.1.14-fx.xpi"
+        },
+        {
+          "version": "0.1.15",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.1.15-fx.xpi"
+        },
+        {
+          "version": "0.2.0",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.2.0-fx.xpi"
+        },
+        {
+          "version": "0.2.1",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.2.1-fx.xpi"
+        },
+        {
+          "version": "0.2.2",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.2.2-fx.xpi"
+        },
+        {
+          "version": "0.2.3",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.2.3-fx.xpi"
+        },
+        {
+          "version": "0.2.4",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.2.4-fx.xpi"
+        },
+        {
+          "version": "0.2.5",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.2.5-fx.xpi"
+        },
+        {
+          "version": "0.2.6",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.2.6-fx.xpi"
+        },
+        {
+          "version": "0.2.7",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.2.7-fx.xpi"
+        },
+        {
+          "version": "0.2.8",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.2.8-fx.xpi"
+        },
+        {
+          "version": "0.3.0",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.3.0-fx.xpi"
+        },
+        {
+          "version": "0.3.1",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.3.1-fx.xpi"
+        },
+        {
+          "version": "0.3.4",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.3.4-fx.xpi"
+        }
+      ]
+    }
+  }
+}
