@@ -42,7 +42,7 @@ function TabGroup({ children, contextMenuItems }: IProps): React.ReactElement {
     <>
       <div
         className={clsx(
-          'flex-initial mb-2 border border-solid md:mr-2 md:last:mr-0 md:w-56 dark:border-gray-500'
+          'flex-initial mb-2 border border-solid md:mr-2 md:last:mr-0 md:w-56 dark:border-gray-500 rounded'
         )}
       >
         {children({ handleOpenContextMenu })}
@@ -72,7 +72,7 @@ interface IHeaderProps {
 TabGroup.Header = function Header({ children, isReadOnly, onOpenContextMenu }: IHeaderProps) {
   return (
     <div
-      className="flex flex-row items-center justify-between px-2 py-1 bg-gray-100 min-h-6 dark:text-gray-900 dark:bg-gray-700"
+      className="flex flex-row items-center justify-between px-2 py-1 bg-gray-100 border-b rounded shadow-sm min-h-6 dark:text-gray-900 dark:bg-gray-700"
       onContextMenu={!isReadOnly ? onOpenContextMenu : undefined}
     >
       {children}

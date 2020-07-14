@@ -103,7 +103,7 @@ Tab.Container = function Container({
   return (
     <div
       className={clsx(
-        'flex flex-row h-6 items-center justify-start px-2 py-1 text-xs border-b dark:border-gray-700 last:border-0',
+        'h-6 flex flex-row items-center justify-start px-2 py-1 text-xs leading-3 border-b dark:border-gray-700 last:border-0',
         !isReadOnly && isOpen && 'bg-orange-200 dark:bg-gray-700'
       )}
       ref={provided.innerRef}

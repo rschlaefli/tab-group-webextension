@@ -762,6 +762,6 @@ module.exports = {
     transitionDuration: ['responsive'],
   },
   corePlugins: {},
-  plugins: [],
+  plugins: [require('@tailwindcss/typography')],
   purge: ['./public/**/*.html', './src/**/*.ts', './src/**/*.tsx', './src/styles/index.css'],
 }

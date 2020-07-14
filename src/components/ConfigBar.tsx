@@ -1,8 +1,7 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { FormControlLabel, Switch, Tooltip, Button, IconButton } from '@material-ui/core'
+import { FormControlLabel, Switch, Tooltip, IconButton } from '@material-ui/core'
 import {
-  InfoRounded,
   ZoomOutMap,
   Settings,
   ChromeReaderModeSharp,
@@ -80,7 +79,7 @@ function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
   }
 
   return (
-    <div className="flex flex-col pb-2 md:justify-between md:flex-row dark:text-gray-100">
+    <div className="flex flex-col pb-2 md:justify-between md:flex-row dark:text-gray-100 md:pb-0">
       <div className="flex flex-row items-center justify-between pl-2 md:order-2">
         <div className="flex flex-row items-center mr-4">
           <FormControlLabel
