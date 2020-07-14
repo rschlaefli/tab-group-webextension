@@ -12,7 +12,6 @@ const path = require('path')
 const CleanWebpackPlugin = require('clean-webpack-plugin').CleanWebpackPlugin
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const WriteFilePlugin = require('write-file-webpack-plugin')
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin')
 const WebextensionPlugin = require('webpack-webextension-plugin')
@@ -61,6 +60,8 @@ module.exports = function (webpackEnv, _) {
   const isEnvProduction = webpackEnv && !!webpackEnv.production
 
   const PACKAGE = require('./package.json')
+  const OUT_PATH =
+    PATHS[webpackEnv && webpackEnv.browser ? `output_${webpackEnv.browser}` : 'output']
 
   return {
     context: __dirname,
@@ -90,7 +91,7 @@ module.exports = function (webpackEnv, _) {
       ui: PATHS.ui,
     },
     output: {
-      path: PATHS[webpackEnv && webpackEnv.browser ? `output_${webpackEnv.browser}` : 'output'],
+      path: OUT_PATH,
       filename: '[name].bundle.js',
     },
     // cache: {
@@ -106,9 +107,9 @@ module.exports = function (webpackEnv, _) {
             {
               test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
               loader: require.resolve('url-loader'),
-              include: PATHS.public,
+              include: [PATHS.public, PATHS.docs],
               options: {
-                limit: '10000',
+                limit: '20000',
                 name: 'media/[name].[hash:8].[ext]',
               },
             },
@@ -258,6 +259,7 @@ module.exports = function (webpackEnv, _) {
           { from: PATHS.changelog },
           { from: PATHS.appIconBlack },
           { from: PATHS.appIconWhite },
+          { from: `${PATHS.docs}/**/*.png`, to: OUT_PATH, flatten: true },
         ],
       }),
       // dynamically generate the main extension ui page
