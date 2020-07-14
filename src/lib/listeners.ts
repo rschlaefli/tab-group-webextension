@@ -154,6 +154,11 @@ export const processSettings = ({ dispatch, getState }) => (settings?: unknown) 
   const currentState: RootState = getState()
   const options: any = settings || currentState.settings
 
+  const tutorial = currentState.tutorial
+  if (tutorial?.progress < 3) {
+    browser.tabs.create({ url: 'tutorial.html' })
+  }
+
   console.log('[background] Processing options', options)
 
   if (options.isHeuristicsBackendEnabled && !nativePort) {
@@ -177,10 +182,5 @@ export const processSettings = ({ dispatch, getState }) => (settings?: unknown) 
       nativePort = null
     }
     setupListeners({ dispatch, getState })
-  }
-
-  const tutorial = currentState.tutorial
-  if (tutorial?.progress < 3) {
-    browser.tabs.create({ url: 'tutorial.html' })
   }
 }

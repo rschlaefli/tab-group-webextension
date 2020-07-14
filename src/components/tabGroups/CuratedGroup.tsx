@@ -130,7 +130,7 @@ function CuratedGroup({ selector }: IProps): React.ReactElement {
 
           {matchingSuggestions && matchingSuggestions.tabs.length > 0 && (
             <TabGroup.Tabs isCollapsed={collapsed} id={`additional-${id}`}>
-              <div className="pt-1 pl-2 mt-1 text-gray-700 bg-gray-100 border-b border-gray-300 dark:text-gray-900 dark:bg-gray-700 ">
+              <div className="pl-2 mt-1 text-gray-700 bg-gray-100 border-b border-gray-300 dark:text-gray-900 dark:bg-gray-700 ">
                 Suggestions
               </div>
               {matchingSuggestions.tabs.map((tab, ix) => {

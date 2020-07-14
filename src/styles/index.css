@@ -90,7 +90,43 @@ body > * {
   margin: initial !important;
 }
 
+.header-icon {
+  @apply text-xs;
+  @apply text-gray-500;
+}
+
+.header-icon:hover {
+  @apply text-gray-600;
+}
+
+.tab-icon {
+  @apply text-xs;
+  @apply text-gray-400;
+}
+
+.tab-icon:hover {
+  @apply text-gray-500;
+}
+
 @media (prefers-color-scheme: dark) {
+  .header-icon {
+    @apply text-xs;
+    @apply text-gray-500;
+  }
+
+  .header-icon:hover {
+    @apply text-gray-400;
+  }
+
+  .tab-icon {
+    @apply text-xs;
+    @apply text-gray-500;
+  }
+
+  .tab-icon:hover {
+    @apply text-gray-400;
+  }
+
   :root {
     background-color: #292a2d;
   }

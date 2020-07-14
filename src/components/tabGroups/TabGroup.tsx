@@ -145,11 +145,7 @@ interface IGroupActionProps {
 }
 TabGroup.GroupAction = function GroupAction({ title, onClick, children }: IGroupActionProps) {
   return (
-    <button
-      className="ml-2 text-xs text-gray-600 dark:text-gray-400"
-      onClick={onClick}
-      title={title}
-    >
+    <button className="ml-2 header-icon" onClick={onClick} title={title}>
       {children}
     </button>
   )
@@ -160,14 +156,9 @@ interface IOpenGroupButtonProps {
 }
 TabGroup.OpenGroup = function OpenGroupButton({ onOpenTabGroup }: IOpenGroupButtonProps) {
   return (
-    <button
-      key="open"
-      className="ml-2 text-xs text-gray-600 dark:text-gray-400"
-      onClick={onOpenTabGroup}
-      title="open group"
-    >
+    <TabGroup.GroupAction title="open group" onClick={onOpenTabGroup}>
       <Launch fontSize="inherit" />
-    </button>
+    </TabGroup.GroupAction>
   )
 }
 
@@ -176,14 +167,9 @@ interface ICloseGroupProps {
 }
 TabGroup.CloseGroup = function CloseGroupButton({ onCloseTabGroup }: ICloseGroupProps) {
   return (
-    <button
-      key="close"
-      className="ml-2 text-xs text-gray-600 dark:text-gray-400"
-      onClick={onCloseTabGroup}
-      title="close group"
-    >
+    <TabGroup.GroupAction title="close group" onClick={onCloseTabGroup}>
       <Close fontSize="inherit" />
-    </button>
+    </TabGroup.GroupAction>
   )
 }
 
@@ -194,14 +180,9 @@ TabGroup.DiscardGroup = function DiscardGroupButton({
   onDiscardSuggestion,
 }: IDiscardSuggestionProps) {
   return (
-    <button
-      key="discard"
-      className="ml-2 text-xs text-gray-600 dark:text-gray-400"
-      onClick={onDiscardSuggestion}
-      title="discard suggestion"
-    >
+    <TabGroup.GroupAction title="discard suggestion" onClick={onDiscardSuggestion}>
       <Delete fontSize="inherit" />
-    </button>
+    </TabGroup.GroupAction>
   )
 }
 
@@ -210,14 +191,9 @@ interface IAcceptGroupProps {
 }
 TabGroup.AcceptGroup = function AcceptGroupButton({ onAcceptSuggestion }: IAcceptGroupProps) {
   return (
-    <button
-      key="save"
-      className="ml-2 text-xs text-gray-600 dark:text-gray-400"
-      onClick={onAcceptSuggestion}
-      title="save suggestion"
-    >
+    <TabGroup.GroupAction title="save suggestion" onClick={onAcceptSuggestion}>
       <Save fontSize="inherit" />
-    </button>
+    </TabGroup.GroupAction>
   )
 }
 
