@@ -88,11 +88,11 @@ export const acceptSuggestedTab = createAsyncThunk<
 
 export const discardSuggestedTab = createAsyncThunk<
   void,
-  { _sender?: any; payload: { sourceGroupId: string; targetTabHash: string } },
+  { _sender?: any; payload: { sourceGroupId: string; targetTabHash: string; reason?: string } },
   { dispatch: AppDispatch; state: RootState }
 >(
   'suggestions/discardSuggestedTab',
-  async ({ payload: { sourceGroupId, targetTabHash } }, thunkAPI) => {
+  async ({ payload: { sourceGroupId, targetTabHash, reason } }, thunkAPI) => {
     const state = thunkAPI.getState()
 
     const cleanSourceGroupId = sourceGroupId.replace('suggest-', '').replace('additional-', '')
@@ -103,6 +103,7 @@ export const discardSuggestedTab = createAsyncThunk<
         removeSuggestedTab({
           sourceGroupId: cleanSourceGroupId,
           targetTabHash,
+          reason,
         })
       )
 
@@ -120,18 +121,18 @@ export const discardSuggestedTab = createAsyncThunk<
 
 export const discardSuggestedGroup = createAsyncThunk<
   void,
-  { _sender?: any; payload: string },
+  { _sender?: any; payload: { sourceGroupId: string; reason?: string; rating?: number } },
   { dispatch: AppDispatch; state: RootState }
 >(
   'suggestions/discardSuggestedGroup',
-  async ({ payload: sourceGroupId }, thunkAPI): Promise<void> => {
+  async ({ payload: { sourceGroupId, reason, rating } }, thunkAPI): Promise<void> => {
     const cleanSourceGroupId = sourceGroupId.replace('suggest-', '')
 
     thunkAPI.dispatch(removeSuggestedGroup(cleanSourceGroupId))
 
     postNativeMessage(nativePort, {
       action: TAB_ACTION.DISCARD_GROUP,
-      payload: { groupHash: cleanSourceGroupId },
+      payload: { groupHash: cleanSourceGroupId, reason, rating },
     })
   }
 )
@@ -167,12 +168,15 @@ export const acceptSuggestedTabAlias = createAction<{
 export const acceptSuggestedGroupAlias = createAction<string>(
   'suggestions/acceptSuggestedGroupAlias'
 )
-export const discardSuggestedGroupAlias = createAction<string>(
-  'suggestions/discardSuggestedGroupAlias'
-)
+export const discardSuggestedGroupAlias = createAction<{
+  sourceGroupId: string
+  rating?: number
+  reason?: string
+}>('suggestions/discardSuggestedGroupAlias')
 export const discardSuggestedTabAlias = createAction<{
   sourceGroupId: string
   targetTabHash: string
+  reason?: string
 }>('suggestions/discardSuggestedTabAlias')
 
 export const refreshSuggestedGroupsAlias = createAction('suggestions/refreshSuggestedGroupsAlias')

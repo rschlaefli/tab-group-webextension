@@ -141,7 +141,7 @@ TabGroup.Title = function Title({ isReadOnly, onChangeGroupName, value }: ITitle
 interface IGroupActionProps {
   title: string
   children: React.ReactNode
-  onClick: () => void
+  onClick: (e) => void
 }
 TabGroup.GroupAction = function GroupAction({ title, onClick, children }: IGroupActionProps) {
   return (
@@ -174,7 +174,7 @@ TabGroup.CloseGroup = function CloseGroupButton({ onCloseTabGroup }: ICloseGroup
 }
 
 interface IDiscardSuggestionProps {
-  onDiscardSuggestion: () => void
+  onDiscardSuggestion: (e) => void
 }
 TabGroup.DiscardGroup = function DiscardGroupButton({
   onDiscardSuggestion,

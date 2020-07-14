@@ -1,19 +1,11 @@
 Before the _Heuristics Engine_ can be installed, certain system requirements need to be satisfied.
 
-### Java 8 Runtime Environment
+### Java 11 Runtime Environment
 
-Install a Java 8 JRE using the command appropriate for your distribution:
-
-#### Ubuntu
+Install a Java 11 JRE using the command appropriate for your distribution:
 
 ```bash
-sudo apt-get update && sudo apt-get install openjdk-8-jre
-```
-
-#### Fedora
-
-```bash
-...
+sudo apt-get update && sudo apt-get install openjdk-11-jre
 ```
 
 Ensure that a Java JRE has been successfully installed using the following command:
@@ -25,5 +17,5 @@ java -version
 The output should contain a line similar to the following:
 
 ```bash
-OpenJDK Runtime Environment (AdoptOpenJDK)(build 1.8.0_252-b09)
+OpenJDK Runtime Environment (AdoptOpenJDK)
 ```
