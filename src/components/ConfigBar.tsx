@@ -8,7 +8,7 @@ import {
   RadioButtonUncheckedRounded,
   CheckCircleRounded,
   PauseCircleOutline,
-  HelpOutline,
+  Help,
 } from '@material-ui/icons'
 import clsx from 'clsx'
 
@@ -127,37 +127,25 @@ function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
 
         <span className="flex items-center">
           {self != top && self.name !== 'New Tab' && (
-            <button
-              className="mr-2 text-lg text-gray-600 dark:text-gray-100"
-              onClick={handlePinSidebar}
-              title="open group ui"
-            >
+            <IconButton onClick={handlePinSidebar} size="small" title="pin sidebar">
               <ChromeReaderModeSharp fontSize="inherit" />
-            </button>
+            </IconButton>
           )}
 
           {self != top && self.name !== 'New Tab' && (
-            <button
-              className="mr-2 text-lg text-gray-600 dark:text-gray-100"
-              onClick={handleOpenUI}
-              title="open group ui"
-            >
+            <IconButton onClick={handleOpenUI} size="small" title="open group ui">
               <ZoomOutMap fontSize="inherit" />
-            </button>
+            </IconButton>
           )}
 
-          <button
-            className="flex items-center text-lg text-gray-600 dark:text-gray-100"
-            onClick={handleOpenOptions}
-            title="open settings"
-          >
+          <IconButton onClick={handleOpenOptions} size="small" title="open settings">
             <Settings fontSize="inherit" />
-          </button>
+          </IconButton>
         </span>
       </div>
 
-      {withFocusMode ? (
-        <div className="flex flex-row items-center pl-2 md:order-1">
+      <div className="flex flex-row items-center justify-between pl-2 md:order-1">
+        {withFocusMode ? (
           <Tooltip
             title="Focus Mode: On opening of a tab group, close all tabs belonging to other groups"
             aria-label="Focus Mode: On opening of a tab group, close all tabs belonging to other groups"
@@ -175,19 +163,19 @@ function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
               label="Focus Mode"
             />
           </Tooltip>
-          <IconButton
-            color="primary"
-            href="features.html"
-            target="_blank"
-            size="small"
-            title="Documentation"
-          >
-            <HelpOutline fontSize="inherit" />
-          </IconButton>
-        </div>
-      ) : (
-        <div />
-      )}
+        ) : (
+          <div />
+        )}
+        <IconButton
+          color="primary"
+          href="features.html"
+          target="_blank"
+          size="small"
+          title="Documentation"
+        >
+          <Help fontSize="inherit" />
+        </IconButton>
+      </div>
     </div>
   )
 }

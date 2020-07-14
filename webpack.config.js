@@ -94,12 +94,12 @@ module.exports = function (webpackEnv, _) {
       path: OUT_PATH,
       filename: '[name].bundle.js',
     },
-    // cache: {
-    //   type: 'filesystem',
-    //   buildDependencies: {
-    //     config: [__filename],
-    //   },
-    // },
+    cache: {
+      type: 'filesystem',
+      buildDependencies: {
+        config: [__filename],
+      },
+    },
     module: {
       rules: [
         {
@@ -119,11 +119,11 @@ module.exports = function (webpackEnv, _) {
               use: [
                 {
                   loader: require.resolve('babel-loader'),
-                  // options: {
-                  //   // cacheDirectory: true,
-                  //   // cacheCompression: false,
-                  //   // compact: isEnvProduction,
-                  // },
+                  options: {
+                    cacheDirectory: true,
+                    cacheCompression: false,
+                    compact: isEnvProduction,
+                  },
                 },
               ],
             },
@@ -297,8 +297,6 @@ module.exports = function (webpackEnv, _) {
         filename: 'features.html',
         chunks: ['features'],
       }),
-      // ensure that webpack always writes files (for dev-server)
-      // new WriteFilePlugin(),
     ].filter(Boolean),
   }
 }
