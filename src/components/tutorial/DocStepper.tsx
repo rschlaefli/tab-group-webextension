@@ -12,8 +12,8 @@ interface IProps {
 function DocStepper({ activeStep, steps, children }: IProps): React.ReactElement {
   return (
     <Layout>
-      <Container className="p-4">
-        <div className="p-4 bg-gray-100 border border-gray-300 border-solid dark:bg-gray-700 min-h-64 dark:border-none">
+      <Container className="p-4" maxWidth="md">
+        <div className="flex flex-col p-4 bg-gray-100 border border-gray-300 border-solid rounded shadow-xl dark:bg-gray-700 min-h-64 dark:border-none">
           {children}
         </div>
 
@@ -50,21 +50,25 @@ DocStepper.Step = function Step({
   }
 
   return (
-    <div>
-      {children}
-      <div className="flex justify-between">
+    <>
+      <div className="flex-auto">{children}</div>
+      <div className="flex justify-between flex-initial pt-4">
         {hasPrev ? (
-          <Button onClick={() => onChangeStep(currentStep - 1)}>Previous Step</Button>
+          <Button size="small" onClick={() => onChangeStep(currentStep - 1)}>
+            Previous Step
+          </Button>
         ) : (
           <div />
         )}
         {hasNext ? (
-          <Button onClick={() => onChangeStep(currentStep + 1)}>Next Step</Button>
+          <Button size="small" onClick={() => onChangeStep(currentStep + 1)}>
+            Next Step
+          </Button>
         ) : (
           <div />
         )}
       </div>
-    </div>
+    </>
   )
 }
 

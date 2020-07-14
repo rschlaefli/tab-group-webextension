@@ -18,7 +18,7 @@
 .markdown h3,
 .markdown h4,
 .markdown pre {
-  @apply mb-1;
+  @apply mb-2;
 }
 
 .markdown h1,
@@ -52,12 +52,18 @@
   @apply text-sm;
 }
 
+.markdown p {
+  @apply leading-relaxed;
+}
+
 .markdown pre,
 .markdown code {
   @apply text-xs;
+  @apply leading-tight;
 }
 
-.markdown ul {
+.markdown ul,
+.markdown ul li ul {
   @apply list-disc;
   @apply list-inside;
 }
@@ -68,7 +74,6 @@
 
 .markdown ul li ul li {
   @apply ml-5;
-  @apply list-none;
 }
 
 .markdown a {
