@@ -2,16 +2,17 @@
 
 import { browser } from 'webextension-polyfill-ts'
 
-const sidebarWrapper = document.createElement('div')
+const sidebarWrapper =
+  document.getElementById('tabs-sidebar-wrapper') || document.createElement('div')
 sidebarWrapper.id = 'tabs-sidebar-wrapper'
 
 const togglePinned = (): void => {
   if (sidebarWrapper.className.includes('pinned')) {
-    sidebarWrapper.setAttribute('class', sidebarWrapper.className.replace('pinned', ''))
-    document.body.setAttribute('class', document.body.className.replace('tabGroupsPinned', ''))
+    sidebarWrapper.className = sidebarWrapper.className.replace('pinned', '').trim()
+    document.body.className = document.body.className.replace('tabGroupsPinned', '').trim()
   } else {
-    sidebarWrapper.setAttribute('class', sidebarWrapper.className + ' pinned')
-    document.body.setAttribute('class', document.body.className + ' tabGroupsPinned')
+    sidebarWrapper.className = sidebarWrapper.className + ' pinned'
+    document.body.className = document.body.className + ' tabGroupsPinned'
   }
 }
 
@@ -20,9 +21,9 @@ const toggleSidebar = (): void => {
     if (sidebarWrapper.className.includes('pinned')) {
       togglePinned()
     }
-    sidebarWrapper.setAttribute('class', sidebarWrapper.className.replace('open', ''))
+    sidebarWrapper.className = sidebarWrapper.className.replace('open', '').trim()
   } else {
-    sidebarWrapper.setAttribute('class', sidebarWrapper.className + ' open')
+    sidebarWrapper.className = sidebarWrapper.className + ' open'
   }
 }
 
@@ -38,14 +39,15 @@ browser.runtime.onMessage.addListener((message) => {
   }
 })
 
-const sidebarToggle = document.createElement('button')
+const sidebarToggle =
+  document.getElementById('tabs-sidebar-toggle') || document.createElement('button')
 sidebarToggle.id = 'tabs-sidebar-toggle'
 sidebarToggle.addEventListener('click', (e) => {
   e.preventDefault()
   browser.runtime.sendMessage('TOGGLE_SIDEBAR')
 })
 
-const sidebarPin = document.createElement('pin')
+const sidebarPin = document.getElementById('tabs-sidebar-pin') || document.createElement('pin')
 sidebarPin.id = 'tabs-sidebar-pin'
 sidebarPin.addEventListener('click', (e) => {
   e.preventDefault()
