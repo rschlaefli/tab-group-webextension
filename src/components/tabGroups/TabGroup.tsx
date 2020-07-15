@@ -40,11 +40,7 @@ function TabGroup({ children, contextMenuItems }: IProps): React.ReactElement {
 
   return (
     <>
-      <div
-        className={clsx(
-          'flex-initial mb-2 border border-solid md:mr-2 md:last:mr-0 md:w-56 dark:border-gray-500 rounded'
-        )}
-      >
+      <div className="flex flex-col flex-initial mb-2 border border-solid rounded md:mr-2 md:last:mr-0 md:w-56 dark:border-gray-500">
         {children({ handleOpenContextMenu })}
       </div>
 
@@ -209,7 +205,7 @@ TabGroup.Tabs = function Tabs({ id, isCollapsed, isReadOnly, children }: ITabsPr
       {(provided: DroppableProvided, snapshot: DroppableStateSnapshot): React.ReactElement => (
         <div
           className={clsx(
-            'min-h-8 max-h-48 overflow-y-auto',
+            'flex-1 min-h-8 max-h-48 overflow-y-auto',
             !!children && isCollapsed && 'hidden',
             'md:block'
           )}

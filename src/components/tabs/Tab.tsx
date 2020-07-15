@@ -159,8 +159,6 @@ Tab.EditDialog = function EditDialog({
       <DialogTitle>Edit Tab</DialogTitle>
       <DialogContent>
         <TextField
-          autoFocus
-          margin="dense"
           id="title"
           label="Title"
           type="text"

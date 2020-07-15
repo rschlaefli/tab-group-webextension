@@ -18,7 +18,7 @@ interface IProps {
   onCloseTab?: () => void
   onOpenCurrentTab?: () => void
   onRemoveTab?: () => void
-  onEditTab: (title: string, url?: string) => void
+  onEditTab?: (title: string, url?: string) => void
 }
 
 function CuratedTab({
@@ -100,13 +100,6 @@ function CuratedTab({
           isOpen={isOpen}
           onOpenContextMenu={handleOpenContextMenu}
         >
-          <Tab.EditDialog
-            isOpen={isEditModeActive}
-            currentTitle={displayTitle || title}
-            // currentUrl={url}
-            onClose={() => setIsEditModeActive(false)}
-            onSave={onEditTab}
-          />
           <Tab.Title
             isOpen={isOpen}
             title={displayTitle || title}
@@ -114,7 +107,18 @@ function CuratedTab({
             onOpenCurrentTab={onOpenCurrentTab}
             onOpenTab={handleOpenTab}
           />
-          <Tab.Edit onActivateEditMode={() => setIsEditModeActive(true)} />
+          {onEditTab && (
+            <>
+              <Tab.Edit onActivateEditMode={() => setIsEditModeActive(true)} />
+              <Tab.EditDialog
+                isOpen={isEditModeActive}
+                currentTitle={displayTitle || title}
+                // currentUrl={url}
+                onClose={() => setIsEditModeActive(false)}
+                onSave={onEditTab}
+              />
+            </>
+          )}
           {isStale && <Snooze fontSize="inherit" />}
           {onCloseTab && <Tab.Close isOpen={isOpen} onCloseTab={onCloseTab} />}
         </Tab.Container>
