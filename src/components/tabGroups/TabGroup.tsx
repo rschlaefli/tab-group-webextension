@@ -195,11 +195,12 @@ TabGroup.AcceptGroup = function AcceptGroupButton({ onAcceptSuggestion }: IAccep
 
 interface ITabsProps {
   id: string
+  additional?: boolean
   isCollapsed?: boolean
   isReadOnly?: boolean
   children: React.ReactNode | React.ReactNode[]
 }
-TabGroup.Tabs = function Tabs({ id, isCollapsed, isReadOnly, children }: ITabsProps) {
+TabGroup.Tabs = function Tabs({ additional, id, isCollapsed, isReadOnly, children }: ITabsProps) {
   return (
     <Droppable ignoreContainerClipping droppableId={id} isDropDisabled={isReadOnly}>
       {(provided: DroppableProvided, snapshot: DroppableStateSnapshot): React.ReactElement => (
@@ -207,6 +208,7 @@ TabGroup.Tabs = function Tabs({ id, isCollapsed, isReadOnly, children }: ITabsPr
           className={clsx(
             'flex-1 min-h-8 max-h-48 overflow-y-auto',
             !!children && isCollapsed && 'hidden',
+            additional && 'pb-6',
             'md:block'
           )}
           ref={provided.innerRef}

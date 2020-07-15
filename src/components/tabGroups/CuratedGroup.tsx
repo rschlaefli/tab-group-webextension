@@ -137,25 +137,30 @@ function CuratedGroup({ selector }: IProps): React.ReactElement {
           </TabGroup.Tabs>
 
           {matchingSuggestions && matchingSuggestions.tabs.length > 0 && (
-            <TabGroup.Tabs isCollapsed={collapsed} id={`additional-${id}`}>
+            <>
               <Separator>Suggestions</Separator>
-              {matchingSuggestions.tabs.map((tab, ix) => {
-                const uniqueId = `${id}-${tab.hash}`
-                return (
-                  <AdditionalTab
-                    isOpen={(tab.hash && tabHashes && tabHashes.includes(tab.hash)) || false}
-                    key={uniqueId}
-                    id={uniqueId}
-                    index={ix}
-                    title={tab.title}
-                    url={tab.url}
-                    onOpenCurrentTab={handleOpenCurrentTab(tab.hash as string)}
-                    onCloseTab={handleCloseCurrentTab(tab.hash as string)}
-                    onDiscardTab={handleRemoveSuggestedTab(`additional-${id}`, tab.hash as string)}
-                  />
-                )
-              })}
-            </TabGroup.Tabs>
+              <TabGroup.Tabs additional isCollapsed={collapsed} id={`additional-${id}`}>
+                {matchingSuggestions.tabs.map((tab, ix) => {
+                  const uniqueId = `${id}-${tab.hash}`
+                  return (
+                    <AdditionalTab
+                      isOpen={(tab.hash && tabHashes && tabHashes.includes(tab.hash)) || false}
+                      key={uniqueId}
+                      id={uniqueId}
+                      index={ix}
+                      title={tab.title}
+                      url={tab.url}
+                      onOpenCurrentTab={handleOpenCurrentTab(tab.hash as string)}
+                      onCloseTab={handleCloseCurrentTab(tab.hash as string)}
+                      onDiscardTab={handleRemoveSuggestedTab(
+                        `additional-${id}`,
+                        tab.hash as string
+                      )}
+                    />
+                  )
+                })}
+              </TabGroup.Tabs>
+            </>
           )}
         </>
       )}
