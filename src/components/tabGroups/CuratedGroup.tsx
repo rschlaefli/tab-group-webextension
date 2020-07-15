@@ -14,6 +14,7 @@ import {
   updateGroup,
   closeTabGroupAlias,
   closeTabsOutsideGroupAlias,
+  editTab,
 } from '@src/state/tabGroups'
 import { closeCurrentTabAlias, openCurrentTabAlias } from '@src/state/currentTabs'
 import { MenuItem } from '@material-ui/core'
@@ -41,6 +42,10 @@ function CuratedGroup({ selector }: IProps): React.ReactElement {
 
   const handleRemoveTab = (sourceGroupId: string, sourceTabIndex: any) => (): void => {
     dispatch(removeTab({ sourceGroupId, sourceTabIndex }))
+  }
+
+  const handleEditTab = (sourceGroupId: string, sourceTabIndex: number) => (title, url) => {
+    dispatch(editTab({ sourceGroupId, sourceTabIndex, title }))
   }
 
   const handleRemoveTabGroup = (sourceGroupId: string) => (): void => {
@@ -120,10 +125,12 @@ function CuratedGroup({ selector }: IProps): React.ReactElement {
                   id={uniqueId}
                   index={ix}
                   title={tab.title}
+                  displayTitle={tab.displayTitle}
                   url={tab.url}
                   onRemoveTab={handleRemoveTab(id, ix)}
                   onOpenCurrentTab={handleOpenCurrentTab(tab.hash as string)}
                   onCloseTab={handleCloseCurrentTab(tab.hash as string)}
+                  onEditTab={handleEditTab(id, ix)}
                 />
               )
             })}

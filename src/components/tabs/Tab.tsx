@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Draggable,
   DraggableProvided,
@@ -10,9 +10,18 @@ import {
 
 import useContextMenu from '@src/lib/useContextMenu'
 import { makeStyles } from '@material-ui/core/styles'
-import { Menu, Typography } from '@material-ui/core'
+import {
+  Menu,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+} from '@material-ui/core'
 import clsx from 'clsx'
-import { Close, Delete } from '@material-ui/icons'
+import { Close, Delete, Edit } from '@material-ui/icons'
 
 interface IChildrenParams {
   handleOpenContextMenu: () => void
@@ -128,6 +137,62 @@ Tab.FavIcon = function FavIcon({ favIconUrl }: IFavIconProps): React.ReactElemen
   )
 }
 
+interface IEditDialogProps {
+  isOpen: boolean
+  currentTitle: string
+  // currentUrl: string
+  onClose: () => void
+  onSave: (title: string, url?: string) => void
+}
+Tab.EditDialog = function EditDialog({
+  isOpen,
+  currentTitle,
+  // currentUrl,
+  onClose,
+  onSave,
+}: IEditDialogProps) {
+  const [title, setTitle] = useState(currentTitle)
+  // const [url, setUrl] = useState(currentUrl)
+
+  return (
+    <Dialog open={isOpen} onClose={onClose}>
+      <DialogTitle>Edit Tab</DialogTitle>
+      <DialogContent>
+        <TextField
+          autoFocus
+          margin="dense"
+          id="title"
+          label="Title"
+          type="text"
+          fullWidth
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        {/* <TextField
+          margin="dense"
+          id="url"
+          label="URL"
+          type="text"
+          fullWidth
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+        /> */}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Discard</Button>
+        <Button
+          onClick={() => {
+            onSave(title, undefined)
+            onClose()
+          }}
+        >
+          Save
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
 interface ITitleProps {
   title: string
   url?: string
@@ -144,7 +209,7 @@ Tab.Title = function Title({
 }: ITitleProps): React.ReactElement {
   return (
     <div className="flex-auto w-40 leading-tight">
-      <Typography noWrap display="block" variant="inherit" title={title}>
+      <Typography noWrap display="block" variant="inherit" title={`${title}\n${url}`}>
         {isOpen && (
           <a role="button" onClick={onOpenCurrentTab}>
             {title}
@@ -163,6 +228,17 @@ Tab.Title = function Title({
   )
 }
 
+interface IEditButtonProps {
+  onActivateEditMode: () => void
+}
+Tab.Edit = function EditButton({ onActivateEditMode }: IEditButtonProps) {
+  return (
+    <button className="flex-initial ml-1 text-right tab-icon" onClick={onActivateEditMode}>
+      <Edit fontSize="inherit" />
+    </button>
+  )
+}
+
 interface ICloseButtonProps {
   isOpen?: boolean
   onCloseTab: () => void
@@ -172,7 +248,7 @@ Tab.Close = function CloseButton({ isOpen, onCloseTab }: ICloseButtonProps) {
     <button
       disabled={!isOpen}
       className={clsx(
-        'flex-auto ml-2 text-right ',
+        'flex-initial ml-1 text-right',
         isOpen ? 'tab-icon' : 'text-xs text-gray-300 dark:text-gray-700'
       )}
       onClick={onCloseTab}
@@ -189,7 +265,7 @@ interface IDiscardButtonProps {
 Tab.Discard = function DiscardButton({ onDiscardTab }: IDiscardButtonProps) {
   return (
     <button
-      className="flex-auto ml-2 text-right tab-icon"
+      className="flex-initial ml-1 text-right tab-icon"
       onClick={onDiscardTab}
       title="discard tab"
     >

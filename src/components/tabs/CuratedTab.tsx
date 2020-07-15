@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { Snooze } from '@material-ui/icons'
+import { Typography, MenuItem } from '@material-ui/core'
 
 import Tab from './Tab'
-import { Typography, MenuItem } from '@material-ui/core'
 import useOpenTab from './useOpenTab'
-import { Snooze } from '@material-ui/icons'
 
 interface IProps {
   isReadOnly?: boolean
@@ -11,12 +11,14 @@ interface IProps {
   id: string
   index: number
   title: string
+  displayTitle?: string
   url: string
   isOpen?: boolean
   // favIconUrl?: string
   onCloseTab?: () => void
   onOpenCurrentTab?: () => void
   onRemoveTab?: () => void
+  onEditTab: (title: string, url?: string) => void
 }
 
 function CuratedTab({
@@ -25,14 +27,18 @@ function CuratedTab({
   id,
   index,
   title,
+  displayTitle,
   url,
   isOpen,
   // favIconUrl,
   onCloseTab,
   onOpenCurrentTab,
   onRemoveTab,
+  onEditTab,
 }: IProps): React.ReactElement {
   const handleOpenTab = useOpenTab()
+
+  const [isEditModeActive, setIsEditModeActive] = useState(false)
 
   const contextMenuItems = [
     isOpen && [
@@ -94,14 +100,21 @@ function CuratedTab({
           isOpen={isOpen}
           onOpenContextMenu={handleOpenContextMenu}
         >
-          {/* <Tab.FavIcon favIconUrl={favIconUrl} /> */}
+          <Tab.EditDialog
+            isOpen={isEditModeActive}
+            currentTitle={displayTitle || title}
+            // currentUrl={url}
+            onClose={() => setIsEditModeActive(false)}
+            onSave={onEditTab}
+          />
           <Tab.Title
             isOpen={isOpen}
-            title={title}
+            title={displayTitle || title}
             url={url}
             onOpenCurrentTab={onOpenCurrentTab}
             onOpenTab={handleOpenTab}
           />
+          <Tab.Edit onActivateEditMode={() => setIsEditModeActive(true)} />
           {isStale && <Snooze fontSize="inherit" />}
           {onCloseTab && <Tab.Close isOpen={isOpen} onCloseTab={onCloseTab} />}
         </Tab.Container>

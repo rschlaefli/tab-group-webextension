@@ -72,4 +72,5 @@ export interface ITab {
   hash: string | null
   origin?: string
   baseUrl?: string
+  displayTitle?: string
 }

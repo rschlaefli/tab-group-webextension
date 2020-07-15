@@ -23,9 +23,9 @@ import { closeTabsWithHashes, openCurrentTab } from './currentTabs'
 import { AppDispatch } from '@src/background'
 import { RootState } from './configureStore'
 import { DropResult } from 'react-beautiful-dnd'
-import { removeSuggestedTab, acceptSuggestedTab, acceptSuggestedTabAlias } from './suggestions'
+import { removeSuggestedTab, acceptSuggestedTabAlias } from './suggestions'
 
-function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): any {
+function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): (state) => any {
   return pipe(path([sourceGroupIndex, 'tabs', sourceTabIndex]), assoc('uuid', uuidv4()))
 }
 
@@ -196,6 +196,28 @@ const tabGroupsSlice = createSlice({
       }
       return removeTabFromGroup(sourceGroupIndex, action.payload.sourceTabIndex as number)(state)
     },
+    editTab(state, action): ITabGroup[] {
+      const sourceGroupIndex = findIndex((el) => el.id === action.payload.sourceGroupId, state)
+      if (sourceGroupIndex === -1) {
+        return state
+      }
+
+      return pipe(
+        extractTabFromGroup(sourceGroupIndex, action.payload.sourceTabIndex as number),
+        assoc('displayTitle', action.payload.title),
+        (updatedTab) =>
+          adjust(
+            sourceGroupIndex,
+            (tabGroup) =>
+              assoc(
+                'tabs',
+                adjust(action.payload.sourceTabIndex, () => updatedTab, tabGroup.tabs),
+                tabGroup
+              ),
+            state
+          )
+      )(state)
+    },
     appendGroup(state, action): ITabGroup[] {
       return append(action.payload, state)
     },
@@ -212,6 +234,7 @@ export const {
   removeTab,
   moveCurrentTab,
   appendGroup,
+  editTab,
 } = actions
 export default reducer
 
