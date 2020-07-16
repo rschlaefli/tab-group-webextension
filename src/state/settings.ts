@@ -139,6 +139,35 @@ export const reloadExtension = createAsyncThunk(
   }
 )
 
+export const enableHeuristicsBackend = createAsyncThunk<
+  void,
+  void,
+  { dispatch: AppDispatch; state: RootState }
+>(
+  'settings/enableHeuristicsBackend',
+  async (_, thunkAPI): Promise<void> => {
+    const state = thunkAPI.getState()
+    if (!state.settings.isHeuristicsBackendEnabled) {
+      thunkAPI.dispatch(updateHeuristicsStatus(null))
+    }
+    thunkAPI.dispatch(updateIsHeuristicsBackendEnabled(true))
+    processSettings(thunkAPI)({ isHeuristicsBackendEnabled: true })
+  }
+)
+
+export const disableHeuristicsBackend = createAsyncThunk<
+  void,
+  void,
+  { dispatch: AppDispatch; state: RootState }
+>(
+  'settings/disableHeuristicsBackend',
+  async (_, thunkAPI): Promise<void> => {
+    thunkAPI.dispatch(updateHeuristicsStatus(null))
+    thunkAPI.dispatch(updateIsHeuristicsBackendEnabled(false))
+    processSettings(thunkAPI)({ isHeuristicsBackendEnabled: false })
+  }
+)
+
 export const toggleHeuristicsBackend = createAsyncThunk<
   void,
   void,
@@ -147,12 +176,11 @@ export const toggleHeuristicsBackend = createAsyncThunk<
   'settings/toggleHeuristicsBackend',
   async (_, thunkAPI): Promise<void> => {
     const state = thunkAPI.getState()
-    const isHeuristicsBackendEnabled = !state.settings.isHeuristicsBackendEnabled
-    if (!isHeuristicsBackendEnabled) {
-      thunkAPI.dispatch(updateHeuristicsStatus(null))
+    if (state.settings.isHeuristicsBackendEnabled) {
+      thunkAPI.dispatch(disableHeuristicsBackend() as any)
+    } else {
+      thunkAPI.dispatch(enableHeuristicsBackend() as any)
     }
-    thunkAPI.dispatch(updateIsHeuristicsBackendEnabled(isHeuristicsBackendEnabled))
-    processSettings(thunkAPI)({ isHeuristicsBackendEnabled })
   }
 )
 

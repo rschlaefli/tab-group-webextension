@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
 import { AppDispatch } from '@src/background'
 import { RootState } from './configureStore'
-import { toggleHeuristicsBackend } from './settings'
-import { getBrowserSafe, performBrowserActionSafe } from '@src/lib/utils'
+import { enableHeuristicsBackend } from './settings'
+import { getBrowserSafe } from '@src/lib/utils'
 
 import { nativePort } from '../lib/listeners'
 
@@ -63,15 +63,17 @@ export const establishHeuristicsConnection = createAsyncThunk<
 >(
   'tutorial/establishHeuristicsConnection',
   async (_, thunkAPI): Promise<void> => {
-    const state = thunkAPI.getState()
-    if (!state.settings.isHeuristicsBackendEnabled) {
-      thunkAPI.dispatch(toggleHeuristicsBackend() as any)
-    }
+    const browser = await getBrowserSafe()
+
+    thunkAPI.dispatch(enableHeuristicsBackend() as any)
+
     try {
-      performBrowserActionSafe(async () => {
-        nativePort?.postMessage({ action: 'PING' })
-        thunkAPI.dispatch(updateHeuristicsConnectionEstablished({ success: true }))
-      })
+      nativePort?.postMessage({ action: 'PING', payload: {} })
+      if (browser.runtime.lastError) {
+        console.warn(browser.runtime.lastError.message)
+        throw Error(browser.runtime.lastError.message)
+      }
+      thunkAPI.dispatch(updateHeuristicsConnectionEstablished({ success: true }))
     } catch (e) {
       console.error(e)
       thunkAPI.dispatch(updateHeuristicsConnectionEstablished({ error: e.message }))

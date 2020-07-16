@@ -162,9 +162,8 @@ export const processSettings = ({ dispatch, getState }) => (settings?: unknown) 
         // @ts-ignore
         (tab) => tab.pendingUrl?.includes('tutorial.html') || tab.url?.includes('tutorial.html')
       )
-      browser.tabs.create({ url: 'tutorial.html' })
-      if (tutorialTabs.length > 0) {
-        browser.tabs.remove(tutorialTabs.map((tab) => tab.id) as number[])
+      if (tutorialTabs.length === 0) {
+        browser.tabs.create({ url: 'tutorial.html' })
       }
     })
   }
@@ -177,6 +176,10 @@ export const processSettings = ({ dispatch, getState }) => (settings?: unknown) 
 
     try {
       nativePort = browser.runtime.connectNative('tabs')
+      if (browser.runtime.lastError) {
+        console.warn(browser.runtime.lastError.message)
+        throw Error(browser.runtime.lastError.message)
+      }
       console.log('[background] Opened native port:', nativePort.name)
       setupListeners({ dispatch, getState }, nativePort)
     } catch (e) {
@@ -188,8 +191,13 @@ export const processSettings = ({ dispatch, getState }) => (settings?: unknown) 
     // if there is a native port, but the heuristics have been disabled, close the port
     if (nativePort) {
       removeListeners(nativePort)
-      nativePort.disconnect()
-      nativePort = null
+      try {
+        nativePort.disconnect()
+      } catch (e) {
+        console.error(e)
+      } finally {
+        nativePort = null
+      }
     }
     setupListeners({ dispatch, getState })
   }
