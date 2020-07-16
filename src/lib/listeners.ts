@@ -156,10 +156,15 @@ export const processSettings = ({ dispatch, getState }) => (settings?: unknown) 
 
   const tutorial = currentState.tutorial
   if (tutorial?.progress < 3) {
-    browser.tabs.query({ url: 'tutorial.html' }).then((existingTutorialTabs) => {
+    browser.tabs.query({}).then((currentTabs) => {
+      const tutorialTabs = currentTabs.filter(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        (tab) => tab.pendingUrl?.includes('tutorial.html') || tab.url?.includes('tutorial.html')
+      )
       browser.tabs.create({ url: 'tutorial.html' })
-      if (existingTutorialTabs.length > 0) {
-        browser.tabs.remove(existingTutorialTabs.map((tab) => tab.id) as number[])
+      if (tutorialTabs.length > 0) {
+        browser.tabs.remove(tutorialTabs.map((tab) => tab.id) as number[])
       }
     })
   }

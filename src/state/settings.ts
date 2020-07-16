@@ -52,7 +52,6 @@ const settingsSlice = createSlice({
   name: 'settings',
   initialState: {
     groupingActivationKey: '',
-    isDebugLoggingEnabled: true,
     isHeuristicsBackendEnabled: false,
     isFocusModeEnabled: false,
     heuristicsStatus: null,
@@ -62,9 +61,6 @@ const settingsSlice = createSlice({
   reducers: {
     updateHeuristicsStatus(state, action): void {
       state.heuristicsStatus = action.payload
-    },
-    updateIsDebugLoggingEnabled(state, action): void {
-      state.isDebugLoggingEnabled = action.payload
     },
     updateIsHeuristicsBackendEnabled(state, action): void {
       state.isHeuristicsBackendEnabled = action.payload
@@ -115,7 +111,6 @@ const { actions, reducer } = settingsSlice
 export const {
   updateHeuristicsStatus,
   toggleFocusMode,
-  updateIsDebugLoggingEnabled,
   updateIsHeuristicsBackendEnabled,
   setGroupingActivationKey,
   addHeuristicsConfig,
@@ -141,20 +136,6 @@ export const reloadExtension = createAsyncThunk(
     await performBrowserActionSafe(async (browser) => {
       await browser.runtime.reload()
     })
-  }
-)
-
-export const toggleDebugLogging = createAsyncThunk<
-  void,
-  void,
-  { dispatch: AppDispatch; state: RootState }
->(
-  'settings/toggleDebugLogging',
-  async (_, thunkAPI): Promise<void> => {
-    const state = thunkAPI.getState()
-    const isDebugLoggingEnabled = !state.settings.isDebugLoggingEnabled
-    thunkAPI.dispatch(updateIsDebugLoggingEnabled(isDebugLoggingEnabled))
-    processSettings(thunkAPI)({ isDebugLoggingEnabled })
   }
 )
 
@@ -220,6 +201,14 @@ export const processHeuristicsStatusUpdate = createAsyncThunk<
       thunkAPI.dispatch(updateHeuristicsStatus(HEURISTICS_STATUS.RUNNING))
       break
     }
+    case HEURISTICS_STATUS.STOPPED: {
+      thunkAPI.dispatch(updateHeuristicsStatus(HEURISTICS_STATUS.STOPPED))
+      break
+    }
+    case HEURISTICS_STATUS.FAILED: {
+      thunkAPI.dispatch(updateHeuristicsStatus(HEURISTICS_STATUS.FAILED))
+      break
+    }
   }
 })
 
@@ -255,7 +244,6 @@ export const reloadExtensionAlias = createAction('settings/reloadExtensionAlias'
 export const openExtensionUIAlias = createAction('settings/openExtensionUIAlias')
 export const settingsAliases = {
   [openOptionsPageAlias.type]: openOptionsPage,
-  [toggleDebugLoggingAlias.type]: toggleDebugLogging,
   [toggleHeuristicsBackendAlias.type]: toggleHeuristicsBackend,
   [reloadExtensionAlias.type]: reloadExtension,
   [openExtensionUIAlias.type]: openExtensionUI,
