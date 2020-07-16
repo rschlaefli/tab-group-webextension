@@ -1,6 +1,7 @@
 # Feature Overview
 
 - [Feature Overview](#feature-overview)
+  - [Pause & Resume](#pause--resume)
   - [Keyboard Shortcuts](#keyboard-shortcuts)
   - [Manual Grouping](#manual-grouping)
     - [Current Tabs](#current-tabs)
@@ -12,6 +13,12 @@
 To start using the manual and automated grouping features of the extension, please enter the activation key you have received upon conclusion of phase one.
 
 You will be presented with an overview of your manually curated groups (empty), as well as some suggestions that have been computed from initial data collection. The remainder of this documentation goes into all of the features that are available to you during phase two.
+
+## Pause & Resume
+
+You can pause and resume tracking of your behavior by clicking on the (pause/green) circle as shown below:
+
+![Tracking States](tracking_states.png)
 
 ## Keyboard Shortcuts
 
