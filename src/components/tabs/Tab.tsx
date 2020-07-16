@@ -140,14 +140,14 @@ Tab.FavIcon = function FavIcon({ favIconUrl }: IFavIconProps): React.ReactElemen
 interface IEditDialogProps {
   isOpen: boolean
   currentTitle: string
-  // currentUrl: string
+  currentUrl: string
   onClose: () => void
   onSave: (title: string, url?: string) => void
 }
 Tab.EditDialog = function EditDialog({
   isOpen,
   currentTitle,
-  // currentUrl,
+  currentUrl,
   onClose,
   onSave,
 }: IEditDialogProps) {
@@ -166,15 +166,15 @@ Tab.EditDialog = function EditDialog({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-        {/* <TextField
+        <TextField
+          disabled
           margin="dense"
           id="url"
           label="URL"
           type="text"
           fullWidth
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-        /> */}
+          value={currentUrl}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Discard</Button>

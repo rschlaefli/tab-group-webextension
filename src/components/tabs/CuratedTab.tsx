@@ -113,7 +113,7 @@ function CuratedTab({
               <Tab.EditDialog
                 isOpen={isEditModeActive}
                 currentTitle={displayTitle || title}
-                // currentUrl={url}
+                currentUrl={url}
                 onClose={() => setIsEditModeActive(false)}
                 onSave={onEditTab}
               />

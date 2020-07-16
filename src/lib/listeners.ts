@@ -156,7 +156,12 @@ export const processSettings = ({ dispatch, getState }) => (settings?: unknown) 
 
   const tutorial = currentState.tutorial
   if (tutorial?.progress < 3) {
-    browser.tabs.create({ url: 'tutorial.html' })
+    browser.tabs.query({ url: 'tutorial.html' }).then((existingTutorialTabs) => {
+      browser.tabs.create({ url: 'tutorial.html' })
+      if (existingTutorialTabs.length > 0) {
+        browser.tabs.remove(existingTutorialTabs.map((tab) => tab.id) as number[])
+      }
+    })
   }
 
   console.log('[background] Processing options', options)
