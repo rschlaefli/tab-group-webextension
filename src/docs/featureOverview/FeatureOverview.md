@@ -10,6 +10,7 @@
       - [Edit Tab](#edit-tab)
   - [Sidebar](#sidebar)
   - [Suggestions](#suggestions)
+    - [Discarding Suggestions](#discarding-suggestions)
 
 To start using the manual and automated grouping features of the extension, please enter the activation key you have received upon conclusion of phase one.
 
@@ -81,3 +82,9 @@ When a significant overlap is detected, the heuristics might also suggest additi
 ![Suggested Additions](additions.png)
 
 You can accept these additions by dragging the additional tab into your curated group, or discard them by clicking the trash icon.
+
+### Discarding Suggestions
+
+![Discard Reasons](discard_reasons.png)
+
+When you discard suggestions, we will ask you to provide a reason and rating of the suggestion for the purposes of our study. When you rate the suggestion from 1 to 5, please give your subjective judgement on how good the group was independent on whether it was useful to you at that time. The reasons will allow you to state that the group was incorrect and should never be shown again (i.e., the tabs in the group have no significant relationship) or that the group is not useful at this time, but could be shown in the future if you use the constituent tabs again.
