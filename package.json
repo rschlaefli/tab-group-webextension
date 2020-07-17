@@ -55,7 +55,7 @@
     "@material-ui/lab": "4.0.0-alpha.56",
     "@reduxjs/toolkit": "1.4.0",
     "@svgr/webpack": "5.4.0",
-    "@tailwindcss/typography": "0.1.4",
+    "@tailwindcss/typography": "0.2.0",
     "@types/chrome": "0.0.120",
     "@types/jest": "26.0.4",
     "@types/lodash.debounce": "4.0.6",
