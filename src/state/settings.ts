@@ -9,6 +9,7 @@ import { processSettings } from '@src/lib/listeners'
 import { openCurrentTab } from './currentTabs'
 import { HEURISTICS_STATUS, TAB_ACTION } from '@src/types/Extension'
 import { Runtime } from 'webextension-polyfill-ts'
+import { nativePort } from '@src/lib/listeners'
 
 const GRAPH_GENERATION_DEFAULTS = {
   minWeight: 2,
@@ -164,6 +165,10 @@ export const disableHeuristicsBackend = createAsyncThunk<
   async (_, thunkAPI): Promise<void> => {
     thunkAPI.dispatch(updateHeuristicsStatus(null))
     thunkAPI.dispatch(updateIsHeuristicsBackendEnabled(false))
+    postNativeMessage(nativePort, {
+      action: TAB_ACTION.STOP,
+      payload: {},
+    })
     processSettings(thunkAPI)({ isHeuristicsBackendEnabled: false })
   }
 )

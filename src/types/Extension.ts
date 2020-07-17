@@ -18,6 +18,7 @@ export enum TAB_ACTION {
   'ACCEPT_TAB' = 'ACCEPT_TAB',
   'OPEN_GROUP' = 'OPEN_GROUP',
   'CLOSE_GROUP' = 'CLOSE_GROUP',
+  'STOP' = 'STOP',
 }
 
 export enum HEURISTICS_ACTION {
