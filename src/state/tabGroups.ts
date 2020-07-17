@@ -17,13 +17,14 @@ import {
 import { v4 as uuidv4 } from 'uuid'
 import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
 
-import { ITabGroup, ITab } from '@src/types/Extension'
-import { getBrowserSafe } from '@src/lib/utils'
+import { ITabGroup, ITab, TAB_ACTION } from '@src/types/Extension'
+import { getBrowserSafe, postNativeMessage } from '@src/lib/utils'
 import { closeTabsWithHashes, openCurrentTab } from './currentTabs'
 import { AppDispatch } from '@src/background'
 import { RootState } from './configureStore'
 import { DropResult } from 'react-beautiful-dnd'
 import { removeSuggestedTab, acceptSuggestedTabAlias } from './suggestions'
+import { nativePort } from '@src/lib/listeners'
 
 function extractTabFromGroup(sourceGroupIndex: number, sourceTabIndex: number): (state) => any {
   return pipe(path([sourceGroupIndex, 'tabs', sourceTabIndex]), assoc('uuid', uuidv4()))
@@ -252,6 +253,12 @@ export const closeTabGroup = createAsyncThunk<
     if (tabGroup) {
       const tabHashes = tabGroup.tabs.map((tab) => tab.hash)
       await thunkAPI.dispatch(closeTabsWithHashes({ closeHashes: tabHashes }) as any)
+
+      // notify heuristics about the interaction
+      postNativeMessage(nativePort, {
+        action: TAB_ACTION.CLOSE_GROUP,
+        payload: {},
+      })
     }
   }
 )
@@ -337,6 +344,12 @@ export const openTabGroup = createAsyncThunk<
           closeTabsWithHashes({ closeHashes: tabHashesFromOtherGroups }) as any
         )
       }
+
+      // notify heuristics about the interaction
+      postNativeMessage(nativePort, {
+        action: TAB_ACTION.OPEN_GROUP,
+        payload: { focusMode: state.settings.isFocusModeEnabled },
+      })
 
       // close the new tab page if we open a group
       if (_sender?.tab?.url && _sender.tab.id) {

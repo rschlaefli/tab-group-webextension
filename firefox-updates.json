@@ -165,6 +165,10 @@
         {
           "version": "0.3.9",
           "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.3.9-fx.xpi"
+        },
+        {
+          "version": "0.3.10",
+          "update_link": "https://tabs.fra1.digitaloceanspaces.com/webextension/automated_tab_organization-0.3.10-fx.xpi"
         }
       ]
     }
