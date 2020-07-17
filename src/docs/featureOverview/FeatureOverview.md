@@ -7,6 +7,7 @@
     - [Current Tabs](#current-tabs)
     - [Curated Groups](#curated-groups)
       - [Focus Mode](#focus-mode)
+      - [Edit Tab](#edit-tab)
   - [Sidebar](#sidebar)
   - [Suggestions](#suggestions)
 
@@ -51,7 +52,13 @@ The context menu of a group (right-click on the header) additionally allows you 
 
 ![Focus Mode](focus_mode.png)
 
-We have also implemented a `Focus Mode` to improve your workflow if you regularly switch groups/tasks. Once focus mode is activated and you open a tab group (as described above), all other tab groups that are currently open will be closed. This allows you to switch tasks while cleaning up unneeded tabs simultaneously.
+We have implemented a `Focus Mode` to improve your workflow if you regularly switch groups/tasks. Once focus mode is activated and you open a tab group (as described above), all other tab groups that are currently open will be closed. This allows you to switch tasks while cleaning up unneeded tabs simultaneously.
+
+#### Edit Tab
+
+![Edit Tab](edit_tab.png)
+
+You can edit the title of a tab using the pencil icon on the respective tab. The URL cannot be changed; instead, open a tab with the other URL and drag it to that group.
 
 ## Sidebar
 

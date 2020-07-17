@@ -8,7 +8,7 @@ import {
   RadioButtonUncheckedRounded,
   CheckCircleRounded,
   PauseCircleOutline,
-  Help,
+  HelpOutline,
 } from '@material-ui/icons'
 import clsx from 'clsx'
 
@@ -173,7 +173,7 @@ function ConfigBar({ withFocusMode }: IProps): React.ReactElement {
           size="small"
           title="Documentation"
         >
-          <Help fontSize="inherit" />
+          <HelpOutline fontSize="inherit" />
         </IconButton>
       </div>
     </div>
