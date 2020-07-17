@@ -8,7 +8,11 @@ import {
 } from '@src/types/Extension'
 import { updateSuggestedGroups } from '@src/state/suggestions'
 import { postNativeMessage, pickRelevantProperties } from '../utils'
-import { updateHeuristicsStatus } from '@src/state/settings'
+import {
+  updateHeuristicsStatus,
+  processHeuristicsStatusUpdateAlias,
+  processHeuristicsStatusUpdate,
+} from '@src/state/settings'
 import { updateStaleTabs } from '@src/state/currentTabs'
 import { RootState } from '@src/state/configureStore'
 
@@ -84,7 +88,7 @@ export default function onNativeMessage(
           '[background] Received status update from heuristics',
           messageFromHeuristics.payload
         )
-        dispatch(updateHeuristicsStatus(messageFromHeuristics.payload?.message))
+        dispatch(processHeuristicsStatusUpdate(messageFromHeuristics.payload?.message))
         break
       }
     }

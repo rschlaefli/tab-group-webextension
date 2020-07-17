@@ -219,24 +219,24 @@ export const processHeuristicsStatusUpdate = createAsyncThunk<
   void,
   string,
   { dispatch: AppDispatch; state: RootState }
->('settings/updateHeuristicsStatus', async (heuristicsStatus, thunkAPI) => {
+>('settings/processHeuristicsStatusUpdate', async (heuristicsStatus, thunkAPI) => {
   switch (heuristicsStatus) {
     case HEURISTICS_STATUS.ALREADY_RUNNING: {
       thunkAPI.dispatch(updateHeuristicsStatus(HEURISTICS_STATUS.ALREADY_RUNNING))
-      break
-    }
-    case HEURISTICS_STATUS.RUNNING: {
-      thunkAPI.dispatch(updateHeuristicsStatus(HEURISTICS_STATUS.RUNNING))
-      break
-    }
-    case HEURISTICS_STATUS.STOPPED: {
-      thunkAPI.dispatch(updateHeuristicsStatus(HEURISTICS_STATUS.STOPPED))
+      performBrowserActionSafe(async (browser) => {
+        await browser.tabs.create({ url: 'already_running.html', active: true })
+      })
       break
     }
     case HEURISTICS_STATUS.FAILED: {
-      thunkAPI.dispatch(updateHeuristicsStatus(HEURISTICS_STATUS.FAILED))
+      thunkAPI.dispatch(updateHeuristicsStatus(HEURISTICS_STATUS.ALREADY_RUNNING))
+      performBrowserActionSafe(async (browser) => {
+        await browser.tabs.create({ url: 'troubleshooting.html', active: true })
+      })
       break
     }
+    default:
+      thunkAPI.dispatch(updateHeuristicsStatus(heuristicsStatus))
   }
 })
 
@@ -266,13 +266,16 @@ export const resumeHeuristicsProcessing = createAsyncThunk<
 
 // ALIASES
 export const openOptionsPageAlias = createAction('settings/openOptionsPageAlias')
-export const toggleDebugLoggingAlias = createAction('settings/toggleDebugLoggingAlias')
 export const toggleHeuristicsBackendAlias = createAction('settings/toggleHeuristicsBackendAlias')
 export const reloadExtensionAlias = createAction('settings/reloadExtensionAlias')
 export const openExtensionUIAlias = createAction('settings/openExtensionUIAlias')
+export const processHeuristicsStatusUpdateAlias = createAction(
+  'settings/processHeuristicsStatusUpdateAlias'
+)
 export const settingsAliases = {
   [openOptionsPageAlias.type]: openOptionsPage,
   [toggleHeuristicsBackendAlias.type]: toggleHeuristicsBackend,
   [reloadExtensionAlias.type]: reloadExtension,
   [openExtensionUIAlias.type]: openExtensionUI,
+  [processHeuristicsStatusUpdateAlias.type]: processHeuristicsStatusUpdate,
 }

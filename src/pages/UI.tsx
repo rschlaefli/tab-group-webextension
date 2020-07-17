@@ -184,6 +184,13 @@ function UI(): React.ReactElement {
         onClose={() => setWasInteractionRequested(false)}
         message="Do you have a minute to interact with our suggestions?"
       />
+
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={wasInteractionRequested}
+        onClose={() => setWasInteractionRequested(false)}
+        message="Do you have a minute to interact with our suggestions?"
+      />
     </Layout>
   )
 }

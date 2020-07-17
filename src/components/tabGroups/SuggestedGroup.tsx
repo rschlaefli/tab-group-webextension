@@ -155,19 +155,19 @@ function SuggestedGroup({ selector }: IProps): React.ReactElement {
               <Typography className="pb-2">Why are you discarding it?</Typography>
               <ButtonGroup fullWidth className="pb-2" orientation="vertical">
                 <Button
-                  color={reason === REASONS.WRONG ? 'primary' : undefined}
+                  color={reason === REASONS.WRONG ? 'secondary' : undefined}
                   onClick={() => setReason(REASONS.WRONG)}
                 >
                   Wrongly Grouped
                 </Button>
                 <Button
-                  color={reason === REASONS.NOT_USEFUL ? 'primary' : undefined}
+                  color={reason === REASONS.NOT_USEFUL ? 'secondary' : undefined}
                   onClick={() => setReason(REASONS.NOT_USEFUL)}
                 >
                   Not Useful At This Time
                 </Button>
                 <Button
-                  color={reason === REASONS.OTHER ? 'primary' : undefined}
+                  color={reason === REASONS.OTHER ? 'secondary' : undefined}
                   onClick={() => setReason(REASONS.OTHER)}
                 >
                   Other Reason
