@@ -254,11 +254,7 @@ module.exports = function (webpackEnv, _) {
       // inject the css for the sidebar
       new CopyWebpackPlugin({
         patterns: [
-          { from: PATHS.sidebarCss },
-          { from: PATHS.troubleshooting },
-          { from: PATHS.changelog },
-          { from: PATHS.appIconBlack },
-          { from: PATHS.appIconWhite },
+          { from: `${PATHS.public}/*`, to: OUT_PATH, flatten: true },
           { from: `${PATHS.docs}/**/*.png`, to: OUT_PATH, flatten: true },
         ],
       }),
