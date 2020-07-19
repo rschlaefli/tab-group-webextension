@@ -14,8 +14,8 @@ import { nativePort } from '@src/lib/listeners'
 const GRAPH_GENERATION_DEFAULTS = {
   minWeight: 2,
   expireAfter: 14,
-  sameOriginFactor: 0.3,
-  urlSimilarityFactor: 0.5,
+  sameOriginFactor: 0.4,
+  urlSimilarityFactor: 0.6,
 }
 
 const GROUPING_DEFAULTS = {
