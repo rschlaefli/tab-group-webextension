@@ -3,6 +3,7 @@
 - [Feature Overview](#feature-overview)
   - [Pause & Resume](#pause--resume)
   - [Keyboard Shortcuts](#keyboard-shortcuts)
+  - [Omnibox](#omnibox)
   - [Manual Grouping](#manual-grouping)
     - [Current Tabs](#current-tabs)
     - [Curated Groups](#curated-groups)
@@ -27,6 +28,12 @@ You can pause and resume tracking of your behavior by clicking on the (pause/gre
 - `Ctrl+Shift+S`: Open the extension overview in a new tab
 
 You can customize these shortcuts in the Browser extension settings (Chrome: <chrome://extensions/shortcuts>, Firefox: <https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox>).
+
+## Omnibox
+
+You can quickly open curated groups or tabs in curated groups using the Omnibox (“URL bar”).
+To do so, enter `grp` and a space and start typing the name of the curated group or tab that you would like to open.
+We will provide you with a list of matching suggestions that you can select to open an entire group or single tab.
 
 ## Manual Grouping
 
