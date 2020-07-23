@@ -16,6 +16,8 @@ import onSuggestionsRefresh from './listeners/onSuggestionsRefresh'
 import { updateIsHeuristicsBackendEnabled } from '@src/state/settings'
 import onRuntimeMessage from './listeners/onRuntimeMessage'
 import onCommand from './listeners/onCommand'
+import onOmniboxInput from './listeners/onOmniboxInput'
+import onOmniboxEnter from './listeners/onOmniboxEnter'
 
 const RELEVANT_TAB_PROPS = ['pinned', 'title', 'status', 'favIconUrl', 'url']
 
@@ -68,6 +70,12 @@ function setupListeners({ dispatch, getState }, nativePort?: Runtime.Port): void
   // setup a listener for runtime messages
   LISTENERS.onRuntimeMessage = onRuntimeMessage({ dispatch, nativePort })
   browser.runtime.onMessage.addListener(LISTENERS.onRuntimeMessage)
+
+  // setup listener for omnibox inputs
+  LISTENERS.onOmniboxInput = onOmniboxInput({ getState })
+  browser.omnibox.onInputChanged.addListener(LISTENERS.onOmniboxInput)
+  LISTENERS.onOmniboxEnter = onOmniboxEnter({ dispatch })
+  browser.omnibox.onInputEntered.addListener(LISTENERS.onOmniboxEnter)
 
   if (nativePort) {
     LISTENERS.onNativeMessage = onNativeMessage({ dispatch, getState }, nativePort)
