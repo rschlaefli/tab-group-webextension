@@ -138,6 +138,8 @@ function removeListeners(nativePort?: Runtime.Port): void {
     browser.tabs.onRemoved.removeListener(LISTENERS.onTabRemoved)
     browser.windows.onFocusChanged.removeListener(LISTENERS.onWindowFocusChanged)
     browser.idle.onStateChanged.removeListener(LISTENERS.onIdleStateChanged)
+    browser.omnibox.onInputChanged.removeListener(LISTENERS.onOmniboxInput)
+    browser.omnibox.onInputEntered.removeListener(LISTENERS.onOmniboxEnter)
 
     if (nativePort) {
       console.log('[background] Removing native messaging listeners')
