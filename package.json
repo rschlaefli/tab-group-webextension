@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@babel/core": "7.11.0",
-    "@babel/plugin-proposal-optional-chaining": "7.10.4",
+    "@babel/plugin-proposal-optional-chaining": "7.11.0",
     "@babel/plugin-proposal-pipeline-operator": "7.10.5",
     "@babel/preset-env": "7.11.0",
     "@babel/preset-react": "7.10.4",
