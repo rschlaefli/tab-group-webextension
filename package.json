@@ -103,7 +103,7 @@
     "html-loader": "1.1.0",
     "html-webpack-plugin": "4.3.0",
     "husky": "4.2.5",
-    "jest": "26.2.1",
+    "jest": "26.2.2",
     "json-stringify-safe": "5.0.1",
     "jsoneditor": "9.0.3",
     "jsoneditor-react": "3.0.0",
