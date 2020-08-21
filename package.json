@@ -100,7 +100,7 @@
     "file-loader": "6.0.0",
     "fork-ts-checker-webpack-plugin": "5.1.0",
     "highlight.js": "10.1.2",
-    "html-loader": "1.2.0",
+    "html-loader": "1.2.1",
     "html-webpack-plugin": "4.3.0",
     "husky": "4.2.5",
     "jest": "26.4.0",
