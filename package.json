@@ -141,7 +141,7 @@
     "style-loader": "1.2.1",
     "tailwindcss": "1.7.5",
     "terser-webpack-plugin": "4.1.0",
-    "ts-jest": "26.2.0",
+    "ts-jest": "26.3.0",
     "typescript": "3.9.7",
     "url-loader": "4.1.0",
     "uuid": "8.3.0",
