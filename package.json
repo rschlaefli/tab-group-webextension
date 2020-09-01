@@ -106,7 +106,7 @@
     "jest": "26.4.2",
     "json-stringify-safe": "5.0.1",
     "jsoneditor": "9.0.4",
-    "jsoneditor-react": "3.0.0",
+    "jsoneditor-react": "3.0.1",
     "jssha": "3.1.2",
     "lint-staged": "10.2.13",
     "lodash.debounce": "4.0.8",
