@@ -147,7 +147,7 @@
     "uuid": "8.3.0",
     "webext-base-css": "1.1.0",
     "webext-redux": "2.1.7",
-    "webext-storage-cache": "4.0.0",
+    "webext-storage-cache": "4.1.1",
     "webextension-polyfill-ts": "0.19.0",
     "webpack": "5.0.0-beta.29",
     "webpack-bundle-analyzer": "3.9.0",
