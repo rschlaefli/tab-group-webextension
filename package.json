@@ -140,7 +140,7 @@
     "redux-persist": "6.0.0",
     "style-loader": "2.0.0",
     "tailwindcss": "1.9.2",
-    "terser-webpack-plugin": "4.2.3",
+    "terser-webpack-plugin": "5.0.0",
     "ts-jest": "26.4.1",
     "typescript": "3.9.7",
     "url-loader": "4.1.1",
