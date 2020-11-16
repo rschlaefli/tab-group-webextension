@@ -54,7 +54,7 @@
     "@material-ui/icons": "4.9.1",
     "@material-ui/lab": "4.0.0-alpha.56",
     "@reduxjs/toolkit": "1.4.0",
-    "@svgr/webpack": "5.4.0",
+    "@svgr/webpack": "5.5.0",
     "@tailwindcss/typography": "0.2.0",
     "@types/chrome": "0.0.126",
     "@types/jest": "26.0.15",
