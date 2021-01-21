@@ -15,7 +15,7 @@ However, it is still possible to use the core feature-set (manually):
 - Create and use tab groups (in New Tab and sidebar views)
 - Synchronize groups across devices
 
-It is planned to further develop the extension as an open-source project and distribute it over official channels (i.e. Firefox AMO and Chrome Web Stores).
+It is planned to further develop the extension as an open-source project (https://github.com/rschlaefli/tabai) and distribute it over official channels (i.e. Firefox AMO and Chrome Web Stores).
 
 ## Requirements
 
