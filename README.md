@@ -1,6 +1,6 @@
 # Automated Tab Organization - WebExtension
 
-This repository contains the WebExtension and Heuristics Frontend for my master thesis on `Automated Tab Grouping` at the `University of Zurich`.
+This repository contains the WebExtension and Heuristics Frontend for my master thesis (`msc_thesis.pdf`) on `Automated Tab Grouping` at the `University of Zurich`.
 
 While the extension is thought to provide useful manual grouping features on its own, additional features are available by installing a separately distributed heuristics engine. More specifically, installing the Scala-based heuristics engine on the local machine allows for data exchange through `Native Messaging` and enables the **local** computation of automated tab groups (based on tab switches and further heuristics). For privacy-purposes, everything is computed and persisted locally with no data sent to any cloud whatsoever.
 
