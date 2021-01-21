@@ -1,8 +1,8 @@
 # Automated Tab Organization - WebExtension
 
-This repository contains the WebExtension and Heuristics Frontend for my master thesis on `Automated Tab Grouping` at the `University of Zurich` (in its early stages).
+This repository contains the WebExtension and Heuristics Frontend for my master thesis on `Automated Tab Grouping` at the `University of Zurich`.
 
-While the extension is thought to provide useful manual grouping features on its own, additional features will be available by installing a separately distributed heuristics engine. More specifically, installing the Scala-based heuristics engine on the local machine will allow for data exchange through `Native Messaging` and will enable the **local** computation of automated tab groups (based on tab switches and further heuristics). For privacy-purposes, everything is computed and persisted locally with no data sent to any cloud whatsoever.
+While the extension is thought to provide useful manual grouping features on its own, additional features are available by installing a separately distributed heuristics engine. More specifically, installing the Scala-based heuristics engine on the local machine allows for data exchange through `Native Messaging` and enables the **local** computation of automated tab groups (based on tab switches and further heuristics). For privacy-purposes, everything is computed and persisted locally with no data sent to any cloud whatsoever.
 
 The following will **not** work in a "standalone" installation with default settings:
 
@@ -15,10 +15,7 @@ However, it is still possible to use the core feature-set (manually):
 - Create and use tab groups (in New Tab and sidebar views)
 - Synchronize groups across devices
 
-As it is planned to conduct a user study and write an accompanying scientific report, this code shall remain closed-source and manually distributed until said publication is finished. After publication, it is planned to further develop the extension as an open-source project and distribute it over official channels (i.e. Firefox AMO and Chrome Web Stores).
-
-For feature requests, bug reports, and feedback of any kind, please refer to the following form:
-<https://docs.google.com/forms/d/1pLqMgDVgzzf7yAmn6JLd0jJbrn3QlFZNVaYlKWVie78/edit>
+It is planned to further develop the extension as an open-source project and distribute it over official channels (i.e. Firefox AMO and Chrome Web Stores).
 
 ## Requirements
 
