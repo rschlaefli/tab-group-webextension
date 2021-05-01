@@ -134,7 +134,7 @@
     "react-dom": "16.14.0",
     "react-dropzone": "11.2.4",
     "react-redux": "7.2.4",
-    "react-table": "7.6.3",
+    "react-table": "7.7.0",
     "redux": "4.0.5",
     "redux-logger": "3.0.6",
     "redux-persist": "6.0.0",
