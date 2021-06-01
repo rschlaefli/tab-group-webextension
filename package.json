@@ -149,7 +149,7 @@
     "webext-redux": "2.1.7",
     "webext-storage-cache": "4.2.0",
     "webextension-polyfill-ts": "0.22.0",
-    "webpack": "5.19.0",
+    "webpack": "5.38.1",
     "webpack-bundle-analyzer": "4.4.2",
     "webpack-cli": "4.1.0",
     "webpack-dev-server": "3.11.2",
