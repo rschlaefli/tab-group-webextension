@@ -127,7 +127,7 @@
     "prettier": "2.3.2",
     "ramda": "0.27.1",
     "react": "16.14.0",
-    "react-beautiful-dnd": "13.0.0",
+    "react-beautiful-dnd": "13.1.0",
     "react-dev-utils": "11.0.4",
     "react-docgen-typescript-loader": "3.7.2",
     "react-docgen-typescript-webpack-plugin": "1.1.0",
