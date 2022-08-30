@@ -1,0 +1,37 @@
+version: 2
+registries:
+  git-git-overleaf-com:
+    type: git
+    url: https://git.overleaf.com
+    username: rolandschlaefli@pm.me
+    password: "${{secrets.GIT_GIT_OVERLEAF_COM_PASSWORD}}"
+
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: monthly
+    time: "04:00"
+  open-pull-requests-limit: 99
+  reviewers:
+  - rschlaefli
+  versioning-strategy: increase
+  ignore:
+  - dependency-name: "@tailwindcss/typography"
+    versions:
+    - 0.3.1
+  - dependency-name: tailwindcss
+    versions:
+    - 2.0.2
+  - dependency-name: webpack-cli
+    versions:
+    - 4.3.1
+    - 4.4.0
+  - dependency-name: "@types/ramda"
+    versions:
+    - 0.27.36
+  - dependency-name: "@types/chrome"
+    versions:
+    - 0.0.129
+  registries:
+  - git-git-overleaf-com
